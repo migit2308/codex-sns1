@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>入出力設計書｜テンプレート</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: #fff;
+        color: #263445;
+        font:
+          15px/1.75 system-ui,
+          -apple-system,
+          "Noto Sans JP",
+          sans-serif;
+      }
+      header,
+      main,
+      footer {
+        max-width: 1200px;
+        margin: auto;
+        padding: 24px;
+      }
+      header {
+        border-bottom: 3px solid #233e61;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #233e61;
+        line-height: 1.4;
+      }
+      h1 {
+        font-size: 30px;
+      }
+      h2 {
+        font-size: 23px;
+        border-bottom: 1px solid #ccd5df;
+        padding-bottom: 12px;
+      }
+      h3 {
+        font-size: 18px;
+        margin-top: 28px;
+      }
+      section {
+        margin: 42px 0;
+        scroll-margin-top: 20px;
+      }
+      a {
+        color: #245c91;
+        text-underline-offset: 3px;
+      }
+      a:focus-visible {
+        outline: 3px solid #c57812;
+        outline-offset: 4px;
+      }
+      nav {
+        background: #f4f7fb;
+        padding: 20px;
+        border: 1px solid #d5dde7;
+      }
+      nav ol {
+        columns: 2;
+        column-gap: 36px;
+        padding-left: 24px;
+      }
+      nav li {
+        break-inside: avoid;
+        margin: 7px 0;
+      }
+      .note {
+        border-left: 4px solid #718aa5;
+        background: #f7f9fc;
+        padding: 12px 18px;
+      }
+      .table-wrap,
+      .diagram-wrap {
+        overflow-x: auto;
+        margin: 16px 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 680px;
+        font-size: 14px;
+      }
+      th,
+      td {
+        border: 1px solid #ccd5df;
+        padding: 11px;
+        vertical-align: top;
+        text-align: left;
+        min-width: 105px;
+        overflow-wrap: anywhere;
+      }
+      th {
+        background: #eef3f8;
+        color: #233e61;
+      }
+      td {
+        white-space: pre-line;
+      }
+      svg {
+        display: block;
+        min-width: 760px;
+        width: 100%;
+        font-size: 13px;
+      }
+      figure {
+        margin: 20px 0;
+      }
+      figcaption {
+        font-size: 13px;
+        color: #506075;
+      }
+      pre {
+        background: #f4f7fb;
+        border: 1px solid #ccd5df;
+        padding: 18px;
+        overflow-x: auto;
+      }
+      code {
+        font-family: ui-monospace, monospace;
+      }
+      .wire {
+        border: 2px solid #718aa5;
+        padding: 18px;
+        min-width: 580px;
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        gap: 14px;
+      }
+      .wire div {
+        border: 1px dashed #718aa5;
+        padding: 24px;
+      }
+      .wire .wide {
+        grid-column: 1/-1;
+      }
+      .back {
+        font-size: 14px;
+      }
+      .badge {
+        color: #506075;
+        font-size: 14px;
+      }
+      @media (max-width: 700px) {
+        header,
+        main,
+        footer {
+          padding: 16px;
+        }
+        h1 {
+          font-size: 25px;
+        }
+        nav ol {
+          columns: 1;
+        }
+      }
+      @media print {
+        @page {
+          size: A4 landscape;
+          margin: 12mm;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+        body {
+          font-size: 10pt;
+        }
+        header,
+        main,
+        footer {
+          max-width: none;
+          padding: 0;
+        }
+        nav {
+          position: static;
+        }
+        nav ol {
+          columns: 2;
+        }
+        .table-wrap,
+        .diagram-wrap {
+          overflow: visible;
+        }
+        table {
+          min-width: 0;
+          table-layout: fixed;
+          font-size: 8pt;
+        }
+        th,
+        td {
+          min-width: 0;
+          padding: 5px;
+        }
+        svg {
+          min-width: 0;
+          width: 100%;
+        }
+        .wire {
+          min-width: 0;
+        }
+        tr,
+        figure,
+        pre {
+          break-inside: avoid;
+        }
+        thead {
+          display: table-header-group;
+        }
+        h2,
+        h3 {
+          break-after: avoid;
+        }
+        .back {
+          display: none;
+        }
+        a {
+          color: inherit;
+        }
+        section {
+          margin: 24px 0;
+        }
+        pre {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+        }
+      }
+      /* 目次のリンクを押しやすく表示する */
+      #toc {
+        margin: 24px 0;
+        scroll-margin-top: 16px;
+      }
+      #toc a {
+        display: block;
+        padding: 8px 12px;
+        border: 1px solid #ccd5df;
+        border-radius: 4px;
+        background: #fff;
+      }
+      #toc a:hover {
+        background: #e7eef6;
+      }
+      section:target > h2 {
+        background: #eef3f8;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      @media print {
+        #toc a {
+          padding: 2px 0;
+          border: 0;
+        }
+        #toc {
+          margin: 12px 0;
+        }
+      }
+
+      /* 左側に目次を固定し、本文と独立してスクロールできるようにする。 */
+      @media screen and (min-width: 901px) {
+        body {
+          padding-left: 300px;
+        }
+        #toc {
+          position: fixed;
+          inset: 0 auto 0 0;
+          width: 280px;
+          height: 100dvh;
+          margin: 0;
+          padding: 20px 16px;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          border: 0;
+          border-right: 1px solid #ccd5df;
+          border-radius: 0;
+          z-index: 10;
+        }
+        #toc h2 {
+          margin-top: 0;
+          font-size: 21px;
+        }
+        #toc p {
+          font-size: 13px;
+        }
+        #toc ol {
+          columns: 1;
+          padding-left: 25px;
+        }
+        #toc li {
+          margin: 8px 0;
+        }
+        #toc a {
+          font-size: 14px;
+        }
+      }
+      /* 狭い画面でも本文の横に目次を残し、本文の表・図は横スクロールする。 */
+      @media screen and (max-width: 900px) {
+        body {
+          padding-left: 150px;
+        }
+        header,
+        main,
+        footer {
+          padding: 12px;
+          min-width: 0;
+        }
+        #toc {
+          position: fixed;
+          inset: 0 auto 0 0;
+          width: 150px;
+          height: 100dvh;
+          margin: 0;
+          padding: 12px 8px;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          border: 0;
+          border-right: 1px solid #ccd5df;
+          z-index: 10;
+        }
+        #toc h2 {
+          margin-top: 0;
+          font-size: 18px;
+        }
+        #toc p {
+          font-size: 12px;
+        }
+        #toc ol {
+          columns: 1;
+          padding-left: 22px;
+        }
+        #toc li {
+          margin: 6px 0;
+        }
+        #toc a {
+          padding: 6px 4px;
+          font-size: 12px;
+          overflow-wrap: anywhere;
+        }
+        h1 {
+          font-size: 22px;
+        }
+        h2 {
+          font-size: 20px;
+        }
+      }
+      @media print {
+        body {
+          padding-left: 0;
+        }
+        #toc {
+          position: static;
+          width: auto;
+          height: auto;
+          overflow: visible;
+          border: 1px solid #d5dde7;
+        }
+        #toc ol {
+          columns: 2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="badge">詳細設計書 / テンプレート</p>
+      <h1>入出力設計書</h1>
+      <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
+        <h2 id="toc-heading">目次</h2>
+        <p>章名をクリックすると、該当する章へ移動します。</p>
+        <ol>
+          <li><a href="#chapter-1">画面一覧表</a></li>
+          <li><a href="#chapter-2">画面遷移図</a></li>
+          <li><a href="#chapter-3">画面共通部位一覧表</a></li>
+          <li><a href="#chapter-4">画面共通設計</a></li>
+          <li><a href="#chapter-5">画面レイアウト図</a></li>
+          <li><a href="#chapter-6">画面入力設計</a></li>
+        </ol>
+      </nav>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">設計項目</th>
+              <th scope="col">記入内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>文書バージョン</td>
+              <td>［記入：文書バージョン］</td>
+            </tr>
+            <tr>
+              <td>更新日</td>
+              <td>［記入：更新日］</td>
+            </tr>
+            <tr>
+              <td>作成者</td>
+              <td>［記入：作成者］</td>
+            </tr>
+            <tr>
+              <td>ステータス</td>
+              <td>［記入：ステータス］</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </header>
+    <main>
+      <aside class="note">
+        <strong>記入方法</strong>
+        <p>
+          記入欄は［記入：内容の説明］で示します。未確定は「未決」、採用しない項目は「対象外」と記載してください。図やID・JSONの見本はすべて記入例・未確定であり、採用する仕様を示しません。
+        </p>
+        <p>
+          個別仕様の表・図は対象単位で複製してください。HTMLのidを一意にし、目次・参照先も更新します。画面・項目・テーブル・処理・APIのIDを文書間で揃え、関連する一覧・図・仕様を合わせて更新してください。
+        </p>
+      </aside>
+      <p>
+        関連設計書：<a href="データベース設計.html#toc">データベース設計</a> /
+        <a href="ロジック設計.html#toc">ロジック設計</a> /
+        <a href="API設計.html#toc">API設計</a>
+      </p>
+      <section id="chapter-1">
+        <h2>1. 画面一覧表</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">画面ID</th>
+                <th scope="col">画面名</th>
+                <th scope="col">URLパス</th>
+                <th scope="col">目的・表示内容</th>
+                <th scope="col">利用条件</th>
+                <th scope="col">備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：画面ID］</td>
+                <td>［記入：画面名］</td>
+                <td>［記入：URLパス］</td>
+                <td>［記入：目的・表示内容］</td>
+                <td>［記入：利用条件］</td>
+                <td>［記入：備考］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p><a href="#screen-layout-example">SCR-001のレイアウト記入例</a></p>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-2">
+        <h2>2. 画面遷移図</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>画面間の移動方向</td>
+                <td>［記入：画面間の移動方向］</td>
+              </tr>
+              <tr>
+                <td>操作</td>
+                <td>［記入：操作］</td>
+              </tr>
+              <tr>
+                <td>遷移条件</td>
+                <td>［記入：遷移条件］</td>
+              </tr>
+              <tr>
+                <td>引き継ぐ情報</td>
+                <td>［記入：引き継ぐ情報］</td>
+              </tr>
+              <tr>
+                <td>失敗・中断時の動作</td>
+                <td>［記入：失敗・中断時の動作］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 760 190"
+              role="img"
+              aria-labelledby="screen-example-title screen-example-desc"
+            >
+              <title id="screen-example-title">記入例・未確定</title>
+              <desc id="screen-example-desc">
+                箱は画面、矢印は移動方向を示します。
+              </desc>
+              <defs>
+                <marker
+                  id="screen-example-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <rect
+                x="15.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="102.0" y="107" text-anchor="middle">
+                SCR-001：仮の画面A
+              </text>
+              <path
+                d="M 190.0 100 H 387.0"
+                stroke="#344e70"
+                marker-end="url(#screen-example-arrow)"
+              />
+              <text x="288.5" y="50" text-anchor="middle">仮の操作・条件</text>
+              <rect
+                x="395.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="482.0" y="107" text-anchor="middle">
+                SCR-002：仮の画面B
+              </text>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：箱は画面、矢印は移動方向を示します。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">遷移元ID</th>
+                <th scope="col">遷移先ID</th>
+                <th scope="col">操作</th>
+                <th scope="col">条件</th>
+                <th scope="col">引き継ぐ情報</th>
+                <th scope="col">失敗・中断時の動作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>SCR-001（記入例）</td>
+                <td>SCR-002（記入例）</td>
+                <td>［記入：操作］</td>
+                <td>［記入：条件］</td>
+                <td>［記入：引き継ぐ情報］</td>
+                <td>［記入：失敗・中断時の動作］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-3">
+        <h2>3. 画面共通部位一覧表</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">共通部位ID</th>
+                <th scope="col">部位名</th>
+                <th scope="col">役割・表示内容</th>
+                <th scope="col">適用画面</th>
+                <th scope="col">表示・操作条件</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：共通部位ID］</td>
+                <td>［記入：部位名］</td>
+                <td>［記入：役割・表示内容］</td>
+                <td>［記入：適用画面］</td>
+                <td>［記入：表示・操作条件］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-4">
+        <h2>4. 画面共通設計</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>共通レイアウト</td>
+                <td>［記入：共通レイアウト］</td>
+              </tr>
+              <tr>
+                <td>画面幅への対応</td>
+                <td>［記入：画面幅への対応］</td>
+              </tr>
+              <tr>
+                <td>表示形式</td>
+                <td>［記入：表示形式］</td>
+              </tr>
+              <tr>
+                <td>処理中・空・エラー時の表示</td>
+                <td>［記入：処理中・空・エラー時の表示］</td>
+              </tr>
+              <tr>
+                <td>入力・権限・キーボード操作の共通ルール</td>
+                <td>［記入：入力・権限・キーボード操作の共通ルール］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>共通レイアウトと適用するCOM ID</td>
+                <td>［記入：共通レイアウトと適用するCOM ID］</td>
+              </tr>
+              <tr>
+                <td>画面幅・改行・スクロール</td>
+                <td>［記入：画面幅・改行・スクロール］</td>
+              </tr>
+              <tr>
+                <td>日付・数値・タイムゾーンの表示形式</td>
+                <td>［記入：日付・数値・タイムゾーンの表示形式］</td>
+              </tr>
+              <tr>
+                <td>処理中・二重操作防止</td>
+                <td>［記入：処理中・二重操作防止］</td>
+              </tr>
+              <tr>
+                <td>空の状態</td>
+                <td>［記入：空の状態］</td>
+              </tr>
+              <tr>
+                <td>エラーと復旧導線</td>
+                <td>［記入：エラーと復旧導線］</td>
+              </tr>
+              <tr>
+                <td>入力・権限・キーボード操作・フォーカス順</td>
+                <td>［記入：入力・権限・キーボード操作・フォーカス順］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-5">
+        <h2>5. 画面レイアウト図</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>画面ごとの配置図</td>
+                <td>［記入：画面ごとの配置図］</td>
+              </tr>
+              <tr>
+                <td>番号付きの要素一覧</td>
+                <td>［記入：番号付きの要素一覧］</td>
+              </tr>
+              <tr>
+                <td>表示内容・取得元</td>
+                <td>［記入：表示内容・取得元］</td>
+              </tr>
+              <tr>
+                <td>操作・表示条件</td>
+                <td>［記入：操作・表示条件］</td>
+              </tr>
+              <tr>
+                <td>画面固有の補足</td>
+                <td>［記入：画面固有の補足］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <article id="screen-layout-example">
+          <h3>個別画面：SCR-001（記入例・未確定）</h3>
+          <figure>
+            <div class="diagram-wrap">
+              <div
+                class="wire"
+                role="img"
+                aria-label="仮の画面配置。上部に共通部位、左に案内、右に内容、下部に入力欄。"
+              >
+                <div class="wide">① COM-001：仮の共通部位</div>
+                <div>② ITEM-001：仮の案内</div>
+                <div>③ ITEM-002：仮の表示内容</div>
+                <div class="wide">④ ITEM-003：仮の入力欄</div>
+              </div>
+            </div>
+            <figcaption>
+              記入例・未確定：番号は次の要素一覧に対応します。配置・名称は仮です。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">図中番号</th>
+                  <th scope="col">部位・項目ID（例）</th>
+                  <th scope="col">役割・表示内容</th>
+                  <th scope="col">取得元</th>
+                  <th scope="col">操作・表示条件</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>COM-001</td>
+                  <td>［記入：役割・表示内容］</td>
+                  <td>［記入：取得元］</td>
+                  <td>［記入：操作・表示条件］</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>ITEM-001</td>
+                  <td>［記入：役割・表示内容］</td>
+                  <td>［記入：取得元］</td>
+                  <td>［記入：操作・表示条件］</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>ITEM-002</td>
+                  <td>［記入：役割・表示内容］</td>
+                  <td>［記入：取得元］</td>
+                  <td>［記入：操作・表示条件］</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>ITEM-003</td>
+                  <td>［記入：役割・表示内容］</td>
+                  <td>［記入：取得元］</td>
+                  <td>［記入：操作・表示条件］</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">設計項目</th>
+                  <th scope="col">記入内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>画面固有の補足</td>
+                  <td>［記入：画面固有の補足］</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-6">
+        <h2>6. 画面入力設計</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>画面ごとの入力形式</td>
+                <td>［記入：画面ごとの入力形式］</td>
+              </tr>
+              <tr>
+                <td>必須条件</td>
+                <td>［記入：必須条件］</td>
+              </tr>
+              <tr>
+                <td>初期値</td>
+                <td>［記入：初期値］</td>
+              </tr>
+              <tr>
+                <td>入力制約</td>
+                <td>［記入：入力制約］</td>
+              </tr>
+              <tr>
+                <td>エラー表示</td>
+                <td>［記入：エラー表示］</td>
+              </tr>
+              <tr>
+                <td>入力チェック・送信・キャンセル時の動作</td>
+                <td>［記入：入力チェック・送信・キャンセル時の動作］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>個別画面：SCR-001（記入例・未確定）</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">項目ID</th>
+                <th scope="col">入力形式</th>
+                <th scope="col">必須条件</th>
+                <th scope="col">初期値</th>
+                <th scope="col">制約</th>
+                <th scope="col">エラー表示</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>ITEM-003（記入例）</td>
+                <td>［記入：入力形式］</td>
+                <td>［記入：必須条件］</td>
+                <td>［記入：初期値］</td>
+                <td>［記入：制約］</td>
+                <td>［記入：エラー表示］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>文字数の数え方・上限と下限</td>
+                <td>［記入：文字数の数え方・上限と下限］</td>
+              </tr>
+              <tr>
+                <td>空白・改行・正規化の扱い</td>
+                <td>［記入：空白・改行・正規化の扱い］</td>
+              </tr>
+              <tr>
+                <td>入力チェックのタイミング</td>
+                <td>［記入：入力チェックのタイミング］</td>
+              </tr>
+              <tr>
+                <td>送信時の動作・成功後の表示</td>
+                <td>［記入：送信時の動作・成功後の表示］</td>
+              </tr>
+              <tr>
+                <td>キャンセル・離脱時の入力保持</td>
+                <td>［記入：キャンセル・離脱時の入力保持］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+    </main>
+    <footer>
+      テンプレート：記入例は未確定です。更新時は関連文書・図表の整合性も確認してください。
+    </footer>
+  </body>
+</html>

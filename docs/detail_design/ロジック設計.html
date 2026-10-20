@@ -1,0 +1,2063 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ロジック設計書｜テンプレート</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        background: #fff;
+        color: #263445;
+        font:
+          15px/1.75 system-ui,
+          -apple-system,
+          "Noto Sans JP",
+          sans-serif;
+      }
+      header,
+      main,
+      footer {
+        max-width: 1200px;
+        margin: auto;
+        padding: 24px;
+      }
+      header {
+        border-bottom: 3px solid #233e61;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #233e61;
+        line-height: 1.4;
+      }
+      h1 {
+        font-size: 30px;
+      }
+      h2 {
+        font-size: 23px;
+        border-bottom: 1px solid #ccd5df;
+        padding-bottom: 12px;
+      }
+      h3 {
+        font-size: 18px;
+        margin-top: 28px;
+      }
+      section {
+        margin: 42px 0;
+        scroll-margin-top: 20px;
+      }
+      a {
+        color: #245c91;
+        text-underline-offset: 3px;
+      }
+      a:focus-visible {
+        outline: 3px solid #c57812;
+        outline-offset: 4px;
+      }
+      nav {
+        background: #f4f7fb;
+        padding: 20px;
+        border: 1px solid #d5dde7;
+      }
+      nav ol {
+        columns: 2;
+        column-gap: 36px;
+        padding-left: 24px;
+      }
+      nav li {
+        break-inside: avoid;
+        margin: 7px 0;
+      }
+      .note {
+        border-left: 4px solid #718aa5;
+        background: #f7f9fc;
+        padding: 12px 18px;
+      }
+      .table-wrap,
+      .diagram-wrap {
+        overflow-x: auto;
+        margin: 16px 0;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 680px;
+        font-size: 14px;
+      }
+      th,
+      td {
+        border: 1px solid #ccd5df;
+        padding: 11px;
+        vertical-align: top;
+        text-align: left;
+        min-width: 105px;
+        overflow-wrap: anywhere;
+      }
+      th {
+        background: #eef3f8;
+        color: #233e61;
+      }
+      td {
+        white-space: pre-line;
+      }
+      svg {
+        display: block;
+        min-width: 760px;
+        width: 100%;
+        font-size: 13px;
+      }
+      figure {
+        margin: 20px 0;
+      }
+      figcaption {
+        font-size: 13px;
+        color: #506075;
+      }
+      pre {
+        background: #f4f7fb;
+        border: 1px solid #ccd5df;
+        padding: 18px;
+        overflow-x: auto;
+      }
+      code {
+        font-family: ui-monospace, monospace;
+      }
+      .wire {
+        border: 2px solid #718aa5;
+        padding: 18px;
+        min-width: 580px;
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        gap: 14px;
+      }
+      .wire div {
+        border: 1px dashed #718aa5;
+        padding: 24px;
+      }
+      .wire .wide {
+        grid-column: 1/-1;
+      }
+      .back {
+        font-size: 14px;
+      }
+      .badge {
+        color: #506075;
+        font-size: 14px;
+      }
+      @media (max-width: 700px) {
+        header,
+        main,
+        footer {
+          padding: 16px;
+        }
+        h1 {
+          font-size: 25px;
+        }
+        nav ol {
+          columns: 1;
+        }
+      }
+      @media print {
+        @page {
+          size: A4 landscape;
+          margin: 12mm;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+        body {
+          font-size: 10pt;
+        }
+        header,
+        main,
+        footer {
+          max-width: none;
+          padding: 0;
+        }
+        nav {
+          position: static;
+        }
+        nav ol {
+          columns: 2;
+        }
+        .table-wrap,
+        .diagram-wrap {
+          overflow: visible;
+        }
+        table {
+          min-width: 0;
+          table-layout: fixed;
+          font-size: 8pt;
+        }
+        th,
+        td {
+          min-width: 0;
+          padding: 5px;
+        }
+        svg {
+          min-width: 0;
+          width: 100%;
+        }
+        .wire {
+          min-width: 0;
+        }
+        tr,
+        figure,
+        pre {
+          break-inside: avoid;
+        }
+        thead {
+          display: table-header-group;
+        }
+        h2,
+        h3 {
+          break-after: avoid;
+        }
+        .back {
+          display: none;
+        }
+        a {
+          color: inherit;
+        }
+        section {
+          margin: 24px 0;
+        }
+        pre {
+          white-space: pre-wrap;
+          overflow-wrap: anywhere;
+        }
+      }
+      /* 目次のリンクを押しやすく表示する */
+      #toc {
+        margin: 24px 0;
+        scroll-margin-top: 16px;
+      }
+      #toc a {
+        display: block;
+        padding: 8px 12px;
+        border: 1px solid #ccd5df;
+        border-radius: 4px;
+        background: #fff;
+      }
+      #toc a:hover {
+        background: #e7eef6;
+      }
+      section:target > h2 {
+        background: #eef3f8;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      @media print {
+        #toc a {
+          padding: 2px 0;
+          border: 0;
+        }
+        #toc {
+          margin: 12px 0;
+        }
+      }
+
+      /* 左側に目次を固定し、本文と独立してスクロールできるようにする。 */
+      @media screen and (min-width: 901px) {
+        body {
+          padding-left: 300px;
+        }
+        #toc {
+          position: fixed;
+          inset: 0 auto 0 0;
+          width: 280px;
+          height: 100dvh;
+          margin: 0;
+          padding: 20px 16px;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          border: 0;
+          border-right: 1px solid #ccd5df;
+          border-radius: 0;
+          z-index: 10;
+        }
+        #toc h2 {
+          margin-top: 0;
+          font-size: 21px;
+        }
+        #toc p {
+          font-size: 13px;
+        }
+        #toc ol {
+          columns: 1;
+          padding-left: 25px;
+        }
+        #toc li {
+          margin: 8px 0;
+        }
+        #toc a {
+          font-size: 14px;
+        }
+      }
+      /* 狭い画面でも本文の横に目次を残し、本文の表・図は横スクロールする。 */
+      @media screen and (max-width: 900px) {
+        body {
+          padding-left: 150px;
+        }
+        header,
+        main,
+        footer {
+          padding: 12px;
+          min-width: 0;
+        }
+        #toc {
+          position: fixed;
+          inset: 0 auto 0 0;
+          width: 150px;
+          height: 100dvh;
+          margin: 0;
+          padding: 12px 8px;
+          overflow-y: auto;
+          overscroll-behavior: contain;
+          border: 0;
+          border-right: 1px solid #ccd5df;
+          z-index: 10;
+        }
+        #toc h2 {
+          margin-top: 0;
+          font-size: 18px;
+        }
+        #toc p {
+          font-size: 12px;
+        }
+        #toc ol {
+          columns: 1;
+          padding-left: 22px;
+        }
+        #toc li {
+          margin: 6px 0;
+        }
+        #toc a {
+          padding: 6px 4px;
+          font-size: 12px;
+          overflow-wrap: anywhere;
+        }
+        h1 {
+          font-size: 22px;
+        }
+        h2 {
+          font-size: 20px;
+        }
+      }
+      @media print {
+        body {
+          padding-left: 0;
+        }
+        #toc {
+          position: static;
+          width: auto;
+          height: auto;
+          overflow: visible;
+          border: 1px solid #d5dde7;
+        }
+        #toc ol {
+          columns: 2;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <p class="badge">詳細設計書 / テンプレート</p>
+      <h1>ロジック設計書</h1>
+      <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
+        <h2 id="toc-heading">目次</h2>
+        <p>章名をクリックすると、該当する章へ移動します。</p>
+        <ol>
+          <li><a href="#chapter-1">機能一覧</a></li>
+          <li><a href="#chapter-2">プログラム一覧</a></li>
+          <li><a href="#chapter-3">クラス一覧</a></li>
+          <li><a href="#chapter-4">ユースケース図</a></li>
+          <li><a href="#chapter-5">アクティビティ図</a></li>
+          <li><a href="#chapter-6">クラス図</a></li>
+          <li><a href="#chapter-7">パッケージ図</a></li>
+          <li><a href="#chapter-8">シーケンス図</a></li>
+          <li><a href="#chapter-9">処理フロー図（フローチャート）</a></li>
+          <li><a href="#chapter-10">データフロー図（DFD）</a></li>
+          <li><a href="#chapter-11">状態遷移設計</a></li>
+          <li><a href="#chapter-12">バッチ全体設計</a></li>
+          <li><a href="#chapter-13">バッチプログラム一覧</a></li>
+          <li><a href="#chapter-14">処理設計（プログラム仕様書）</a></li>
+          <li><a href="#chapter-15">ログ一覧</a></li>
+          <li><a href="#chapter-16">エラーコード一覧</a></li>
+        </ol>
+      </nav>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">設計項目</th>
+              <th scope="col">記入内容</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>文書バージョン</td>
+              <td>［記入：文書バージョン］</td>
+            </tr>
+            <tr>
+              <td>更新日</td>
+              <td>［記入：更新日］</td>
+            </tr>
+            <tr>
+              <td>作成者</td>
+              <td>［記入：作成者］</td>
+            </tr>
+            <tr>
+              <td>ステータス</td>
+              <td>［記入：ステータス］</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </header>
+    <main>
+      <aside class="note">
+        <strong>記入方法</strong>
+        <p>
+          記入欄は［記入：内容の説明］で示します。未確定は「未決」、採用しない項目は「対象外」と記載してください。図やID・JSONの見本はすべて記入例・未確定であり、採用する仕様を示しません。
+        </p>
+        <p>
+          個別仕様の表・図は対象単位で複製してください。HTMLのidを一意にし、目次・参照先も更新します。画面・項目・テーブル・処理・APIのIDを文書間で揃え、関連する一覧・図・仕様を合わせて更新してください。
+        </p>
+      </aside>
+      <p>
+        関連設計書：<a href="入出力設計.html#toc">入出力設計</a> /
+        <a href="データベース設計.html#toc">データベース設計</a> /
+        <a href="API設計.html#toc">API設計</a>
+      </p>
+      <section id="chapter-1">
+        <h2>1. 機能一覧</h2>
+        <p>分類：管理系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">機能ID</th>
+                <th scope="col">分類・機能名</th>
+                <th scope="col">目的</th>
+                <th scope="col">利用者・起動条件</th>
+                <th scope="col">関連する画面・処理</th>
+                <th scope="col">採用状況</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：機能ID］</td>
+                <td>［記入：分類・機能名］</td>
+                <td>［記入：目的］</td>
+                <td>［記入：利用者・起動条件］</td>
+                <td>［記入：関連する画面・処理］</td>
+                <td>［記入：採用状況］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-2">
+        <h2>2. プログラム一覧</h2>
+        <p>分類：管理系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">プログラムID</th>
+                <th scope="col">名称・責務</th>
+                <th scope="col">ファイルパス・実行単位</th>
+                <th scope="col">関連機能</th>
+                <th scope="col">入出力・依存先</th>
+                <th scope="col">処理仕様への参照</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：プログラムID］</td>
+                <td>［記入：名称・責務］</td>
+                <td>［記入：ファイルパス・実行単位］</td>
+                <td>［記入：関連機能］</td>
+                <td>［記入：入出力・依存先］</td>
+                <td>［記入：処理仕様への参照］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-3">
+        <h2>3. クラス一覧</h2>
+        <p>分類：管理系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">クラスID</th>
+                <th scope="col">名称・所属</th>
+                <th scope="col">責務</th>
+                <th scope="col">主要な属性・操作</th>
+                <th scope="col">関連プログラム</th>
+                <th scope="col">採用状況</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：クラスID］</td>
+                <td>［記入：名称・所属］</td>
+                <td>［記入：責務］</td>
+                <td>［記入：主要な属性・操作］</td>
+                <td>［記入：関連プログラム］</td>
+                <td>［記入：採用状況］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-4">
+        <h2>4. ユースケース図</h2>
+        <p>分類：個別系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>利用者</td>
+                <td>［記入：利用者］</td>
+              </tr>
+              <tr>
+                <td>システム境界</td>
+                <td>［記入：システム境界］</td>
+              </tr>
+              <tr>
+                <td>達成する目的</td>
+                <td>［記入：達成する目的］</td>
+              </tr>
+              <tr>
+                <td>事前・事後条件</td>
+                <td>［記入：事前・事後条件］</td>
+              </tr>
+              <tr>
+                <td>基本・代替・例外シナリオ</td>
+                <td>［記入：基本・代替・例外シナリオ］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 760 190"
+              role="img"
+              aria-labelledby="logic-4-title logic-4-desc"
+            >
+              <title id="logic-4-title">記入例・未確定</title>
+              <desc id="logic-4-desc">
+                左はシステム外の利用者、右はシステム境界内のユースケース。矢印は利用関係です。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-4-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <rect
+                x="15.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="102.0" y="107" text-anchor="middle">仮の利用者</text>
+              <path
+                d="M 190.0 100 H 387.0"
+                stroke="#344e70"
+                marker-end="url(#logic-4-arrow)"
+              />
+              <text x="288.5" y="50" text-anchor="middle">利用</text>
+              <rect
+                x="395.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="482.0" y="107" text-anchor="middle">
+                UC-001：仮の目的
+              </text>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：左はシステム外の利用者、右はシステム境界内のユースケース。矢印は利用関係です。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>事前条件・事後条件</td>
+                <td>［記入：事前条件・事後条件］</td>
+              </tr>
+              <tr>
+                <td>基本シナリオ</td>
+                <td>［記入：基本シナリオ］</td>
+              </tr>
+              <tr>
+                <td>代替シナリオ</td>
+                <td>［記入：代替シナリオ］</td>
+              </tr>
+              <tr>
+                <td>例外シナリオ</td>
+                <td>［記入：例外シナリオ］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-5">
+        <h2>5. アクティビティ図</h2>
+        <p>分類：個別系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>作業の流れ</td>
+                <td>［記入：作業の流れ］</td>
+              </tr>
+              <tr>
+                <td>担当者</td>
+                <td>［記入：担当者］</td>
+              </tr>
+              <tr>
+                <td>開始・終了条件</td>
+                <td>［記入：開始・終了条件］</td>
+              </tr>
+              <tr>
+                <td>分岐条件</td>
+                <td>［記入：分岐条件］</td>
+              </tr>
+              <tr>
+                <td>例外</td>
+                <td>［記入：例外］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 800 330"
+              role="img"
+              aria-labelledby="logic-5-title logic-5-desc"
+            >
+              <title id="logic-5-title">記入例・未確定</title>
+              <desc id="logic-5-desc">
+                楕円は開始・終了、四角は作業または処理、ひし形は判定、矢印は進行方向。名称・条件は仮です。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-5-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <g stroke="#344e70" fill="#f4f7fb">
+                <ellipse cx="280" cy="30" rx="85" ry="22" />
+                <text
+                  x="280"
+                  y="35"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の開始
+                </text>
+                <path
+                  d="M 280 52 L 280 80"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-5-arrow)"
+                />
+                <rect x="180" y="80" width="200" height="45" />
+                <text
+                  x="280"
+                  y="107"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の作業／処理
+                </text>
+                <path
+                  d="M 280 125 L 280 155"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-5-arrow)"
+                />
+                <path d="M 280 155 L 385 200 L 280 245 L 175 200 Z" />
+                <text
+                  x="280"
+                  y="205"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の判定
+                </text>
+                <path
+                  d="M 280 245 L 280 280"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-5-arrow)"
+                />
+                <text
+                  x="325"
+                  y="268"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  成立
+                </text>
+                <ellipse cx="280" cy="302" rx="85" ry="22" />
+                <text
+                  x="280"
+                  y="307"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の正常終了
+                </text>
+                <path
+                  d="M 385 200 L 550 200"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-5-arrow)"
+                />
+                <text
+                  x="465"
+                  y="184"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  不成立／例外
+                </text>
+                <rect x="550" y="175" width="190" height="50" />
+                <text
+                  x="645"
+                  y="205"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の異常終了
+                </text>
+              </g>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：楕円は開始・終了、四角は作業、ひし形は判定、矢印は進行方向です。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>担当者・開始終了条件</td>
+                <td>［記入：担当者・開始終了条件］</td>
+              </tr>
+              <tr>
+                <td>分岐元・条件・分岐先</td>
+                <td>［記入：分岐元・条件・分岐先］</td>
+              </tr>
+              <tr>
+                <td>例外・復帰先</td>
+                <td>［記入：例外・復帰先］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-6">
+        <h2>6. クラス図</h2>
+        <p>分類：俯瞰系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>クラスの属性・操作・型・可視性</td>
+                <td>［記入：クラスの属性・操作・型・可視性］</td>
+              </tr>
+              <tr>
+                <td>クラス間の関連・依存・継承</td>
+                <td>［記入：クラス間の関連・依存・継承］</td>
+              </tr>
+              <tr>
+                <td>多重度・制約</td>
+                <td>［記入：多重度・制約］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 760 190"
+              role="img"
+              aria-labelledby="logic-6-title logic-6-desc"
+            >
+              <title id="logic-6-title">記入例・未確定</title>
+              <desc id="logic-6-desc">
+                箱はクラス、矢印は依存元から依存先です。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-6-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <rect
+                x="15.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="102.0" y="107" text-anchor="middle">
+                CLS-001：仮のクラスA
+              </text>
+              <path
+                d="M 190.0 100 H 387.0"
+                stroke="#344e70"
+                marker-end="url(#logic-6-arrow)"
+              />
+              <text x="288.5" y="50" text-anchor="middle">仮の依存 →</text>
+              <rect
+                x="395.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="482.0" y="107" text-anchor="middle">
+                CLS-002：仮のクラスB
+              </text>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：箱はクラス、矢印は依存元から依存先です。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>クラスID・属性名・型・可視性</td>
+                <td>［記入：クラスID・属性名・型・可視性］</td>
+              </tr>
+              <tr>
+                <td>操作名・引数・戻り値・可視性</td>
+                <td>［記入：操作名・引数・戻り値・可視性］</td>
+              </tr>
+              <tr>
+                <td>関連・依存・継承・多重度・制約</td>
+                <td>［記入：関連・依存・継承・多重度・制約］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-7">
+        <h2>7. パッケージ図</h2>
+        <p>分類：俯瞰系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>クラス・モジュールのまとまり</td>
+                <td>［記入：クラス・モジュールのまとまり］</td>
+              </tr>
+              <tr>
+                <td>責務</td>
+                <td>［記入：責務］</td>
+              </tr>
+              <tr>
+                <td>公開する機能</td>
+                <td>［記入：公開する機能］</td>
+              </tr>
+              <tr>
+                <td>依存方向と理由</td>
+                <td>［記入：依存方向と理由］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 760 190"
+              role="img"
+              aria-labelledby="logic-7-title logic-7-desc"
+            >
+              <title id="logic-7-title">記入例・未確定</title>
+              <desc id="logic-7-desc">
+                箱はパッケージ、矢印は利用する側から利用される側です。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-7-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <rect
+                x="15.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="102.0" y="107" text-anchor="middle">
+                PKG-001：仮の公開層
+              </text>
+              <path
+                d="M 190.0 100 H 387.0"
+                stroke="#344e70"
+                marker-end="url(#logic-7-arrow)"
+              />
+              <text x="288.5" y="50" text-anchor="middle">仮の依存 →</text>
+              <rect
+                x="395.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="482.0" y="107" text-anchor="middle">
+                PKG-002：仮の内部層
+              </text>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：箱はパッケージ、矢印は利用する側から利用される側です。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>パッケージID・含まれるクラス／モジュール</td>
+                <td>［記入：パッケージID・含まれるクラス／モジュール］</td>
+              </tr>
+              <tr>
+                <td>公開機能・依存方向・理由</td>
+                <td>［記入：公開機能・依存方向・理由］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-8">
+        <h2>8. シーケンス図</h2>
+        <p>分類：個別系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>処理の参加者</td>
+                <td>［記入：処理の参加者］</td>
+              </tr>
+              <tr>
+                <td>時系列の呼び出し・応答</td>
+                <td>［記入：時系列の呼び出し・応答］</td>
+              </tr>
+              <tr>
+                <td>引数・戻り値</td>
+                <td>［記入：引数・戻り値］</td>
+              </tr>
+              <tr>
+                <td>分岐・例外</td>
+                <td>［記入：分岐・例外］</td>
+              </tr>
+              <tr>
+                <td>トランザクション</td>
+                <td>［記入：トランザクション］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 800 330"
+              role="img"
+              aria-labelledby="logic-8-title logic-8-desc"
+            >
+              <title id="logic-8-title">記入例・未確定</title>
+              <desc id="logic-8-desc">
+                縦の破線は参加者の生存線。時間は上から下へ進みます。実線矢印は呼出、横の破線矢印は応答です。名称・引数・戻り値は仮です。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-8-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <g stroke="#344e70" fill="#f4f7fb">
+                <rect x="30" y="15" width="200" height="45" />
+                <text
+                  x="130"
+                  y="43"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の呼出元
+                </text>
+                <path d="M 130 60 V 310" stroke-dasharray="5 5" />
+                <rect x="300" y="15" width="200" height="45" />
+                <text
+                  x="400"
+                  y="43"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  PRC-001：仮の処理
+                </text>
+                <path d="M 400 60 V 310" stroke-dasharray="5 5" />
+                <rect x="570" y="15" width="200" height="45" />
+                <text
+                  x="670"
+                  y="43"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の保存先
+                </text>
+                <path d="M 670 60 V 310" stroke-dasharray="5 5" />
+                <path
+                  d="M 130 100 L 400 100"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-8-arrow)"
+                />
+                <text
+                  x="265.0"
+                  y="90"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  ① 呼出（仮の引数）
+                </text>
+                <path
+                  d="M 400 160 L 670 160"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-8-arrow)"
+                />
+                <text
+                  x="535.0"
+                  y="150"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  ② 保存依頼（仮）
+                </text>
+                <path
+                  d="M 670 220 L 400 220"
+                  fill="none"
+                  stroke-dasharray="6 4"
+                  marker-end="url(#logic-8-arrow)"
+                />
+                <text
+                  x="535.0"
+                  y="210"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  ③ 保存結果（仮）
+                </text>
+                <path
+                  d="M 400 280 L 130 280"
+                  fill="none"
+                  stroke-dasharray="6 4"
+                  marker-end="url(#logic-8-arrow)"
+                />
+                <text
+                  x="265.0"
+                  y="270"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  ④ 応答（仮の戻り値）
+                </text>
+              </g>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：時間は上から下へ進みます。縦破線は生存線、実線矢印は呼出、横破線矢印は応答です。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>順序・送信元・受信先・呼出名</td>
+                <td>［記入：順序・送信元・受信先・呼出名］</td>
+              </tr>
+              <tr>
+                <td>引数・戻り値・応答方向</td>
+                <td>［記入：引数・戻り値・応答方向］</td>
+              </tr>
+              <tr>
+                <td>分岐・例外・トランザクション範囲</td>
+                <td>［記入：分岐・例外・トランザクション範囲］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-9">
+        <h2>9. 処理フロー図（フローチャート）</h2>
+        <p>分類：個別系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>個別処理の実行順序</td>
+                <td>［記入：個別処理の実行順序］</td>
+              </tr>
+              <tr>
+                <td>判定</td>
+                <td>［記入：判定］</td>
+              </tr>
+              <tr>
+                <td>繰り返し</td>
+                <td>［記入：繰り返し］</td>
+              </tr>
+              <tr>
+                <td>終了・復帰先</td>
+                <td>［記入：終了・復帰先］</td>
+              </tr>
+              <tr>
+                <td>正常・異常時の戻り値</td>
+                <td>［記入：正常・異常時の戻り値］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 800 330"
+              role="img"
+              aria-labelledby="logic-9-title logic-9-desc"
+            >
+              <title id="logic-9-title">記入例・未確定</title>
+              <desc id="logic-9-desc">
+                楕円は開始・終了、四角は作業または処理、ひし形は判定、矢印は進行方向。名称・条件は仮です。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-9-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <g stroke="#344e70" fill="#f4f7fb">
+                <ellipse cx="280" cy="30" rx="85" ry="22" />
+                <text
+                  x="280"
+                  y="35"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の開始
+                </text>
+                <path
+                  d="M 280 52 L 280 80"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-9-arrow)"
+                />
+                <rect x="180" y="80" width="200" height="45" />
+                <text
+                  x="280"
+                  y="107"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の作業／処理
+                </text>
+                <path
+                  d="M 280 125 L 280 155"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-9-arrow)"
+                />
+                <path d="M 280 155 L 385 200 L 280 245 L 175 200 Z" />
+                <text
+                  x="280"
+                  y="205"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の判定
+                </text>
+                <path
+                  d="M 280 245 L 280 280"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-9-arrow)"
+                />
+                <text
+                  x="325"
+                  y="268"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  成立
+                </text>
+                <ellipse cx="280" cy="302" rx="85" ry="22" />
+                <text
+                  x="280"
+                  y="307"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の正常終了
+                </text>
+                <path
+                  d="M 385 200 L 550 200"
+                  fill="none"
+                  stroke-dasharray="none"
+                  marker-end="url(#logic-9-arrow)"
+                />
+                <text
+                  x="465"
+                  y="184"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  不成立／例外
+                </text>
+                <rect x="550" y="175" width="190" height="50" />
+                <text
+                  x="645"
+                  y="205"
+                  text-anchor="middle"
+                  fill="#263445"
+                  stroke="none"
+                >
+                  仮の異常終了
+                </text>
+              </g>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：楕円は開始・終了、四角は処理、ひし形は判定、矢印は実行順序です。繰り返し・例外の詳細は下の表で補足します。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>判定条件・成立時と不成立時の遷移先</td>
+                <td>［記入：判定条件・成立時と不成立時の遷移先］</td>
+              </tr>
+              <tr>
+                <td>繰り返し条件・終了条件</td>
+                <td>［記入：繰り返し条件・終了条件］</td>
+              </tr>
+              <tr>
+                <td>正常・異常の戻り値・復帰先</td>
+                <td>［記入：正常・異常の戻り値・復帰先］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-10">
+        <h2>10. データフロー図（DFD）</h2>
+        <p>分類：個別系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>データの発生元</td>
+                <td>［記入：データの発生元］</td>
+              </tr>
+              <tr>
+                <td>処理</td>
+                <td>［記入：処理］</td>
+              </tr>
+              <tr>
+                <td>保存先</td>
+                <td>［記入：保存先］</td>
+              </tr>
+              <tr>
+                <td>受け渡すデータ名・形式</td>
+                <td>［記入：受け渡すデータ名・形式］</td>
+              </tr>
+              <tr>
+                <td>関連テーブル・ファイル</td>
+                <td>［記入：関連テーブル・ファイル］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 760 190"
+              role="img"
+              aria-labelledby="logic-10-title logic-10-desc"
+            >
+              <title id="logic-10-title">記入例・未確定</title>
+              <desc id="logic-10-desc">
+                箱は外部主体・処理・データ保存先、矢印はデータの受け渡しです。実行順序は示しません。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-10-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <rect
+                x="15.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="102.0" y="107" text-anchor="middle">仮の外部入力</text>
+              <path
+                d="M 190.0 100 H 260.33333333333337"
+                stroke="#344e70"
+                marker-end="url(#logic-10-arrow)"
+              />
+              <text x="225.16666666666669" y="50" text-anchor="middle">
+                仮の入力データ
+              </text>
+              <rect
+                x="268.33333333333337"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="355.33333333333337" y="107" text-anchor="middle">
+                DF-001：仮の変換
+              </text>
+              <path
+                d="M 443.33333333333337 100 H 513.6666666666667"
+                stroke="#344e70"
+                marker-end="url(#logic-10-arrow)"
+              />
+              <text x="478.50000000000006" y="50" text-anchor="middle">
+                仮の保存データ
+              </text>
+              <rect
+                x="521.6666666666667"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="608.6666666666667" y="107" text-anchor="middle">
+                TBL-001：仮の保存先
+              </text>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：箱は外部主体・処理・データ保存先、矢印はデータの受け渡しです。実行順序は示しません。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>データ名・形式・発生元・受け渡し先</td>
+                <td>［記入：データ名・形式・発生元・受け渡し先］</td>
+              </tr>
+              <tr>
+                <td>関連TBL ID・FIL ID</td>
+                <td>［記入：関連TBL ID・FIL ID］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-11">
+        <h2>11. 状態遷移設計</h2>
+        <p>分類：個別系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>対象の状態</td>
+                <td>［記入：対象の状態］</td>
+              </tr>
+              <tr>
+                <td>イベント・条件</td>
+                <td>［記入：イベント・条件］</td>
+              </tr>
+              <tr>
+                <td>遷移先</td>
+                <td>［記入：遷移先］</td>
+              </tr>
+              <tr>
+                <td>実行処理</td>
+                <td>［記入：実行処理］</td>
+              </tr>
+              <tr>
+                <td>許可しない遷移時の扱い</td>
+                <td>［記入：許可しない遷移時の扱い］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 760 190"
+              role="img"
+              aria-labelledby="logic-11-title logic-11-desc"
+            >
+              <title id="logic-11-title">記入例・未確定</title>
+              <desc id="logic-11-desc">
+                箱は対象データの状態、矢印は許可された状態変化です。画面の移動ではありません。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-11-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <rect
+                x="15.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="102.0" y="107" text-anchor="middle">仮の状態A</text>
+              <path
+                d="M 190.0 100 H 387.0"
+                stroke="#344e70"
+                marker-end="url(#logic-11-arrow)"
+              />
+              <text x="288.5" y="50" text-anchor="middle">
+                仮のイベント［条件］
+              </text>
+              <rect
+                x="395.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="482.0" y="107" text-anchor="middle">仮の状態B</text>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：箱は対象データの状態、矢印は許可された状態変化です。画面の移動ではありません。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>対象データ・初期状態・終端状態</td>
+                <td>［記入：対象データ・初期状態・終端状態］</td>
+              </tr>
+              <tr>
+                <td>遷移前・イベント・条件・遷移先・実行処理</td>
+                <td>［記入：遷移前・イベント・条件・遷移先・実行処理］</td>
+              </tr>
+              <tr>
+                <td>禁止する遷移・拒否時の扱い</td>
+                <td>［記入：禁止する遷移・拒否時の扱い］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-12">
+        <h2>12. バッチ全体設計</h2>
+        <p>分類：俯瞰系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>起動から終了までの流れ</td>
+                <td>［記入：起動から終了までの流れ］</td>
+              </tr>
+              <tr>
+                <td>スケジュール・依存関係</td>
+                <td>［記入：スケジュール・依存関係］</td>
+              </tr>
+              <tr>
+                <td>同時実行・再実行</td>
+                <td>［記入：同時実行・再実行］</td>
+              </tr>
+              <tr>
+                <td>失敗・復旧</td>
+                <td>［記入：失敗・復旧］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <figure>
+          <div class="diagram-wrap">
+            <svg
+              viewBox="0 0 760 190"
+              role="img"
+              aria-labelledby="logic-12-title logic-12-desc"
+            >
+              <title id="logic-12-title">記入例・未確定</title>
+              <desc id="logic-12-desc">
+                箱は起動・ジョブ・終了、矢印は実行依存を示します。
+              </desc>
+              <defs>
+                <marker
+                  id="logic-12-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto-start-reverse"
+                >
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                </marker>
+              </defs>
+              <rect
+                x="15.0"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="102.0" y="107" text-anchor="middle">仮の起動</text>
+              <path
+                d="M 190.0 100 H 260.33333333333337"
+                stroke="#344e70"
+                marker-end="url(#logic-12-arrow)"
+              />
+              <text x="225.16666666666669" y="50" text-anchor="middle">
+                仮のスケジュール
+              </text>
+              <rect
+                x="268.33333333333337"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="355.33333333333337" y="107" text-anchor="middle">
+                BAT-001：仮のバッチ
+              </text>
+              <path
+                d="M 443.33333333333337 100 H 513.6666666666667"
+                stroke="#344e70"
+                marker-end="url(#logic-12-arrow)"
+              />
+              <text x="478.50000000000006" y="50" text-anchor="middle">
+                仮の成功条件
+              </text>
+              <rect
+                x="521.6666666666667"
+                y="70"
+                width="175"
+                height="65"
+                rx="5"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="608.6666666666667" y="107" text-anchor="middle">
+                仮の終了
+              </text>
+            </svg>
+          </div>
+          <figcaption>
+            記入例・未確定：箱は起動・ジョブ・終了、矢印は実行依存を示します。
+            名称・関係・条件は仮です。実際の設計に置き換えてください。
+          </figcaption>
+        </figure>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>採用状況（未決／対象外／採用）</td>
+                <td>［記入：採用状況（未決／対象外／採用）］</td>
+              </tr>
+              <tr>
+                <td>スケジュール・タイムゾーン・依存関係</td>
+                <td>［記入：スケジュール・タイムゾーン・依存関係］</td>
+              </tr>
+              <tr>
+                <td>同時実行・再実行・冪等性</td>
+                <td>［記入：同時実行・再実行・冪等性］</td>
+              </tr>
+              <tr>
+                <td>失敗・復旧・通知</td>
+                <td>［記入：失敗・復旧・通知］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-13">
+        <h2>13. バッチプログラム一覧</h2>
+        <p>分類：管理系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">バッチID</th>
+                <th scope="col">関連プログラム・機能</th>
+                <th scope="col">起動契機・実行順</th>
+                <th scope="col">入出力</th>
+                <th scope="col">終了コード</th>
+                <th scope="col">再実行条件</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：バッチID］</td>
+                <td>［記入：関連プログラム・機能］</td>
+                <td>［記入：起動契機・実行順］</td>
+                <td>［記入：入出力］</td>
+                <td>［記入：終了コード］</td>
+                <td>［記入：再実行条件］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-14">
+        <h2>14. 処理設計（プログラム仕様書）</h2>
+        <p>分類：個別系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>処理ごとの目的・起動条件</td>
+                <td>［記入：処理ごとの目的・起動条件］</td>
+              </tr>
+              <tr>
+                <td>入出力</td>
+                <td>［記入：入出力］</td>
+              </tr>
+              <tr>
+                <td>手順</td>
+                <td>［記入：手順］</td>
+              </tr>
+              <tr>
+                <td>データ操作・整合性</td>
+                <td>［記入：データ操作・整合性］</td>
+              </tr>
+              <tr>
+                <td>例外・再試行</td>
+                <td>［記入：例外・再試行］</td>
+              </tr>
+              <tr>
+                <td>ログ・エラー</td>
+                <td>［記入：ログ・エラー］</td>
+              </tr>
+              <tr>
+                <td>完了条件</td>
+                <td>［記入：完了条件］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>処理ID・目的・起動条件・完了条件</td>
+                <td>［記入：処理ID・目的・起動条件・完了条件］</td>
+              </tr>
+              <tr>
+                <td>入力項目・型・条件</td>
+                <td>［記入：入力項目・型・条件］</td>
+              </tr>
+              <tr>
+                <td>出力項目・型・条件</td>
+                <td>［記入：出力項目・型・条件］</td>
+              </tr>
+              <tr>
+                <td>手順・分岐・繰り返し</td>
+                <td>［記入：手順・分岐・繰り返し］</td>
+              </tr>
+              <tr>
+                <td>データ操作・整合性・トランザクション</td>
+                <td>［記入：データ操作・整合性・トランザクション］</td>
+              </tr>
+              <tr>
+                <td>例外・再試行・ロールバック</td>
+                <td>［記入：例外・再試行・ロールバック］</td>
+              </tr>
+              <tr>
+                <td>LOG ID・ERR ID</td>
+                <td>［記入：LOG ID・ERR ID］</td>
+              </tr>
+              <tr>
+                <td>正常系・境界値・異常系の確認観点</td>
+                <td>［記入：正常系・境界値・異常系の確認観点］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-15">
+        <h2>15. ログ一覧</h2>
+        <p>分類：管理系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">ログID</th>
+                <th scope="col">用途</th>
+                <th scope="col">出力する処理・条件</th>
+                <th scope="col">レベル・出力先</th>
+                <th scope="col">メッセージ・項目</th>
+                <th scope="col">保存・マスキング方針</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：ログID］</td>
+                <td>［記入：用途］</td>
+                <td>［記入：出力する処理・条件］</td>
+                <td>［記入：レベル・出力先］</td>
+                <td>［記入：メッセージ・項目］</td>
+                <td>［記入：保存・マスキング方針］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>秘密情報・不要な個人情報を含めない出力方針</td>
+                <td>［記入：秘密情報・不要な個人情報を含めない出力方針］</td>
+              </tr>
+              <tr>
+                <td>保存期間・マスキング・閲覧権限</td>
+                <td>［記入：保存期間・マスキング・閲覧権限］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+      <section id="chapter-16">
+        <h2>16. エラーコード一覧</h2>
+        <p>分類：管理系</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">エラーID・コード</th>
+                <th scope="col">意味・発生条件</th>
+                <th scope="col">関連処理・ログ</th>
+                <th scope="col">返却・表示文言</th>
+                <th scope="col">通信ステータス・再試行可否</th>
+                <th scope="col">復旧方法</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>［記入：エラーID・コード］</td>
+                <td>［記入：意味・発生条件］</td>
+                <td>［記入：関連処理・ログ］</td>
+                <td>［記入：返却・表示文言］</td>
+                <td>［記入：通信ステータス・再試行可否］</td>
+                <td>［記入：復旧方法］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">設計項目</th>
+                <th scope="col">記入内容</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>内部向けメッセージ</td>
+                <td>［記入：内部向けメッセージ］</td>
+              </tr>
+              <tr>
+                <td>利用者向けメッセージ</td>
+                <td>［記入：利用者向けメッセージ］</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back"><a href="#toc">目次へ戻る</a></p>
+      </section>
+    </main>
+    <footer>
+      テンプレート：記入例は未確定です。更新時は関連文書・図表の整合性も確認してください。
+    </footer>
+  </body>
+</html>

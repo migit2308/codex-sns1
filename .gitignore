@@ -2,6 +2,13 @@
 node_modules/
 dist/
 
+# Python virtual environments and generated files
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
 # Local configuration (keep example files trackable)
 .env
 .env.*

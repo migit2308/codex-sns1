@@ -1,7 +1,7 @@
 # codex-sns1
 
 Codexを利用してSNS風Webアプリを開発するプロジェクトです。
-現在はViteとReactで「Hello World」を表示するフロントエンドを用意しています。
+現在はViteとReactで「Hello World」を表示するフロントエンドと、FastAPIのサンプルAPIを用意しています。
 
 ## 前提環境
 
@@ -53,5 +53,62 @@ Vite 8.3.4、React / React DOM 19.3.1、React用Viteプラグイン6.1.2を採�
 
 ## 作業範囲
 
-[Issue #1](https://github.com/migit2308/codex-sns1/issues/1)のフロントエンド初期構築に対応しています。
-FastAPI・uv・SQLiteの環境構築とAPI連携は今後の作業です。
+[Issue #1](https://github.com/migit2308/codex-sns1/issues/1)のフロントエンドとバックエンドの初期構築に対応しています。
+SQLiteの環境構築とフロントエンドからのAPI連携は今後の作業です。
+
+## バックエンドの起動
+
+前提ツールはuvです（動作確認：0.9.2）。未導入の場合は[uv公式のインストール手順](https://docs.astral.sh/uv/getting-started/installation/)を参照してください。
+Pythonは3.12系を使用します（動作確認：3.12.12）。
+
+リポジトリのルートから、フロントエンドとは別のターミナルで実行します。
+
+```sh
+cd backend
+uv sync --locked
+uv run --locked fastapi dev main.py --host 127.0.0.1 --port 8000
+```
+
+`uv sync --locked` は `uv.lock` に記録された依存関係を `backend/.venv/` に導入します。
+対応するPythonが見つからなければ、uvが自動的に取得します。
+`.python-version` と `pyproject.toml` により、このプロジェクトではPython 3.12系を使用します。
+仮想環境の手動有効化は不要です。`uv run` がプロジェクトの環境でコマンドを実行します。
+
+`fastapi dev main.py` は `main.py` のFastAPIアプリを検出して開発サーバーを起動します。ソースを変更すると自動で再起動します。
+`backend/` 内では、`uv run fastapi dev` でも `main.py` が自動検出されます。
+停止するには `Ctrl+C` を押します。8000番ポートが使用中の場合は既存のサーバーを停止するか、別のポートを指定してください。
+
+### サンプルAPIと動作確認
+
+| メソッド・パス | HTTPステータス | レスポンス | 用途 |
+| --- | --- | --- | --- |
+| `GET /` | 200 | `{"message":"Hello World"}` | 挨拶のサンプル |
+| `GET /health` | 200 | `{"status":"ok"}` | APIプロセスの応答確認（DBの接続確認は含みません） |
+
+ブラウザで http://127.0.0.1:8000/ を開くか、別のターミナルから実行します。
+
+```sh
+curl -i http://127.0.0.1:8000/
+curl -i http://127.0.0.1:8000/health
+```
+
+両方ともHTTP 200と上表のJSONが返れば起動成功です。
+存在しないパスは404、サンプルAPIへのPOSTは405になります。
+
+- APIドキュメント：http://127.0.0.1:8000/docs （Swagger UIの表示には外部CDNへの接続が必要です）
+- OpenAPI定義：http://127.0.0.1:8000/openapi.json （コードから自動生成されます）
+- Pythonの確認：`backend/` 内で `uv run --locked python --version`
+
+### バックエンドの構成
+
+| ファイル | 役割 |
+| --- | --- |
+| `backend/main.py` | APIの処理、URL、返却データの型を定義します。 |
+| `backend/.python-version` | uvで使用するPythonの系列を指定します。 |
+| `backend/pyproject.toml` | Pythonの対応範囲と直接依存を定義します。 |
+| `backend/uv.lock` | 間接依存も含めたバージョンを固定し、Gitで管理します。 |
+
+FastAPI 0.153.0、Uvicorn 0.54.0の正式版を固定しています。
+`fastapi[standard]` を指定し、`fastapi dev` に必要なCLIなどの標準依存も導入しています。
+FastAPIがAPIの処理や仕様を定義し、UvicornがHTTPリクエストを受け付けるサーバーとして動きます。
+`.venv/` とPythonのキャッシュはGit管理から除外しています。

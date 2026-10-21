@@ -9,6 +9,9 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
+# Local SQLite databases, including journal/WAL files
+/backend/data/
+
 # Local configuration (keep example files trackable)
 .env
 .env.*

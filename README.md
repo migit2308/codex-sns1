@@ -54,7 +54,7 @@ Vite 8.3.4、React / React DOM 19.3.1、React用Viteプラグイン6.1.2を採�
 ## 作業範囲
 
 [Issue #1](https://github.com/migit2308/codex-sns1/issues/1)のフロントエンドとバックエンドの初期構築に対応しています。
-SQLiteの環境構築とフロントエンドからのAPI連携は今後の作業です。
+SQLiteのサンプルテーブルも用意しています。フロントエンドからのAPI連携は今後の作業です。
 
 ## バックエンドの起動
 
@@ -112,3 +112,47 @@ FastAPI 0.153.0、Uvicorn 0.54.0の正式版を固定しています。
 `fastapi[standard]` を指定し、`fastapi dev` に必要なCLIなどの標準依存も導入しています。
 FastAPIがAPIの処理や仕様を定義し、UvicornがHTTPリクエストを受け付けるサーバーとして動きます。
 `.venv/` とPythonのキャッシュはGit管理から除外しています。
+
+## SQLiteのサンプルテーブル
+
+SQLAlchemy 2.1.5を使用します。SQLAlchemyはPythonのクラスとDBのテーブルを対応づけるORMです。
+SQLiteへの接続にはPython標準の `sqlite3` ドライバーを使用するため、別途DBサーバーの起動は不要です。
+
+リポジトリのルートから、次を実行します。
+
+```sh
+cd backend
+uv sync --locked
+uv run --locked python -m db.init_db
+```
+
+`backend/data/sample.db` に `sample_messages` テーブルが作成され、
+`id=1, body=Hello SQLite` のサンプル行と作成日時が表示されます。
+このテーブルは環境の動作確認用で、SNSの正式な投稿テーブルではありません。
+
+| カラム | SQLAlchemyの型 | 条件・意味 |
+| --- | --- | --- |
+| `id` | Integer | 主キー。未指定の場合はSQLiteが整数IDを採番します。サンプル行は1を使用します。 |
+| `body` | Text | NOT NULL。サンプルの本文です。 |
+| `created_at` | DateTime | NOT NULL。DBが挿入時にUTCの日時を設定します（秒精度、タイムゾーン情報は格納しません）。 |
+
+初期化コマンドは再実行できます。既存テーブルを削除せず、IDが1の行が存在する場合は追加・上書きをしません。
+SQLiteはファイルに保存するため、プロセスを終了してもデータは残ります。
+DBの保存先はPythonファイルの場所から決めているため、作業ディレクトリによって変わりません。
+DBファイルとジャーナルなどを含む `backend/data/` はGit管理対象外です。
+
+| ファイル | 役割 |
+| --- | --- |
+| `backend/db/__init__.py` | DB関連コードをPythonパッケージとしてまとめます。 |
+| `backend/db/database.py` | DB保存先、接続用のEngine、モデルの共通Baseを定義します。 |
+| `backend/db/models.py` | Pythonのクラスでテーブルとカラムを定義します。 |
+| `backend/db/init_db.py` | テーブル作成・サンプル行の追加・読み取りを行います。 |
+
+DB関連コードは `backend/db/`、実データは `backend/data/` に分けています。
+`python -m db.init_db` は、`db` パッケージ内の `init_db` を実行する指定です。`backend/` 内で実行してください。
+
+テーブルは `Base.metadata.create_all()` で作成します。この処理は既存テーブルのカラム変更までは行いません。
+今後、正式なテーブルの構造を変更するときは、マイグレーションの導入を別途検討します。
+API経由のDB操作はまだ追加していません。
+
+参考：[SQLAlchemy ORMの公式クイックスタート](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)

@@ -5,5 +5,6 @@ description = "SNS開発用のFastAPIバックエンド"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "fastapi[standard]==0.153.0",
+    "sqlalchemy==2.1.5",
     "uvicorn==0.54.0",
 ]

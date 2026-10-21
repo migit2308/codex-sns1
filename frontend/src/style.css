@@ -22,3 +22,39 @@ h1 {
   font-size: clamp(2.5rem, 8vw, 4rem);
   margin: 0 0 1rem;
 }
+
+main {
+  max-width: 640px;
+}
+
+section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid #d8e0eb;
+  border-radius: 8px;
+}
+
+button {
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-radius: 6px;
+  background: #245b96;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+button:focus-visible {
+  outline: 3px solid #b56500;
+  outline-offset: 4px;
+}
+
+.error {
+  color: #a12525;
+}

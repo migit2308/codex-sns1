@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>API設計書｜テンプレート</title>
+    <title>API設計書｜投稿一覧取得</title>
     <style>
       * {
         box-sizing: border-box;
@@ -373,39 +373,86 @@
   </head>
   <body>
     <header>
-      <p class="badge">詳細設計書 / テンプレート</p>
-      <h1>API設計書</h1>
+      <p class="badge">
+        旧Twitter風SNS / 詳細設計
+      </p>
+      <h1>
+        API設計書
+      </h1>
+      <p>
+        トップページの投稿一覧取得APIについて、HTTPの入出力を定義する。
+      </p>
       <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
-        <h2 id="toc-heading">目次</h2>
-        <p>章名をクリックすると、該当する章へ移動します。</p>
+        <h2 id="toc-heading">
+          目次
+        </h2>
+        <p>
+          章名をクリックすると該当する章へ移動します。
+        </p>
         <ol>
-          <li><a href="#chapter-1">API一覧</a></li>
-          <li><a href="#chapter-2">共通仕様</a></li>
-          <li><a href="#chapter-3">API個別仕様</a></li>
-          <li><a href="#chapter-4">エラー仕様</a></li>
-          <li><a href="#chapter-5">未決事項</a></li>
+          <li>
+            <a href="#chapter-1">
+              API一覧
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-2">
+              共通仕様
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-3">
+              API個別仕様
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-4">
+              エラー仕様
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-5">
+              未決事項
+            </a>
+          </li>
         </ol>
       </nav>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th scope="col">設計項目</th>
-              <th scope="col">記入内容</th>
+              <th scope="col">
+                設計項目
+              </th>
+              <th scope="col">
+                仕様
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>文書バージョン</td>
-              <td>［記入：文書バージョン］</td>
+              <td>
+                文書バージョン
+              </td>
+              <td>
+                1.0.0
+              </td>
             </tr>
             <tr>
-              <td>更新日</td>
-              <td>［記入：更新日］</td>
+              <td>
+                更新日
+              </td>
+              <td>
+                2026-10-23
+              </td>
             </tr>
             <tr>
-              <td>ステータス</td>
-              <td>［記入：ステータス］</td>
+              <td>
+                ステータス
+              </td>
+              <td>
+                確定済み
+              </td>
             </tr>
           </tbody>
         </table>
@@ -413,322 +460,411 @@
     </header>
     <main>
       <aside class="note">
-        <strong>記入方法</strong>
+        <strong>
+          対象と設計の前提
+        </strong>
         <p>
-          記入欄は［記入：内容の説明］で示します。未確定は「未決」、採用しない項目は「対象外」と記載してください。図やID・JSONの見本はすべて記入例・未確定であり、採用する仕様を示しません。
+          対象はAPI-001（投稿一覧取得）のみ。開発者が事前にシード投入した投稿を取得・表示するための仕様で、APIの実装は未着手。投稿の作成・編集・削除、件数を増減する操作、サイドバー内の機能は本書の対象外。
         </p>
         <p>
-          個別仕様の表・図は対象単位で複製してください。HTMLのidを一意にし、目次・参照先も更新します。画面・項目・テーブル・処理・APIのIDを文書間で揃え、関連する一覧・図・仕様を合わせて更新してください。
+          項目名・型はPost（CLS-001）に合わせる。API設計ではHTTPで受け渡す形式を記載し、表示日時の計算手順はロジック設計、テーブルの物理構造はDB設計で管理する。
         </p>
       </aside>
       <p>
-        関連設計書：<a href="入出力設計.html#toc">入出力設計</a> /
-        <a href="データベース設計.html#toc">データベース設計</a> /
-        <a href="ロジック設計.html#toc">ロジック設計</a>
+        関連設計書：
+        <a href="入出力設計.html#screen-layout-home">
+          入出力設計：SCR-001
+        </a>
+        /
+        <a href="ロジック設計.html#process-002">
+          ロジック設計：PRC-002
+        </a>
+        /
+        <a href="ロジック設計.html#post-attributes">
+          Post：CLS-001
+        </a>
+        /
+        <a href="データベース設計.html#toc">
+          データベース設計
+        </a>
       </p>
       <section id="chapter-1">
-        <h2>1. API一覧</h2>
+        <h2>
+          1. API一覧
+        </h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">API ID</th>
-                <th scope="col">名称・目的</th>
-                <th scope="col">HTTPメソッド</th>
-                <th scope="col">パス</th>
-                <th scope="col">認証・権限</th>
-                <th scope="col">関連画面・処理</th>
-                <th scope="col">状態</th>
+                <th scope="col">
+                  API ID
+                </th>
+                <th scope="col">
+                  名称・目的
+                </th>
+                <th scope="col">
+                  HTTPメソッド
+                </th>
+                <th scope="col">
+                  パス
+                </th>
+                <th scope="col">
+                  認証・権限
+                </th>
+                <th scope="col">
+                  関連画面・処理
+                </th>
+                <th scope="col">
+                  状態
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：API ID］</td>
-                <td>［記入：名称・目的］</td>
-                <td>［記入：HTTPメソッド］</td>
-                <td>［記入：パス］</td>
-                <td>［記入：認証・権限］</td>
-                <td>［記入：関連画面・処理］</td>
-                <td>［記入：状態］</td>
+                <td>
+                  <a href="#api-001">
+                    API-001
+                  </a>
+                </td>
+                <td>
+                  投稿一覧取得。シード済み投稿を全件返す。
+                </td>
+                <td>
+                  GET
+                </td>
+                <td>
+                  ブラウザ：/api/posts
+                  <br>
+                  バックエンド：/posts
+                </td>
+                <td>
+                  認証なし。全投稿を対象とする。
+                </td>
+                <td>
+                  SCR-001 / ITEM-003 / FUN-001 / PRC-002 / CLS-001
+                </td>
+                <td>
+                  設計案・実装未着手
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p><a href="#api-example">API-001の個別仕様記入例</a></p>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p>
+          既存の接続確認用GET /とGET /healthは動作確認用であり、API-001の処理・応答として使用しない。本書はそれらの仕様を変更しない。
+        </p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-2">
-        <h2>2. 共通仕様</h2>
+        <h2>
+          2. 共通仕様
+        </h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  設計項目
+                </th>
+                <th scope="col">
+                  仕様
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>環境・ベースURL</td>
-                <td>［記入：環境・ベースURL］</td>
+                <td>
+                  環境・ベースURL
+                </td>
+                <td>
+                  開発時のブラウザ：http://127.0.0.1:5173。フロントエンドは相対パス /api/posts を呼び出す。バックエンドへの直接アクセス：http://127.0.0.1:8000/posts。本番の配信URL・転送構成は未決。
+                </td>
               </tr>
               <tr>
-                <td>バージョン・命名</td>
-                <td>［記入：バージョン・命名］</td>
+                <td>
+                  転送経路
+                </td>
+                <td>
+                  既存のfrontend/vite.config.jsの設定に従い、Viteが /api を取り除いてバックエンドへ転送する。GET /api/posts → GET /posts。フロントエンドのトップページURL /とは区別する。
+                </td>
               </tr>
               <tr>
-                <td>通信・データ形式</td>
-                <td>［記入：通信・データ形式］</td>
+                <td>
+                  バージョン・命名
+                </td>
+                <td>
+                  本文書は1.0.0。URLにはバージョン番号を付けない。JSONのキーはPostの属性と同じlower_snake_caseとする。
+                </td>
               </tr>
               <tr>
-                <td>ヘッダー</td>
-                <td>［記入：ヘッダー］</td>
+                <td>
+                  通信・データ形式
+                </td>
+                <td>
+                  HTTP GET。正常・サーバーエラーともJSON（UTF-8）。レスポンスのContent-Typeはapplication/json。リクエストボディを持たないため、リクエストのContent-Type指定は不要。
+                </td>
               </tr>
               <tr>
-                <td>認証・認可</td>
-                <td>［記入：認証・認可］</td>
+                <td>
+                  ヘッダー・キャッシュ
+                </td>
+                <td>
+                  Accept: application/jsonをリクエスト例に使用する。API-001の200・500応答にCache-Control: no-storeを付け、応答時点のdisplayed_atが古いキャッシュから再利用されないようにする。
+                </td>
               </tr>
               <tr>
-                <td>日時・数値・ID</td>
-                <td>［記入：日時・数値・ID］</td>
+                <td>
+                  認証・認可
+                </td>
+                <td>
+                  認証なし。Authorizationヘッダーやログイン状態を取得条件にしない。今回の閲覧処理に認証由来の401・403は定義しない。
+                </td>
               </tr>
               <tr>
-                <td>未指定・null・空文字</td>
-                <td>［記入：未指定・null・空文字］</td>
+                <td>
+                  日時・数値・ID
+                </td>
+                <td>
+                  post_idと各件数はJSONの数値（整数）。件数は0以上。posted_atは時差情報付きISO 8601文字列。displayed_atは計算済みの表示文字列。日本国内向けとし、日付表示はAsia/Tokyo（JST、UTC+09:00）を使用する。
+                </td>
               </tr>
               <tr>
-                <td>ページネーション</td>
-                <td>［記入：ページネーション］</td>
+                <td>
+                  必須・null・空文字
+                </td>
+                <td>
+                  正常応答の各投稿は8項目すべて必須・null不可。author・bodyの空文字をDBで許可するかは未決。ここでは新しい入力チェックを設けず、シード済みの文字列を返す。
+                </td>
               </tr>
               <tr>
-                <td>検索・並び順</td>
-                <td>［記入：検索・並び順］</td>
+                <td>
+                  取得範囲・並び順
+                </td>
+                <td>
+                  投稿テーブルの全件をposted_at降順、同日時はpost_id降順で取得する。フィルター・limit・offset・カーソル・ページネーション・追加読み込みは定義しない。同じ投稿日時の場合はpost_idの降順とする。
+                </td>
               </tr>
               <tr>
-                <td>入力検証</td>
-                <td>［記入：入力検証］</td>
+                <td>
+                  入力検証
+                </td>
+                <td>
+                  パス変数・クエリ・ボディの入力項目はない。検索・並び替え条件をリクエストで指定しない。未定義のクエリを送った場合の扱いは未決で、クライアントは送信しない。
+                </td>
               </tr>
               <tr>
-                <td>制限・重複送信・競合</td>
-                <td>［記入：制限・重複送信・競合］</td>
+                <td>
+                  副作用・重複呼出・制限
+                </td>
+                <td>
+                  閲覧APIは参照のみ。INSERT・UPDATE・DELETEやシード投入を実行しない。再度呼び出しても投稿・件数は変更しない。タイムアウト・レート制限・自動再試行は未決。
+                </td>
               </tr>
               <tr>
-                <td>ブラウザからの呼び出し</td>
-                <td>［記入：ブラウザからの呼び出し］</td>
+                <td>
+                  ブラウザからの呼び出し
+                </td>
+                <td>
+                  開発環境では同一オリジンの /api/posts をVite経由で呼ぶ。ブラウザから別オリジンのバックエンドへ直接接続する方式や追加CORS設定は今回採用しない。本番の構成は未決。
+                </td>
               </tr>
               <tr>
-                <td>互換性</td>
-                <td>［記入：互換性］</td>
+                <td>
+                  互換性
+                </td>
+                <td>
+                  応答のラッパーは追加しない。属性・型を変更する場合はAPI・ロジック・入出力設計の対応箇所とJSON例を同時に更新する。今後の互換性維持・バージョン移行方針は未決。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>環境・ベースURL</td>
-                <td>［記入：環境・ベースURL］</td>
-              </tr>
-              <tr>
-                <td>バージョン・命名規則</td>
-                <td>［記入：バージョン・命名規則］</td>
-              </tr>
-              <tr>
-                <td>通信・データ形式・ヘッダー</td>
-                <td>［記入：通信・データ形式・ヘッダー］</td>
-              </tr>
-              <tr>
-                <td>認証・認可・秘密情報の管理参照</td>
-                <td>［記入：認証・認可・秘密情報の管理参照］</td>
-              </tr>
-              <tr>
-                <td>日時・数値・IDの表現</td>
-                <td>［記入：日時・数値・IDの表現］</td>
-              </tr>
-              <tr>
-                <td>未指定・null・空文字の扱い</td>
-                <td>［記入：未指定・null・空文字の扱い］</td>
-              </tr>
-              <tr>
-                <td>ページネーション・検索・並び順</td>
-                <td>［記入：ページネーション・検索・並び順］</td>
-              </tr>
-              <tr>
-                <td>入力検証</td>
-                <td>［記入：入力検証］</td>
-              </tr>
-              <tr>
-                <td>制限・重複送信・競合</td>
-                <td>［記入：制限・重複送信・競合］</td>
-              </tr>
-              <tr>
-                <td>ブラウザからの呼び出し・CORS等の採用方針</td>
-                <td>［記入：ブラウザからの呼び出し・CORS等の採用方針］</td>
-              </tr>
-              <tr>
-                <td>互換性・変更方針</td>
-                <td>［記入：互換性・変更方針］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-3">
-        <h2>3. API個別仕様</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>APIごとの目的・メソッド・パス・条件</td>
-                <td>［記入：APIごとの目的・メソッド・パス・条件］</td>
-              </tr>
-              <tr>
-                <td>共通仕様との差分</td>
-                <td>［記入：共通仕様との差分］</td>
-              </tr>
-              <tr>
-                <td>リクエスト</td>
-                <td>［記入：リクエスト］</td>
-              </tr>
-              <tr>
-                <td>成功レスポンス</td>
-                <td>［記入：成功レスポンス］</td>
-              </tr>
-              <tr>
-                <td>エラー</td>
-                <td>［記入：エラー］</td>
-              </tr>
-              <tr>
-                <td>JSON例</td>
-                <td>［記入：JSON例］</td>
-              </tr>
-              <tr>
-                <td>副作用・失敗時の状態</td>
-                <td>［記入：副作用・失敗時の状態］</td>
-              </tr>
-              <tr>
-                <td>確認観点</td>
-                <td>［記入：確認観点］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <article id="api-example">
-          <h3>API-001（記入例・未確定）</h3>
+        <h2>
+          3. API個別仕様
+        </h2>
+        <article id="api-001">
+          <h3>
+            API-001：投稿一覧取得
+          </h3>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">設計項目</th>
-                  <th scope="col">記入内容</th>
+                  <th scope="col">
+                    設計項目
+                  </th>
+                  <th scope="col">
+                    仕様
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>目的・HTTPメソッド・パス・利用条件</td>
-                  <td>［記入：目的・HTTPメソッド・パス・利用条件］</td>
+                  <td>
+                    目的・関連
+                  </td>
+                  <td>
+                    SCR-001（/）のITEM-003に表示する投稿を返す。内部処理はPRC-002、返却データはPost（CLS-001）。
+                  </td>
                 </tr>
                 <tr>
-                  <td>関連SCR ID・PRC ID</td>
-                  <td>［記入：関連SCR ID・PRC ID］</td>
+                  <td>
+                    メソッド・パス
+                  </td>
+                  <td>
+                    ブラウザ：GET /api/posts。バックエンド：GET /posts。認証なし。
+                  </td>
                 </tr>
                 <tr>
-                  <td>共通仕様との差分</td>
-                  <td>［記入：共通仕様との差分］</td>
+                  <td>
+                    共通仕様との差分
+                  </td>
+                  <td>
+                    なし。2章の仕様を適用する。
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <h3>リクエスト</h3>
+          <h4>
+            リクエスト
+          </h4>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">区分</th>
-                  <th scope="col">項目名</th>
-                  <th scope="col">型・形式</th>
-                  <th scope="col">必須条件</th>
-                  <th scope="col">null許可</th>
-                  <th scope="col">既定値</th>
-                  <th scope="col">制約</th>
-                  <th scope="col">例</th>
+                  <th scope="col">
+                    区分
+                  </th>
+                  <th scope="col">
+                    項目
+                  </th>
+                  <th scope="col">
+                    必須・形式
+                  </th>
+                  <th scope="col">
+                    仕様
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>パス</td>
-                  <td>［記入：項目名］</td>
-                  <td>［記入：型・形式］</td>
-                  <td>［記入：必須条件］</td>
-                  <td>［記入：null許可］</td>
-                  <td>［記入：既定値］</td>
-                  <td>［記入：制約］</td>
-                  <td>［記入：例］</td>
+                  <td>
+                    パス変数
+                  </td>
+                  <td>
+                    なし
+                  </td>
+                  <td>
+                    対象外
+                  </td>
+                  <td>
+                    全投稿が対象。
+                  </td>
                 </tr>
                 <tr>
-                  <td>クエリ</td>
-                  <td>［記入：項目名］</td>
-                  <td>［記入：型・形式］</td>
-                  <td>［記入：必須条件］</td>
-                  <td>［記入：null許可］</td>
-                  <td>［記入：既定値］</td>
-                  <td>［記入：制約］</td>
-                  <td>［記入：例］</td>
+                  <td>
+                    クエリ
+                  </td>
+                  <td>
+                    なし
+                  </td>
+                  <td>
+                    対象外
+                  </td>
+                  <td>
+                    条件指定なし。
+                  </td>
                 </tr>
                 <tr>
-                  <td>ヘッダー</td>
-                  <td>［記入：項目名］</td>
-                  <td>［記入：型・形式］</td>
-                  <td>［記入：必須条件］</td>
-                  <td>［記入：null許可］</td>
-                  <td>［記入：既定値］</td>
-                  <td>［記入：制約］</td>
-                  <td>［記入：例］</td>
+                  <td>
+                    ヘッダー
+                  </td>
+                  <td>
+                    Accept
+                  </td>
+                  <td>
+                    任意・application/json
+                  </td>
+                  <td>
+                    JSON応答を受け取る。Authorizationは不要。
+                  </td>
                 </tr>
                 <tr>
-                  <td>ボディ</td>
-                  <td>［記入：項目名］</td>
-                  <td>［記入：型・形式］</td>
-                  <td>［記入：必須条件］</td>
-                  <td>［記入：null許可］</td>
-                  <td>［記入：既定値］</td>
-                  <td>［記入：制約］</td>
-                  <td>［記入：例］</td>
+                  <td>
+                    ボディ
+                  </td>
+                  <td>
+                    なし
+                  </td>
+                  <td>
+                    対象外
+                  </td>
+                  <td>
+                    リクエストJSONは送信しない。
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <h3>成功レスポンス</h3>
+          <h4>
+            リクエスト例
+          </h4>
+          <pre><code>GET /api/posts HTTP/1.1
+Host: 127.0.0.1:5173
+Accept: application/json</code></pre>
+          <h4>
+            成功レスポンス
+          </h4>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">設計項目</th>
-                  <th scope="col">記入内容</th>
+                  <th scope="col">
+                    設計項目
+                  </th>
+                  <th scope="col">
+                    仕様
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>HTTPステータス・ヘッダー</td>
-                  <td>［記入：HTTPステータス・ヘッダー］</td>
+                  <td>
+                    HTTPステータス
+                  </td>
+                  <td>
+                    200 OK。0件でも200とする。204や404にはしない。
+                  </td>
                 </tr>
                 <tr>
-                  <td>ボディを返さない条件</td>
-                  <td>［記入：ボディを返さない条件］</td>
+                  <td>
+                    ヘッダー
+                  </td>
+                  <td>
+                    Content-Type: application/json
+                    <br>
+                    Cache-Control: no-store
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    ボディ
+                  </td>
+                  <td>
+                    Postの8属性を持つオブジェクトの配列。items・data・totalなどのラッパーや付加項目は設けない。全件をposted_at降順、同日時はpost_id降順で返し、0件なら[]。
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -737,227 +873,549 @@
             <table>
               <thead>
                 <tr>
-                  <th scope="col">項目名</th>
-                  <th scope="col">型・形式</th>
-                  <th scope="col">出現条件</th>
-                  <th scope="col">null許可</th>
-                  <th scope="col">値の意味</th>
+                  <th scope="col">
+                    項目名
+                  </th>
+                  <th scope="col">
+                    JSONの型
+                  </th>
+                  <th scope="col">
+                    必須・null
+                  </th>
+                  <th scope="col">
+                    内容
+                  </th>
+                  <th scope="col">
+                    サンプル値
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>［記入：項目名］</td>
-                  <td>［記入：型・形式］</td>
-                  <td>［記入：出現条件］</td>
-                  <td>［記入：null許可］</td>
-                  <td>［記入：値の意味］</td>
+                  <td>
+                    post_id
+                  </td>
+                  <td>
+                    number（整数）
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    投稿1件の識別子。
+                  </td>
+                  <td>
+                    1
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    author
+                  </td>
+                  <td>
+                    string
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    投稿者の表示名。関連Userオブジェクトを含めない。
+                  </td>
+                  <td>
+                    ユーザーA
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    body
+                  </td>
+                  <td>
+                    string
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    投稿本文。改行はJSON文字列内で表現する。
+                  </td>
+                  <td>
+                    サンプルの投稿です。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    posted_at
+                  </td>
+                  <td>
+                    string（ISO 8601）
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    投稿日時。UTCのZまたは時差オフセットを持つ。クラスではdatetime。
+                  </td>
+                  <td>
+                    2026-10-20T12:00:00+00:00
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    reply_count
+                  </td>
+                  <td>
+                    number（整数）
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    リプライ数。0以上のシード値。
+                  </td>
+                  <td>
+                    2
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    retweet_count
+                  </td>
+                  <td>
+                    number（整数）
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    リツイート数。0以上のシード値。
+                  </td>
+                  <td>
+                    1
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    like_count
+                  </td>
+                  <td>
+                    number（整数）
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    いいね数。0以上のシード値。
+                  </td>
+                  <td>
+                    5
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    displayed_at
+                  </td>
+                  <td>
+                    string
+                  </td>
+                  <td>
+                    必須・null不可
+                  </td>
+                  <td>
+                    posted_atと応答処理時の現在時刻からAPIが算出する。DBには保存しない。
+                  </td>
+                  <td>
+                    2日
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <h3>API固有エラー</h3>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">API ID</th>
-                  <th scope="col">ERR ID・コード</th>
-                  <th scope="col">発生条件</th>
-                  <th scope="col">HTTPステータス</th>
-                  <th scope="col">返却内容</th>
-                  <th scope="col">再試行条件</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>API-001（記入例）</td>
-                  <td>［記入：ERR ID・コード］</td>
-                  <td>［記入：発生条件］</td>
-                  <td>［記入：HTTPステータス］</td>
-                  <td>［記入：返却内容］</td>
-                  <td>［記入：再試行条件］</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <h3>JSON記入例（仮の項目名・構造・値、未確定）</h3>
           <p>
-            以下は構文の見本です。正式な仕様に置き換えた後は項目表と一致させてください。
+            属性の元定義は
+            <a href="ロジック設計.html#post-attributes">
+              6章のPost属性一覧
+            </a>
+            を参照する。displayed_atは
+            <a href="ロジック設計.html#display-time-rules">
+              14章の算出ルール
+            </a>
+            に従い、1分未満は「たった今」、1時間未満は「○分」、1日未満は「○時間」、1週間未満は「○日」、1週間以上は「yyyy/mm/dd」とする。同じ応答では現在時刻を1回取得して全投稿に使用する。1週間以上の場合はposted_atをAsia/Tokyoへ変換してyyyy/mm/ddに整形する。
           </p>
-          <h3>リクエスト例</h3>
-          <pre><code class="language-json">{
-  &quot;sample_input&quot;: &quot;仮の入力値&quot;
-}</code>
-</pre>
-          <h3>成功レスポンス例</h3>
-          <pre><code class="language-json">{
-  &quot;sample_result&quot;: &quot;仮の結果&quot;
-}</code>
-</pre>
-          <h3>エラーレスポンス例</h3>
-          <pre><code class="language-json">{
-  &quot;sample_error&quot;: {
-    &quot;code&quot;: &quot;ERR-EXAMPLE&quot;,
-    &quot;message&quot;: &quot;仮の利用者向け文言&quot;,
-    &quot;trace_id&quot;: &quot;仮の追跡ID&quot;,
-    &quot;fields&quot;: [{&quot;name&quot;: &quot;sample_input&quot;, &quot;reason&quot;: &quot;仮の理由&quot;}]
+          <h4>
+            成功レスポンス例：複数件
+          </h4>
+          <p>
+            値はサンプル。現在時刻を2026-10-22T12:00:00+00:00とした例。投稿日時の新しい順に並べている。
+          </p>
+          <pre id="example-posts"><code>[
+  {
+    &quot;post_id&quot;: 3,
+    &quot;author&quot;: &quot;ユーザーC&quot;,
+    &quot;body&quot;: &quot;同じ投稿日時の確認用です。&quot;,
+    &quot;posted_at&quot;: &quot;2026-10-22T10:00:00+00:00&quot;,
+    &quot;reply_count&quot;: 0,
+    &quot;retweet_count&quot;: 0,
+    &quot;like_count&quot;: 1,
+    &quot;displayed_at&quot;: &quot;2時間&quot;
+  },
+  {
+    &quot;post_id&quot;: 2,
+    &quot;author&quot;: &quot;ユーザーB&quot;,
+    &quot;body&quot;: &quot;動作確認用の投稿です。&quot;,
+    &quot;posted_at&quot;: &quot;2026-10-22T10:00:00+00:00&quot;,
+    &quot;reply_count&quot;: 0,
+    &quot;retweet_count&quot;: 0,
+    &quot;like_count&quot;: 1,
+    &quot;displayed_at&quot;: &quot;2時間&quot;
+  },
+  {
+    &quot;post_id&quot;: 1,
+    &quot;author&quot;: &quot;ユーザーA&quot;,
+    &quot;body&quot;: &quot;サンプルの投稿です。&quot;,
+    &quot;posted_at&quot;: &quot;2026-10-20T12:00:00+00:00&quot;,
+    &quot;reply_count&quot;: 2,
+    &quot;retweet_count&quot;: 1,
+    &quot;like_count&quot;: 5,
+    &quot;displayed_at&quot;: &quot;2日&quot;
   }
-}</code>
-</pre>
+]</code></pre>
+          <h4>
+            成功レスポンス例：0件
+          </h4>
+          <p>
+            200 OK。Content-TypeとCache-Controlは複数件の場合と同じ。
+          </p>
+          <pre id="example-empty"><code>[]</code></pre>
+          <h4>
+            取得失敗
+          </h4>
+          <p>
+            DB参照・Post生成・表示日時算出・JSON変換の失敗、および未来のposted_atの検出は、
+            <a href="#error-001">
+              ERR-001
+            </a>
+            に対応するHTTP 500を返す。途中まで生成した一覧を成功応答として返さず、空配列にも置き換えない。
+          </p>
+          <p>取得した投稿にposted_at &gt; nowの行が1件でもあれば、一覧取得全体をHTTP 500・POST_LIST_FETCH_FAILEDとする。未来の投稿を除外した部分一覧を返したり、「たった今」に補正したりしない。posted_at == nowは正常とし「たった今」を返す。日時の比較は時差を考慮した同じ時間軸で行う。</p><h4>
+            副作用と失敗時の状態
+          </h4>
+          <p>
+            取得の成功・失敗のどちらもDBの投稿や件数を変更しない。通信断などで応答を受け取れなかった場合、クライアントは取得失敗として扱うが、APIの500応答を受信したとはみなさない。画面の状態管理・復旧導線は入出力・ロジック設計を参照する。
+          </p>
+          <h4>
+            確認観点（実装時に検証）
+          </h4><p>追加確認：同一posted_atの投稿を複数用意しpost_idの大きい順となること。1週間以上前の2026-10-01T18:00:00+00:00は日本時間で2026/10/02と表示されること。posted_atがnowと等しい場合は正常、わずかでも未来なら一覧全体が500となることを確認する。</p>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">設計項目</th>
-                  <th scope="col">記入内容</th>
+                  <th scope="col">
+                    ケース
+                  </th>
+                  <th scope="col">
+                    期待する結果
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>副作用・失敗時に残る状態</td>
-                  <td>［記入：副作用・失敗時に残る状態］</td>
+                  <td>
+                    1件・複数件
+                  </td>
+                  <td>
+                    200、全投稿が8項目で返る。余分なラッパーがなくposted_at降順、同日時はpost_id降順。
+                  </td>
                 </tr>
                 <tr>
-                  <td>正常系・境界値・入力不正の確認観点</td>
-                  <td>［記入：正常系・境界値・入力不正の確認観点］</td>
+                  <td>
+                    0件
+                  </td>
+                  <td>
+                    200、[]。取得失敗と区別できる。
+                  </td>
                 </tr>
                 <tr>
-                  <td>認証・権限・対象なし・競合の確認観点</td>
-                  <td>［記入：認証・権限・対象なし・競合の確認観点］</td>
+                  <td>
+                    認証なし
+                  </td>
+                  <td>
+                    Authorizationやログインなしで取得できる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    型・値
+                  </td>
+                  <td>
+                    全8項目が必須・null不可。IDと件数は整数、各件数は0以上、posted_atは時差情報付き日時文字列。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    本文
+                  </td>
+                  <td>
+                    改行を含む本文がJSONとして正しく復元できる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    表示日時の境界
+                  </td>
+                  <td>
+                    59秒/60秒、3599秒/3600秒、86399秒/86400秒、604799秒/604800秒で規則どおりに切り替わる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    DB・変換失敗
+                  </td>
+                  <td>
+                    500と固定のcode・message。空配列・部分一覧を成功応答として返さず内部情報を含めない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    ヘッダー・再取得
+                  </td>
+                  <td>
+                    200・500ともJSONとno-store。再取得で応答時点のdisplayed_atを算出する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    副作用
+                  </td>
+                  <td>
+                    API呼出の前後で投稿・各件数が変わらず、シードが追加されない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    転送経路
+                  </td>
+                  <td>
+                    ブラウザの/api/postsがバックエンドの/postsに転送される。
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
         </article>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-4">
-        <h2>4. エラー仕様</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>共通のエラー応答構造</td>
-                <td>［記入：共通のエラー応答構造］</td>
-              </tr>
-              <tr>
-                <td>項目単位のエラー</td>
-                <td>［記入：項目単位のエラー］</td>
-              </tr>
-              <tr>
-                <td>利用者向け文言</td>
-                <td>［記入：利用者向け文言］</td>
-              </tr>
-              <tr>
-                <td>追跡用ID</td>
-                <td>［記入：追跡用ID］</td>
-              </tr>
-              <tr>
-                <td>エラーコードとHTTPステータスの対応</td>
-                <td>［記入：エラーコードとHTTPステータスの対応］</td>
-              </tr>
-              <tr>
-                <td>再試行条件</td>
-                <td>［記入：再試行条件］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>共通エラー応答構造・項目の型・必須性</td>
-                <td>［記入：共通エラー応答構造・項目の型・必須性］</td>
-              </tr>
-              <tr>
-                <td>項目単位のエラー・利用者向け文言</td>
-                <td>［記入：項目単位のエラー・利用者向け文言］</td>
-              </tr>
-              <tr>
-                <td>追跡用ID・ヘッダーとの対応</td>
-                <td>［記入：追跡用ID・ヘッダーとの対応］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">API ID</th>
-                <th scope="col">ERR ID・コード（ロジック設計参照）</th>
-                <th scope="col">発生条件</th>
-                <th scope="col">HTTPステータス</th>
-                <th scope="col">返却内容</th>
-                <th scope="col">再試行条件</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>［記入：API ID］</td>
-                <td>［記入：ERR ID・コード（ロジック設計参照）］</td>
-                <td>［記入：発生条件］</td>
-                <td>［記入：HTTPステータス］</td>
-                <td>［記入：返却内容］</td>
-                <td>［記入：再試行条件］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          4. エラー仕様
+        </h2>
         <p>
-          エラーコードの意味はロジック設計の第16章で管理します。JSONの仮の構造は第3章を参照してください。
+          この章はAPI-001のサーバー側取得失敗を定義する。項目入力がないため、項目単位の入力エラーは今回定義しない。追跡IDの採用は未決であり、現在の応答には含めない。
         </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">
+                  応答項目
+                </th>
+                <th scope="col">
+                  型
+                </th>
+                <th scope="col">
+                  必須・null
+                </th>
+                <th scope="col">
+                  値・意味
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  code
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  必須・null不可
+                </td>
+                <td>
+                  POST_LIST_FETCH_FAILED。機械的に識別する固定コード。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  message
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  必須・null不可
+                </td>
+                <td>
+                  投稿一覧を取得できませんでした。利用者向けの固定文言。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="error-001">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    エラーID
+                  </th>
+                  <th scope="col">
+                    コード・HTTPステータス
+                  </th>
+                  <th scope="col">
+                    発生条件・関連処理
+                  </th>
+                  <th scope="col">
+                    返却・復旧方針
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <a href="ロジック設計.html#chapter-16">
+                      ERR-001
+                    </a>
+                  </td>
+                  <td>
+                    POST_LIST_FETCH_FAILED / 500 Internal Server Error
+                  </td>
+                  <td>
+                    API-001 / PRC-002。DB参照・Post生成・表示日時算出・JSON変換の失敗。posted_atがAPI処理で1回取得した現在時刻nowを超える場合もERR-001とする。LOG-001は出力候補。
+                  </td>
+                  <td>
+                    内部例外・SQL・接続情報は返さない。原因解消後の再取得は可能。自動再試行の採否・条件は未決。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <h3>
+          エラーレスポンス例
+        </h3>
         <p>
-          <a href="ロジック設計.html#chapter-16"
-            >ロジック設計：エラーコード一覧</a
-          >
+          500 Internal Server Error。Content-Type: application/json、Cache-Control: no-store。
         </p>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <pre id="example-error"><code>{
+  "code": "POST_LIST_FETCH_FAILED",
+  "message": "投稿一覧を取得できませんでした。"
+}</code></pre>
+        <p>
+          HTTP通信失敗など、レスポンス自体を受信できない場合はこのJSONを受け取れる保証はない。クライアント側の通信失敗と、サーバーが返したERR-001を区別する。
+        </p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-5">
-        <h2>5. 未決事項</h2>
+        <h2>
+          5. 未決事項
+        </h2>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">未決事項ID</th>
-                <th scope="col">内容</th>
-                <th scope="col">対象・影響</th>
-                <th scope="col">確認事項・候補</th>
-                <th scope="col">担当・期限</th>
-                <th scope="col">決定内容・反映先</th>
+                <th scope="col">
+                  未決事項ID
+                </th>
+                <th scope="col">
+                  内容
+                </th>
+                <th scope="col">
+                  対象・影響
+                </th>
+                <th scope="col">
+                  担当・期限
+                </th>
+                <th scope="col">
+                  反映先
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：未決事項ID］</td>
-                <td>［記入：内容］</td>
-                <td>［記入：対象・影響］</td>
-                <td>［記入：確認事項・候補］</td>
-                <td>［記入：担当・期限］</td>
-                <td>［記入：決定内容・反映先］</td>
+                <td>
+                  API-DEC-004
+                </td>
+                <td>
+                  タイムアウト・自動再試行・レート制限・追跡ID・ログ。
+                </td>
+                <td>
+                  障害時の動作と調査方法。
+                </td>
+                <td>
+                  未決
+                </td>
+                <td>
+                  本書2・4章、ロジック設計DEC-004・DEC-008
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  API-DEC-005
+                </td>
+                <td>
+                  本番URL・配信構成・将来の互換性方針。
+                </td>
+                <td>
+                  本番の接続経路と変更管理。
+                </td>
+                <td>
+                  未決
+                </td>
+                <td>
+                  本書2章
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  API-DEC-006
+                </td>
+                <td>
+                  未定義クエリの扱い、DB文字列制約。
+                </td>
+                <td>
+                  指定外リクエスト・空文字等の保存制約。
+                </td>
+                <td>
+                  未決
+                </td>
+                <td>
+                  本書2章、DB設計
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p>
+          認証なし、GET /api/posts → /posts、全件取得、posted_at降順、同日時はpost_id降順、Postの8属性、200と[]、500のcode・message、no-storeは今回の設計で決定済み。
+        </p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
     </main>
     <footer>
-      テンプレート：記入例は未確定です。更新時は関連文書・図表の整合性も確認してください。
+      API設計書 v1.0.0｜投稿一覧取得の設計案。APIの実装・動作確認は別途行う。
     </footer>
   </body>
 </html>

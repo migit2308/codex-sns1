@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ロジック設計書｜テンプレート</title>
+    <title>ロジック設計書｜投稿一覧表示</title>
     <style>
       * {
         box-sizing: border-box;
@@ -33,7 +33,8 @@
       }
       h1,
       h2,
-      h3 {
+      h3,
+      h4 {
         color: #233e61;
         line-height: 1.4;
       }
@@ -373,50 +374,141 @@
   </head>
   <body>
     <header>
-      <p class="badge">詳細設計書 / テンプレート</p>
-      <h1>ロジック設計書</h1>
+      <p class="badge">
+        旧Twitter風SNS / 詳細設計
+      </p>
+      <h1>
+        ロジック設計書
+      </h1>
+      <p>
+        トップページからAPI経由でシード済み投稿を全件取得し、投稿日時の新しい順に表示する処理。
+      </p>
       <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
-        <h2 id="toc-heading">目次</h2>
-        <p>章名をクリックすると、該当する章へ移動します。</p>
+        <h2 id="toc-heading">
+          目次
+        </h2>
+        <p>
+          章名をクリックすると該当する章へ移動します。
+        </p>
         <ol>
-          <li><a href="#chapter-1">機能一覧</a></li>
-          <li><a href="#chapter-2">プログラム一覧</a></li>
-          <li><a href="#chapter-3">クラス一覧</a></li>
-          <li><a href="#chapter-4">ユースケース図</a></li>
-          <li><a href="#chapter-5">アクティビティ図</a></li>
-          <li><a href="#chapter-6">クラス図</a></li>
-          <li><a href="#chapter-7">パッケージ図</a></li>
-          <li><a href="#chapter-8">シーケンス図</a></li>
-          <li><a href="#chapter-9">処理フロー図（フローチャート）</a></li>
-          <li><a href="#chapter-10">データフロー図（DFD）</a></li>
-          <li><a href="#chapter-11">状態遷移設計</a></li>
-          <li><a href="#chapter-12">バッチ全体設計</a></li>
-          <li><a href="#chapter-13">バッチプログラム一覧</a></li>
-          <li><a href="#chapter-14">処理設計（プログラム仕様書）</a></li>
-          <li><a href="#chapter-15">ログ一覧</a></li>
-          <li><a href="#chapter-16">エラーコード一覧</a></li>
+          <li>
+            <a href="#chapter-1">
+              機能一覧
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-2">
+              プログラム一覧
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-3">
+              クラス一覧
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-4">
+              ユースケース図
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-5">
+              アクティビティ図
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-6">
+              クラス図
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-7">
+              パッケージ図
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-8">
+              シーケンス図
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-9">
+              処理フロー図（フローチャート）
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-10">
+              データフロー図（DFD）
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-11">
+              状態遷移設計
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-12">
+              バッチ全体設計
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-13">
+              バッチプログラム一覧
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-14">
+              処理設計（プログラム仕様書）
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-15">
+              ログ一覧
+            </a>
+          </li>
+          <li>
+            <a href="#chapter-16">
+              エラーコード一覧
+            </a>
+          </li>
         </ol>
       </nav>
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th scope="col">設計項目</th>
-              <th scope="col">記入内容</th>
+              <th scope="col">
+                設計項目
+              </th>
+              <th scope="col">
+                内容・決定状況
+              </th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>文書バージョン</td>
-              <td>［記入：文書バージョン］</td>
+              <td>
+                文書バージョン
+              </td>
+              <td>
+                1.0.0
+              </td>
             </tr>
             <tr>
-              <td>更新日</td>
-              <td>［記入：更新日］</td>
+              <td>
+                更新日
+              </td>
+              <td>
+                2026-10-22
+              </td>
             </tr>
             <tr>
-              <td>ステータス</td>
-              <td>［記入：ステータス］</td>
+              <td>
+                ステータス
+              </td>
+              <td>
+                完了済み
+              </td>
             </tr>
           </tbody>
         </table>
@@ -424,1636 +516,2208 @@
     </header>
     <main>
       <aside class="note">
-        <strong>記入方法</strong>
+        <strong>
+          対象範囲と設計の前提
+        </strong>
         <p>
-          記入欄は［記入：内容の説明］で示します。未確定は「未決」、採用しない項目は「対象外」と記載してください。図やID・JSONの見本はすべて記入例・未確定であり、採用する仕様を示しません。
+          トップページSCR-001（URL：/）の投稿一覧ITEM-003を対象とする。FUN・PRG・PRC等のIDは本書で管理する設計上のID。各図は処理の設計案であり、実装済みであることを示さない。
         </p>
         <p>
-          個別仕様の表・図は対象単位で複製してください。HTMLのidを一意にし、目次・参照先も更新します。画面・項目・テーブル・処理・APIのIDを文書間で揃え、関連する一覧・図・仕様を合わせて更新してください。
+          閲覧処理は事前にシード投入した投稿の参照のみとし、DBへのINSERT・UPDATE・DELETEを行わない。投稿の作成・編集・削除は対象外。左右のサイドバー（COM-001・COM-002）の検索・通知・トレンド・おすすめなどは採用未決であり、本書では投稿一覧の処理に含めない。設計案はレビュー待ちとし、未決事項を14章にまとめる。
         </p>
       </aside>
       <p>
-        関連設計書：<a href="入出力設計.html#toc">入出力設計</a> /
-        <a href="データベース設計.html#toc">データベース設計</a> /
-        <a href="API設計.html#toc">API設計</a>
+        関連設計書：
+        <a href="入出力設計.html#screen-layout-home">
+          入出力設計：SCR-001
+        </a>
+        /
+        <a href="データベース設計.html#toc">
+          データベース設計
+        </a>
+        /
+        <a href="API設計.html#toc">
+          API設計
+        </a>
       </p>
       <section id="chapter-1">
-        <h2>1. 機能一覧</h2>
-        <p>分類：管理系</p>
+        <h2>
+          1. 機能一覧
+        </h2>
+        <p>
+          分類：管理系
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">機能ID</th>
-                <th scope="col">分類・機能名</th>
-                <th scope="col">目的</th>
-                <th scope="col">利用者・起動条件</th>
-                <th scope="col">関連する画面・処理</th>
-                <th scope="col">採用状況</th>
+                <th scope="col">
+                  機能ID
+                </th>
+                <th scope="col">
+                  分類・機能名
+                </th>
+                <th scope="col">
+                  目的
+                </th>
+                <th scope="col">
+                  利用者・起動条件
+                </th>
+                <th scope="col">
+                  関連する画面・処理
+                </th>
+                <th scope="col">
+                  採用状況
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：機能ID］</td>
-                <td>［記入：分類・機能名］</td>
-                <td>［記入：目的］</td>
-                <td>［記入：利用者・起動条件］</td>
-                <td>［記入：関連する画面・処理］</td>
-                <td>［記入：採用状況］</td>
+                <td>
+                  FUN-001
+                </td>
+                <td>
+                  画面系・投稿一覧表示
+                </td>
+                <td>
+                  事前にシード投入した投稿をAPIで全件取得し、posted_at降順でトップページに表示する。
+                </td>
+                <td>
+                  利用者が「/」を開く。認証条件は未決。
+                </td>
+                <td>
+                  SCR-001 / ITEM-003 / PRC-001・PRC-002
+                </td>
+                <td>
+                  対象。詳細設計案。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  FUN-002
+                </td>
+                <td>
+                  開発準備・投稿データの用意
+                </td>
+                <td>
+                  マイグレーションと確認用データで動作確認可能なDBを用意する。
+                </td>
+                <td>
+                  開発者が明示的に実行する。
+                </td>
+                <td>
+                  PRC-003・PRC-004
+                </td>
+                <td>
+                  対象。ツールとデータ内容は未決。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-2">
-        <h2>2. プログラム一覧</h2>
-        <p>分類：管理系</p>
+        <h2>
+          2. プログラム一覧
+        </h2>
+        <p>
+          分類：管理系
+        </p>
+        <p>
+          以下は論理上の責務。個別のファイルや関数に分けるかは未決であり、4つの実装モジュールの作成を必須としない。
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">プログラムID</th>
-                <th scope="col">名称・責務</th>
-                <th scope="col">ファイルパス・実行単位</th>
-                <th scope="col">関連機能</th>
-                <th scope="col">入出力・依存先</th>
-                <th scope="col">処理仕様への参照</th>
+                <th scope="col">
+                  プログラムID
+                </th>
+                <th scope="col">
+                  名称・責務
+                </th>
+                <th scope="col">
+                  ファイルパス・実行単位
+                </th>
+                <th scope="col">
+                  関連機能
+                </th>
+                <th scope="col">
+                  入出力・依存先
+                </th>
+                <th scope="col">
+                  処理仕様
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：プログラムID］</td>
-                <td>［記入：名称・責務］</td>
-                <td>［記入：ファイルパス・実行単位］</td>
-                <td>［記入：関連機能］</td>
-                <td>［記入：入出力・依存先］</td>
-                <td>［記入：処理仕様への参照］</td>
+                <td>
+                  PRG-001
+                </td>
+                <td>
+                  トップページの表示制御
+                </td>
+                <td>
+                  フロントエンドで実行し、HTTP GETで投稿一覧取得APIを呼び出す。配置ファイルは未決。
+                </td>
+                <td>
+                  FUN-001
+                </td>
+                <td>
+                  起動→取得結果・表示状態。PRG-002に依存。
+                </td>
+                <td>
+                  <a href="#process-001">
+                    PRC-001
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  PRG-002
+                </td>
+                <td>
+                  投稿一覧の取得・表示データへの整形
+                </td>
+                <td>
+                  バックエンドの投稿一覧取得APIで実行する。APIパス・配置ファイルは未決。
+                </td>
+                <td>
+                  FUN-001
+                </td>
+                <td>
+                  条件指定なし→Postの配列・取得失敗。DBはSELECTによる参照のみ。
+                </td>
+                <td>
+                  <a href="#process-002">
+                    PRC-002
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  PRG-003
+                </td>
+                <td>
+                  DBのマイグレーション
+                </td>
+                <td>
+                  ツール・ファイルパス・実行単位は未決。
+                </td>
+                <td>
+                  FUN-002
+                </td>
+                <td>
+                  テーブル定義→DBスキーマ。
+                </td>
+                <td>
+                  <a href="#process-003">
+                    PRC-003
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  PRG-004
+                </td>
+                <td>
+                  動作確認用データの用意
+                </td>
+                <td>
+                  開発者が事前にシードを投入する。コマンド・配置ファイルは未決。
+                </td>
+                <td>
+                  FUN-002
+                </td>
+                <td>
+                  確認用データ→DBの投稿。
+                </td>
+                <td>
+                  <a href="#process-004">
+                    PRC-004
+                  </a>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-3">
-        <h2>3. クラス一覧</h2>
-        <p>分類：管理系</p>
+        <h2>
+          3. クラス一覧
+        </h2>
+        <p>
+          分類：管理系
+        </p>
+        <p>
+          属性・型の詳細は6章、表示日時の算出・応答例は14章に記載する。投稿1件を表すためクラス名は単数形の
+          <code>
+            Post
+          </code>
+          とする。複数件は
+          <code>
+            list[Post]
+          </code>
+          として扱う。以下の属性は投稿ごとに値を持つインスタンス属性であり、全投稿で共有する静的なクラス変数ではない。
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">クラスID</th>
-                <th scope="col">名称・所属</th>
-                <th scope="col">責務</th>
-                <th scope="col">主要な属性・操作</th>
-                <th scope="col">関連プログラム</th>
-                <th scope="col">採用状況</th>
+                <th scope="col">
+                  クラスID
+                </th>
+                <th scope="col">
+                  名称・所属
+                </th>
+                <th scope="col">
+                  責務
+                </th>
+                <th scope="col">
+                  主要な属性・操作
+                </th>
+                <th scope="col">
+                  関連プログラム
+                </th>
+                <th scope="col">
+                  採用状況
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：クラスID］</td>
-                <td>［記入：名称・所属］</td>
-                <td>［記入：責務］</td>
-                <td>［記入：主要な属性・操作］</td>
-                <td>［記入：関連プログラム］</td>
-                <td>［記入：採用状況］</td>
+                <td>
+                  CLS-001
+                </td>
+                <td>
+                  Post / バックエンド。配置ファイルは未決。
+                </td>
+                <td>
+                  投稿1件のデータを保持し、8属性をAPIの応答項目とする。
+                </td>
+                <td>
+                  <a href="#post-attributes">
+                    属性一覧
+                  </a>
+                  /
+                  <a href="#display-time-rules">
+                    表示日時の算出
+                  </a>
+                </td>
+                <td>
+                  PRG-002 / PRC-002
+                </td>
+                <td>
+                  採用。実装は未着手。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-4">
-        <h2>4. ユースケース図</h2>
-        <p>分類：個別系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>利用者</td>
-                <td>［記入：利用者］</td>
-              </tr>
-              <tr>
-                <td>システム境界</td>
-                <td>［記入：システム境界］</td>
-              </tr>
-              <tr>
-                <td>達成する目的</td>
-                <td>［記入：達成する目的］</td>
-              </tr>
-              <tr>
-                <td>事前・事後条件</td>
-                <td>［記入：事前・事後条件］</td>
-              </tr>
-              <tr>
-                <td>基本・代替・例外シナリオ</td>
-                <td>［記入：基本・代替・例外シナリオ］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          4. ユースケース図
+        </h2>
+        <p>
+          分類：個別系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 760 190"
-              role="img"
-              aria-labelledby="logic-4-title logic-4-desc"
-            >
-              <title id="logic-4-title">記入例・未確定</title>
-              <desc id="logic-4-desc">
-                左はシステム外の利用者、右はシステム境界内のユースケース。矢印は利用関係です。
+            <svg viewBox="0 0 760 170" role="img" aria-labelledby="usecase-title usecase-desc">
+              <title id="usecase-title">
+                UC-001 投稿一覧を閲覧する
+              </title>
+              <desc id="usecase-desc">
+                利用者 → SNS：UC-001 投稿一覧閲覧。左の箱はシステム外の利用者、右の箱はSNS内の目的。矢印は利用関係であり、処理順序ではない。
               </desc>
               <defs>
-                <marker
-                  id="logic-4-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="usecase-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <rect
-                x="15.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="102.0" y="107" text-anchor="middle">仮の利用者</text>
-              <path
-                d="M 190.0 100 H 387.0"
-                stroke="#344e70"
-                marker-end="url(#logic-4-arrow)"
-              />
-              <text x="288.5" y="50" text-anchor="middle">利用</text>
-              <rect
-                x="395.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="482.0" y="107" text-anchor="middle">
-                UC-001：仮の目的
+              <rect x="10.0" y="60" width="335.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="177.5" y="99" text-anchor="middle">
+                利用者
+              </text>
+              <path d="M345.0 93 H385.0" stroke="#344e70" marker-end="url(#usecase-arrow)"/>
+              <text x="370.0" y="40" text-anchor="middle">
+                利用
+              </text>
+              <rect x="390.0" y="60" width="335.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="557.5" y="99" text-anchor="middle">
+                SNS：UC-001 投稿一覧閲覧
               </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：左はシステム外の利用者、右はシステム境界内のユースケース。矢印は利用関係です。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            左の箱はシステム外の利用者、右の箱はSNS内の目的。矢印は利用関係であり、処理順序ではない。
           </figcaption>
         </figure>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  設計項目
+                </th>
+                <th scope="col">
+                  内容・決定状況
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>事前条件・事後条件</td>
-                <td>［記入：事前条件・事後条件］</td>
+                <td>
+                  ユースケースID
+                </td>
+                <td>
+                  UC-001 / FUN-001
+                </td>
               </tr>
               <tr>
-                <td>基本シナリオ</td>
-                <td>［記入：基本シナリオ］</td>
+                <td>
+                  事前条件
+                </td>
+                <td>
+                  トップページとAPIにアクセスでき、DBスキーマと事前のシード投入が完了していること。0件の確認では投稿のないDBを使う。認証の要否は未決。
+                </td>
               </tr>
               <tr>
-                <td>代替シナリオ</td>
-                <td>［記入：代替シナリオ］</td>
+                <td>
+                  基本シナリオ
+                </td>
+                <td>
+                  利用者が「/」を開く→投稿を取得する→一覧が表示される→利用者が投稿を読む。
+                </td>
               </tr>
               <tr>
-                <td>例外シナリオ</td>
-                <td>［記入：例外シナリオ］</td>
+                <td>
+                  代替シナリオ
+                </td>
+                <td>
+                  取得に成功し0件の場合、投稿がないことを表示する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  例外シナリオ
+                </td>
+                <td>
+                  DB・通信・データ整形などの失敗を取得失敗として扱い、利用者にエラーを表示する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  事後条件
+                </td>
+                <td>
+                  投稿一覧、0件、取得失敗のいずれかを表示する。投稿データは変更しない。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-5">
-        <h2>5. アクティビティ図</h2>
-        <p>分類：個別系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>作業の流れ</td>
-                <td>［記入：作業の流れ］</td>
-              </tr>
-              <tr>
-                <td>担当者</td>
-                <td>［記入：担当者］</td>
-              </tr>
-              <tr>
-                <td>開始・終了条件</td>
-                <td>［記入：開始・終了条件］</td>
-              </tr>
-              <tr>
-                <td>分岐条件</td>
-                <td>［記入：分岐条件］</td>
-              </tr>
-              <tr>
-                <td>例外</td>
-                <td>［記入：例外］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          5. アクティビティ図
+        </h2>
+        <p>
+          分類：個別系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 800 330"
-              role="img"
-              aria-labelledby="logic-5-title logic-5-desc"
-            >
-              <title id="logic-5-title">記入例・未確定</title>
-              <desc id="logic-5-desc">
-                楕円は開始・終了、四角は作業または処理、ひし形は判定、矢印は進行方向。名称・条件は仮です。
+            <svg viewBox="0 0 760 170" role="img" aria-labelledby="activity-title activity-desc">
+              <title id="activity-title">
+                ACT-001 投稿一覧閲覧の作業
+              </title>
+              <desc id="activity-desc">
+                利用者：/を開く → システム：投稿を取得 → 利用者：結果を確認。ACT-001：箱は担当者と作業、矢印は作業の進行。取得結果に応じた分岐は下表に示す。
               </desc>
               <defs>
-                <marker
-                  id="logic-5-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="activity-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <g stroke="#344e70" fill="#f4f7fb">
-                <ellipse cx="280" cy="30" rx="85" ry="22" />
-                <text
-                  x="280"
-                  y="35"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の開始
-                </text>
-                <path
-                  d="M 280 52 L 280 80"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-5-arrow)"
-                />
-                <rect x="180" y="80" width="200" height="45" />
-                <text
-                  x="280"
-                  y="107"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の作業／処理
-                </text>
-                <path
-                  d="M 280 125 L 280 155"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-5-arrow)"
-                />
-                <path d="M 280 155 L 385 200 L 280 245 L 175 200 Z" />
-                <text
-                  x="280"
-                  y="205"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の判定
-                </text>
-                <path
-                  d="M 280 245 L 280 280"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-5-arrow)"
-                />
-                <text
-                  x="325"
-                  y="268"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  成立
-                </text>
-                <ellipse cx="280" cy="302" rx="85" ry="22" />
-                <text
-                  x="280"
-                  y="307"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の正常終了
-                </text>
-                <path
-                  d="M 385 200 L 550 200"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-5-arrow)"
-                />
-                <text
-                  x="465"
-                  y="184"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  不成立／例外
-                </text>
-                <rect x="550" y="175" width="190" height="50" />
-                <text
-                  x="645"
-                  y="205"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の異常終了
-                </text>
-              </g>
+              <rect x="10.0" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="114.16666666666667" y="99" text-anchor="middle">
+                利用者：/を開く
+              </text>
+              <path d="M218.33333333333337 93 H258.33333333333337" stroke="#344e70" marker-end="url(#activity-arrow)"/>
+              <text x="243.33333333333337" y="40" text-anchor="middle">
+                起動
+              </text>
+              <rect x="263.33333333333337" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="367.50000000000006" y="99" text-anchor="middle">
+                システム：投稿を取得
+              </text>
+              <path d="M471.66666666666674 93 H511.66666666666674" stroke="#344e70" marker-end="url(#activity-arrow)"/>
+              <text x="496.66666666666674" y="40" text-anchor="middle">
+                成功・0件・失敗
+              </text>
+              <rect x="516.6666666666667" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="620.8333333333334" y="99" text-anchor="middle">
+                利用者：結果を確認
+              </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：楕円は開始・終了、四角は作業、ひし形は判定、矢印は進行方向です。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            ACT-001：箱は担当者と作業、矢印は作業の進行。取得結果に応じた分岐は下表に示す。
           </figcaption>
         </figure>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  結果・終了条件
+                </th>
+                <th scope="col">
+                  システムの作業
+                </th>
+                <th scope="col">
+                  利用者の操作
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>担当者・開始終了条件</td>
-                <td>［記入：担当者・開始終了条件］</td>
+                <td>
+                  成功・1件以上
+                </td>
+                <td>
+                  投稿を表示する。
+                </td>
+                <td>
+                  投稿を閲覧する。
+                </td>
               </tr>
               <tr>
-                <td>分岐元・条件・分岐先</td>
-                <td>［記入：分岐元・条件・分岐先］</td>
+                <td>
+                  成功・0件
+                </td>
+                <td>
+                  空の状態を表示する。
+                </td>
+                <td>
+                  投稿がないことを確認する。
+                </td>
               </tr>
               <tr>
-                <td>例外・復帰先</td>
-                <td>［記入：例外・復帰先］</td>
+                <td>
+                  失敗
+                </td>
+                <td>
+                  取得失敗を表示する。
+                </td>
+                <td>
+                  復旧導線・再試行操作は未決。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  離脱・中断
+                </td>
+                <td>
+                  中断処理・取得済み結果の扱いは未決。
+                </td>
+                <td>
+                  画面を離れる。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-6">
-        <h2>6. クラス図</h2>
-        <p>分類：俯瞰系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>クラスの属性・操作・型・可視性</td>
-                <td>［記入：クラスの属性・操作・型・可視性］</td>
-              </tr>
-              <tr>
-                <td>クラス間の関連・依存・継承</td>
-                <td>［記入：クラス間の関連・依存・継承］</td>
-              </tr>
-              <tr>
-                <td>多重度・制約</td>
-                <td>［記入：多重度・制約］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          6. クラス図
+        </h2>
+        <p>
+          分類：俯瞰系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 760 190"
-              role="img"
-              aria-labelledby="logic-6-title logic-6-desc"
-            >
-              <title id="logic-6-title">記入例・未確定</title>
-              <desc id="logic-6-desc">
-                箱はクラス、矢印は依存元から依存先です。
+            <svg viewBox="0 0 800 430" role="img" aria-labelledby="post-class-title post-class-desc">
+              <title id="post-class-title">
+                CLS-001 Postのクラス図
+              </title>
+              <desc id="post-class-desc">
+                Postは投稿1件を表す。post_id、author、body、posted_at、reply_count、retweet_count、like_count、displayed_atの8属性を持つ。表示日時は投稿日時から算出する。
               </desc>
-              <defs>
-                <marker
-                  id="logic-6-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
-                </marker>
-              </defs>
-              <rect
-                x="15.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="102.0" y="107" text-anchor="middle">
-                CLS-001：仮のクラスA
+              <rect x="160" y="20" width="480" height="380" fill="#f4f7fb" stroke="#344e70"/>
+              <path d="M160 80 H640" stroke="#344e70"/>
+              <text x="400" y="55" text-anchor="middle">
+                CLS-001：Post
               </text>
-              <path
-                d="M 190.0 100 H 387.0"
-                stroke="#344e70"
-                marker-end="url(#logic-6-arrow)"
-              />
-              <text x="288.5" y="50" text-anchor="middle">仮の依存 →</text>
-              <rect
-                x="395.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="482.0" y="107" text-anchor="middle">
-                CLS-002：仮のクラスB
+              <text x="185" y="112">
+                + post_id: int
+              </text>
+              <text x="185" y="146">
+                + author: str
+              </text>
+              <text x="185" y="180">
+                + body: str
+              </text>
+              <text x="185" y="214">
+                + posted_at: datetime
+              </text>
+              <text x="185" y="248">
+                + reply_count: int
+              </text>
+              <text x="185" y="282">
+                + retweet_count: int
+              </text>
+              <text x="185" y="316">
+                + like_count: int
+              </text>
+              <text x="185" y="350">
+                + displayed_at: str
               </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：箱はクラス、矢印は依存元から依存先です。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            箱はクラス、+は公開属性を表す。8属性をAPIで同名の項目として返す。displayed_atは算出値であり、永続化する属性ではない。他クラスとの関連・継承は今回定義しない。
           </figcaption>
         </figure>
+        <h3 id="post-attributes">
+          Postの属性とAPIでの型
+        </h3>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  項目
+                </th>
+                <th scope="col">
+                  属性名（lower_snake_case）
+                </th>
+                <th scope="col">
+                  クラスの型
+                </th>
+                <th scope="col">
+                  JSONの型
+                </th>
+                <th scope="col">
+                  内容
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>クラスID・属性名・型・可視性</td>
-                <td>［記入：クラスID・属性名・型・可視性］</td>
+                <td>
+                  投稿ID
+                </td>
+                <td>
+                  post_id
+                </td>
+                <td>
+                  int
+                </td>
+                <td>
+                  number（整数）
+                </td>
+                <td>
+                  投稿1件の識別子。
+                </td>
               </tr>
               <tr>
-                <td>操作名・引数・戻り値・可視性</td>
-                <td>［記入：操作名・引数・戻り値・可視性］</td>
+                <td>
+                  投稿者
+                </td>
+                <td>
+                  author
+                </td>
+                <td>
+                  str
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  投稿者の表示名。今回はUserクラスや関連オブジェクトを含めない。
+                </td>
               </tr>
               <tr>
-                <td>関連・依存・継承・多重度・制約</td>
-                <td>［記入：関連・依存・継承・多重度・制約］</td>
+                <td>
+                  投稿本文
+                </td>
+                <td>
+                  body
+                </td>
+                <td>
+                  str
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  投稿本文。改行を保持し、画面ではテキストとして表示する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  投稿日時
+                </td>
+                <td>
+                  posted_at
+                </td>
+                <td>
+                  datetime
+                </td>
+                <td>
+                  string（ISO 8601）
+                </td>
+                <td>
+                  投稿された時刻。時差情報を持つ日時で扱う。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  リプライ数
+                </td>
+                <td>
+                  reply_count
+                </td>
+                <td>
+                  int
+                </td>
+                <td>
+                  number（整数）
+                </td>
+                <td>
+                  0以上。シードで用意した値を表示する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  リツイート数
+                </td>
+                <td>
+                  retweet_count
+                </td>
+                <td>
+                  int
+                </td>
+                <td>
+                  number（整数）
+                </td>
+                <td>
+                  0以上。シードで用意した値を表示する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  いいね数
+                </td>
+                <td>
+                  like_count
+                </td>
+                <td>
+                  int
+                </td>
+                <td>
+                  number（整数）
+                </td>
+                <td>
+                  0以上。シードで用意した値を表示する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  表示日時
+                </td>
+                <td>
+                  displayed_at
+                </td>
+                <td>
+                  str
+                </td>
+                <td>
+                  string
+                </td>
+                <td>
+                  posted_atとAPI処理時の現在時刻から算出する相対表示文字列。DBには保存しない。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p>
+          全属性を必須・null不可とする設計案。APIは各投稿を上記8属性と同じ名前のJSONオブジェクトとして返し、正常応答はその配列（0件なら
+          <code>
+            []
+          </code>
+          ）とする。datetimeはJSONで表現できないため、posted_atのみISO 8601の文字列へシリアライズする。DBの物理カラム・型・制約はDB設計で別途決める。
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">
+                  設計項目
+                </th>
+                <th scope="col">
+                  内容・決定状況
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  対象
+                </td>
+                <td>
+                  CLS-001 / Post。属性・型は本章の属性一覧に定義する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  利用
+                </td>
+                <td>
+                  PRC-002がDBの取得結果からPostを生成し、属性をそのままJSONの項目として返す。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  永続化との関係
+                </td>
+                <td>
+                  Postは取得・応答用のクラス。DBテーブルの物理設計とは区別する。リプライ・リツイート・いいねの操作は行わず、シード済み件数を表示する。
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-7">
-        <h2>7. パッケージ図</h2>
-        <p>分類：俯瞰系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>クラス・モジュールのまとまり</td>
-                <td>［記入：クラス・モジュールのまとまり］</td>
-              </tr>
-              <tr>
-                <td>責務</td>
-                <td>［記入：責務］</td>
-              </tr>
-              <tr>
-                <td>公開する機能</td>
-                <td>［記入：公開する機能］</td>
-              </tr>
-              <tr>
-                <td>依存方向と理由</td>
-                <td>［記入：依存方向と理由］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          7. パッケージ図
+        </h2>
+        <p>
+          分類：俯瞰系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 760 190"
-              role="img"
-              aria-labelledby="logic-7-title logic-7-desc"
-            >
-              <title id="logic-7-title">記入例・未確定</title>
-              <desc id="logic-7-desc">
-                箱はパッケージ、矢印は利用する側から利用される側です。
+            <svg viewBox="0 0 760 170" role="img" aria-labelledby="package-title package-desc">
+              <title id="package-title">
+                論理上の責務の依存関係
+              </title>
+              <desc id="package-desc">
+                表示：PRG-001 → 取得API：PRG-002 → 参照DB：シード済み投稿。箱は論理上のまとまり、矢印は依存方向。表示→APIはHTTP GET、API→DBはSELECTによる参照。DBへの保存処理を表す図ではない。配置ファイルは未決。
               </desc>
               <defs>
-                <marker
-                  id="logic-7-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="package-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <rect
-                x="15.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="102.0" y="107" text-anchor="middle">
-                PKG-001：仮の公開層
+              <rect x="10.0" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="114.16666666666667" y="99" text-anchor="middle">
+                表示：PRG-001
               </text>
-              <path
-                d="M 190.0 100 H 387.0"
-                stroke="#344e70"
-                marker-end="url(#logic-7-arrow)"
-              />
-              <text x="288.5" y="50" text-anchor="middle">仮の依存 →</text>
-              <rect
-                x="395.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="482.0" y="107" text-anchor="middle">
-                PKG-002：仮の内部層
+              <path d="M218.33333333333337 93 H258.33333333333337" stroke="#344e70" marker-end="url(#package-arrow)"/>
+              <text x="243.33333333333337" y="40" text-anchor="middle">
+                利用
+              </text>
+              <rect x="263.33333333333337" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="367.50000000000006" y="99" text-anchor="middle">
+                取得API：PRG-002
+              </text>
+              <path d="M471.66666666666674 93 H511.66666666666674" stroke="#344e70" marker-end="url(#package-arrow)"/>
+              <text x="496.66666666666674" y="40" text-anchor="middle">
+                参照
+              </text>
+              <rect x="516.6666666666667" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="620.8333333333334" y="99" text-anchor="middle">
+                参照DB：シード済み投稿
               </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：箱はパッケージ、矢印は利用する側から利用される側です。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            箱は論理上のまとまり、矢印は依存方向。表示→APIはHTTP GET、API→DBはSELECTによる参照。DBへの保存処理を表す図ではない。配置ファイルは未決。
           </figcaption>
         </figure>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  設計項目
+                </th>
+                <th scope="col">
+                  内容・決定状況
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>パッケージID・含まれるクラス／モジュール</td>
-                <td>［記入：パッケージID・含まれるクラス／モジュール］</td>
+                <td>
+                  依存の理由
+                </td>
+                <td>
+                  表示処理はAPIの応答を利用し、APIはシード済み投稿テーブルを参照する。閲覧時に投稿や件数を保存・更新しない。
+                </td>
               </tr>
               <tr>
-                <td>公開機能・依存方向・理由</td>
-                <td>［記入：公開機能・依存方向・理由］</td>
+                <td>
+                  実装上の分割
+                </td>
+                <td>
+                  API経由を採用する。API内部のサービス・リポジトリ等への分割と配置は未決。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-8">
-        <h2>8. シーケンス図</h2>
-        <p>分類：個別系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>処理の参加者</td>
-                <td>［記入：処理の参加者］</td>
-              </tr>
-              <tr>
-                <td>時系列の呼び出し・応答</td>
-                <td>［記入：時系列の呼び出し・応答］</td>
-              </tr>
-              <tr>
-                <td>引数・戻り値</td>
-                <td>［記入：引数・戻り値］</td>
-              </tr>
-              <tr>
-                <td>分岐・例外</td>
-                <td>［記入：分岐・例外］</td>
-              </tr>
-              <tr>
-                <td>トランザクション</td>
-                <td>［記入：トランザクション］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          8. シーケンス図
+        </h2>
+        <p>
+          分類：個別系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 800 330"
-              role="img"
-              aria-labelledby="logic-8-title logic-8-desc"
-            >
-              <title id="logic-8-title">記入例・未確定</title>
-              <desc id="logic-8-desc">
-                縦の破線は参加者の生存線。時間は上から下へ進みます。実線矢印は呼出、横の破線矢印は応答です。名称・引数・戻り値は仮です。
+            <svg viewBox="0 0 900 420" role="img" aria-labelledby="sequence-title sequence-desc">
+              <title id="sequence-title">
+                投稿一覧表示の論理シーケンス案
+              </title>
+              <desc id="sequence-desc">
+                フロントエンドがHTTP GETでAPIを呼び出し、APIが投稿テーブルを全件参照する。posted_at降順でPostの配列を返す。DBへの書き込みは行わない。
               </desc>
               <defs>
-                <marker
-                  id="logic-8-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="sequence-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <g stroke="#344e70" fill="#f4f7fb">
-                <rect x="30" y="15" width="200" height="45" />
-                <text
-                  x="130"
-                  y="43"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の呼出元
-                </text>
-                <path d="M 130 60 V 310" stroke-dasharray="5 5" />
-                <rect x="300" y="15" width="200" height="45" />
-                <text
-                  x="400"
-                  y="43"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  PRC-001：仮の処理
-                </text>
-                <path d="M 400 60 V 310" stroke-dasharray="5 5" />
-                <rect x="570" y="15" width="200" height="45" />
-                <text
-                  x="670"
-                  y="43"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の保存先
-                </text>
-                <path d="M 670 60 V 310" stroke-dasharray="5 5" />
-                <path
-                  d="M 130 100 L 400 100"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-8-arrow)"
-                />
-                <text
-                  x="265.0"
-                  y="90"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  ① 呼出（仮の引数）
-                </text>
-                <path
-                  d="M 400 160 L 670 160"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-8-arrow)"
-                />
-                <text
-                  x="535.0"
-                  y="150"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  ② 保存依頼（仮）
-                </text>
-                <path
-                  d="M 670 220 L 400 220"
-                  fill="none"
-                  stroke-dasharray="6 4"
-                  marker-end="url(#logic-8-arrow)"
-                />
-                <text
-                  x="535.0"
-                  y="210"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  ③ 保存結果（仮）
-                </text>
-                <path
-                  d="M 400 280 L 130 280"
-                  fill="none"
-                  stroke-dasharray="6 4"
-                  marker-end="url(#logic-8-arrow)"
-                />
-                <text
-                  x="265.0"
-                  y="270"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  ④ 応答（仮の戻り値）
-                </text>
-              </g>
+              <rect x="30" y="10" width="220" height="50" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="140" y="40" text-anchor="middle">
+                PRC-001：フロントエンド
+              </text>
+              <path d="M140 60 V340" stroke="#718aa5" stroke-dasharray="5 5"/>
+              <rect x="340" y="10" width="220" height="50" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="450" y="40" text-anchor="middle">
+                PRC-002：取得API
+              </text>
+              <path d="M450 60 V340" stroke="#718aa5" stroke-dasharray="5 5"/>
+              <rect x="650" y="10" width="220" height="50" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="760" y="40" text-anchor="middle">
+                DB
+              </text>
+              <path d="M760 60 V340" stroke="#718aa5" stroke-dasharray="5 5"/>
+              <path d="M140 110 H450" stroke="#344e70" marker-end="url(#sequence-arrow)"/>
+              <text x="295.0" y="96" text-anchor="middle">
+                1. HTTP GET（条件指定なし）
+              </text>
+              <path d="M450 170 H760" stroke="#344e70" marker-end="url(#sequence-arrow)"/>
+              <text x="605.0" y="156" text-anchor="middle">
+                2. 全件SELECT・posted_at降順
+              </text>
+              <path d="M760 230 H450" stroke="#344e70" stroke-dasharray="5 5" marker-end="url(#sequence-arrow)"/>
+              <text x="605.0" y="216" text-anchor="middle">
+                3. 取得した全投稿／DBエラー
+              </text>
+              <path d="M450 290 H140" stroke="#344e70" stroke-dasharray="5 5" marker-end="url(#sequence-arrow)"/>
+              <text x="295.0" y="276" text-anchor="middle">
+                4. PostのJSON配列／取得失敗
+              </text>
+              <text x="450" y="385" text-anchor="middle">
+                表示：一覧あり ／ 0件 ／ 取得失敗
+              </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：時間は上から下へ進みます。縦破線は生存線、実線矢印は呼出、横破線矢印は応答です。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            時間は上から下へ進む。縦破線は処理の参加者、実線矢印は呼出、横破線矢印は応答。フロントエンドとAPIの間はHTTP通信、APIとDBの間は参照処理。APIはdisplayed_atを算出して返す。
           </figcaption>
         </figure>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  設計項目
+                </th>
+                <th scope="col">
+                  内容・決定状況
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>順序・送信元・受信先・呼出名</td>
-                <td>［記入：順序・送信元・受信先・呼出名］</td>
+                <td>
+                  起動
+                </td>
+                <td>
+                  SCR-001（/）へのアクセス。PRC-001からPRC-002を起動する。
+                </td>
               </tr>
               <tr>
-                <td>引数・戻り値・応答方向</td>
-                <td>［記入：引数・戻り値・応答方向］</td>
+                <td>
+                  引数・戻り値
+                </td>
+                <td>
+                  条件指定は不要。投稿テーブルの全件をposted_at降順で取得する。正常時はPostの8属性を持つJSONオブジェクトの配列（0件は[]）、異常時は取得失敗を返す。属性と型は<a href="#post-attributes">6章の属性一覧</a>を参照。
+                </td>
               </tr>
               <tr>
-                <td>分岐・例外・トランザクション範囲</td>
-                <td>［記入：分岐・例外・トランザクション範囲］</td>
+                <td>
+                  境界・トランザクション
+                </td>
+                <td>
+                  表示制御はフロントエンド、取得・Postへの変換・displayed_at算出はバックエンドAPIで実行する。HTTP GET・JSON応答を用いる。DBセッション・トランザクション範囲は未決。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  例外
+                </td>
+                <td>
+                  DB失敗・HTTP通信失敗・Postへの変換失敗は成功扱いしない。0件とは区別する。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-9">
-        <h2>9. 処理フロー図（フローチャート）</h2>
-        <p>分類：個別系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>個別処理の実行順序</td>
-                <td>［記入：個別処理の実行順序］</td>
-              </tr>
-              <tr>
-                <td>判定</td>
-                <td>［記入：判定］</td>
-              </tr>
-              <tr>
-                <td>繰り返し</td>
-                <td>［記入：繰り返し］</td>
-              </tr>
-              <tr>
-                <td>終了・復帰先</td>
-                <td>［記入：終了・復帰先］</td>
-              </tr>
-              <tr>
-                <td>正常・異常時の戻り値</td>
-                <td>［記入：正常・異常時の戻り値］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          9. 処理フロー図（フローチャート）
+        </h2>
+        <p>
+          分類：個別系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 800 330"
-              role="img"
-              aria-labelledby="logic-9-title logic-9-desc"
-            >
-              <title id="logic-9-title">記入例・未確定</title>
-              <desc id="logic-9-desc">
-                楕円は開始・終了、四角は作業または処理、ひし形は判定、矢印は進行方向。名称・条件は仮です。
+            <svg viewBox="0 0 920 170" role="img" aria-labelledby="process-flow-title process-flow-desc">
+              <title id="process-flow-title">
+                PRC-001・PRC-002 処理フロー
+              </title>
+              <desc id="process-flow-desc">
+                開始・取得中 → DB参照と整形 → 結果判定 → 表示して終了。箱は処理、矢印は実行順序。成功・0件・例外は次の分岐表で対応づける。
               </desc>
               <defs>
-                <marker
-                  id="logic-9-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="process-flow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <g stroke="#344e70" fill="#f4f7fb">
-                <ellipse cx="280" cy="30" rx="85" ry="22" />
-                <text
-                  x="280"
-                  y="35"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の開始
-                </text>
-                <path
-                  d="M 280 52 L 280 80"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-9-arrow)"
-                />
-                <rect x="180" y="80" width="200" height="45" />
-                <text
-                  x="280"
-                  y="107"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の作業／処理
-                </text>
-                <path
-                  d="M 280 125 L 280 155"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-9-arrow)"
-                />
-                <path d="M 280 155 L 385 200 L 280 245 L 175 200 Z" />
-                <text
-                  x="280"
-                  y="205"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の判定
-                </text>
-                <path
-                  d="M 280 245 L 280 280"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-9-arrow)"
-                />
-                <text
-                  x="325"
-                  y="268"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  成立
-                </text>
-                <ellipse cx="280" cy="302" rx="85" ry="22" />
-                <text
-                  x="280"
-                  y="307"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の正常終了
-                </text>
-                <path
-                  d="M 385 200 L 550 200"
-                  fill="none"
-                  stroke-dasharray="none"
-                  marker-end="url(#logic-9-arrow)"
-                />
-                <text
-                  x="465"
-                  y="184"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  不成立／例外
-                </text>
-                <rect x="550" y="175" width="190" height="50" />
-                <text
-                  x="645"
-                  y="205"
-                  text-anchor="middle"
-                  fill="#263445"
-                  stroke="none"
-                >
-                  仮の異常終了
-                </text>
-              </g>
+              <rect x="10.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="102.5" y="99" text-anchor="middle">
+                開始・取得中
+              </text>
+              <path d="M195.0 93 H235.0" stroke="#344e70" marker-end="url(#process-flow-arrow)"/>
+              <text x="220.0" y="40" text-anchor="middle">
+                取得開始
+              </text>
+              <rect x="240.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="332.5" y="99" text-anchor="middle">
+                DB参照と整形
+              </text>
+              <path d="M425.0 93 H465.0" stroke="#344e70" marker-end="url(#process-flow-arrow)"/>
+              <text x="450.0" y="40" text-anchor="middle">
+                結果
+              </text>
+              <rect x="470.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="562.5" y="99" text-anchor="middle">
+                結果判定
+              </text>
+              <path d="M655.0 93 H695.0" stroke="#344e70" marker-end="url(#process-flow-arrow)"/>
+              <text x="680.0" y="40" text-anchor="middle">
+                分岐は下表
+              </text>
+              <rect x="700.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="792.5" y="99" text-anchor="middle">
+                表示して終了
+              </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：楕円は開始・終了、四角は処理、ひし形は判定、矢印は実行順序です。繰り返し・例外の詳細は下の表で補足します。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            箱は処理、矢印は実行順序。成功・0件・例外は次の分岐表で対応づける。
           </figcaption>
         </figure>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  判定
+                </th>
+                <th scope="col">
+                  分岐先
+                </th>
+                <th scope="col">
+                  終了結果
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>判定条件・成立時と不成立時の遷移先</td>
-                <td>［記入：判定条件・成立時と不成立時の遷移先］</td>
+                <td>
+                  取得成功かつ一覧が1件以上
+                </td>
+                <td>
+                  一覧を画面へ渡す。
+                </td>
+                <td>
+                  一覧表示
+                </td>
               </tr>
               <tr>
-                <td>繰り返し条件・終了条件</td>
-                <td>［記入：繰り返し条件・終了条件］</td>
+                <td>
+                  取得成功かつ一覧が0件
+                </td>
+                <td>
+                  空の状態を画面へ渡す。
+                </td>
+                <td>
+                  0件表示
+                </td>
               </tr>
               <tr>
-                <td>正常・異常の戻り値・復帰先</td>
-                <td>［記入：正常・異常の戻り値・復帰先］</td>
+                <td>
+                  DB参照・通信・整形の失敗
+                </td>
+                <td>
+                  失敗を画面へ渡す。0件として返さない。
+                </td>
+                <td>
+                  取得失敗表示
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  再試行・中断（追加取得は対象外）
+                </td>
+                <td>
+                  条件・採用・動作は未決。
+                </td>
+                <td>
+                  未決
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-10">
-        <h2>10. データフロー図（DFD）</h2>
-        <p>分類：個別系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>データの発生元</td>
-                <td>［記入：データの発生元］</td>
-              </tr>
-              <tr>
-                <td>処理</td>
-                <td>［記入：処理］</td>
-              </tr>
-              <tr>
-                <td>保存先</td>
-                <td>［記入：保存先］</td>
-              </tr>
-              <tr>
-                <td>受け渡すデータ名・形式</td>
-                <td>［記入：受け渡すデータ名・形式］</td>
-              </tr>
-              <tr>
-                <td>関連テーブル・ファイル</td>
-                <td>［記入：関連テーブル・ファイル］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          10. データフロー図（DFD）
+        </h2>
+        <p>
+          分類：個別系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 760 190"
-              role="img"
-              aria-labelledby="logic-10-title logic-10-desc"
-            >
-              <title id="logic-10-title">記入例・未確定</title>
-              <desc id="logic-10-desc">
-                箱は外部主体・処理・データ保存先、矢印はデータの受け渡しです。実行順序は示しません。
+            <svg viewBox="0 0 920 170" role="img" aria-labelledby="dataflow-title dataflow-desc">
+              <title id="dataflow-title">
+                DF-001 投稿データの流れ
+              </title>
+              <desc id="dataflow-desc">
+                参照DB：シード済み投稿 → PRC-002：取得API → PRC-001：フロントエンド → SCR-001：ITEM-003。DF-001：箱は参照元DB・処理・利用先、矢印はデータの受け渡し。処理順序や分岐は示さない。
               </desc>
               <defs>
-                <marker
-                  id="logic-10-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="dataflow-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <rect
-                x="15.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="102.0" y="107" text-anchor="middle">仮の外部入力</text>
-              <path
-                d="M 190.0 100 H 260.33333333333337"
-                stroke="#344e70"
-                marker-end="url(#logic-10-arrow)"
-              />
-              <text x="225.16666666666669" y="50" text-anchor="middle">
-                仮の入力データ
+              <rect x="10.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="102.5" y="99" text-anchor="middle">
+                参照DB：シード済み投稿
               </text>
-              <rect
-                x="268.33333333333337"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="355.33333333333337" y="107" text-anchor="middle">
-                DF-001：仮の変換
+              <path d="M195.0 93 H235.0" stroke="#344e70" marker-end="url(#dataflow-arrow)"/>
+              <text x="220.0" y="40" text-anchor="middle">
+                Postの属性データ
               </text>
-              <path
-                d="M 443.33333333333337 100 H 513.6666666666667"
-                stroke="#344e70"
-                marker-end="url(#logic-10-arrow)"
-              />
-              <text x="478.50000000000006" y="50" text-anchor="middle">
-                仮の保存データ
+              <rect x="240.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="332.5" y="99" text-anchor="middle">
+                PRC-002：取得API
               </text>
-              <rect
-                x="521.6666666666667"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="608.6666666666667" y="107" text-anchor="middle">
-                TBL-001：仮の保存先
+              <path d="M425.0 93 H465.0" stroke="#344e70" marker-end="url(#dataflow-arrow)"/>
+              <text x="450.0" y="40" text-anchor="middle">
+                表示用一覧
+              </text>
+              <rect x="470.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="562.5" y="99" text-anchor="middle">
+                PRC-001：フロントエンド
+              </text>
+              <path d="M655.0 93 H695.0" stroke="#344e70" marker-end="url(#dataflow-arrow)"/>
+              <text x="680.0" y="40" text-anchor="middle">
+                表示内容
+              </text>
+              <rect x="700.0" y="60" width="185.0" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="792.5" y="99" text-anchor="middle">
+                SCR-001：ITEM-003
               </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：箱は外部主体・処理・データ保存先、矢印はデータの受け渡しです。実行順序は示しません。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            DF-001：箱は参照元DB・処理・利用先、矢印はデータの受け渡し。処理順序や分岐は示さない。
           </figcaption>
         </figure>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  データ
+                </th>
+                <th scope="col">
+                  内容・形式
+                </th>
+                <th scope="col">
+                  関連・保存への影響
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>データ名・形式・発生元・受け渡し先</td>
-                <td>［記入：データ名・形式・発生元・受け渡し先］</td>
+                <td>
+                  取得条件
+                </td>
+                <td>
+                  投稿テーブルの全件。posted_atの降順。件数上限・絞り込み・ページ指定は設けない。同じ投稿日時の行同士の順序は未決。
+                </td>
+                <td>
+                  PRC-002への入力。
+                </td>
               </tr>
               <tr>
-                <td>関連TBL ID・FIL ID</td>
-                <td>［記入：関連TBL ID・FIL ID］</td>
+                <td>
+                  Postの属性データ
+                </td>
+                <td>
+                  Postの8属性を扱う。post_id:int、author:str、body:str、posted_at:datetime、reply_count:int、retweet_count:int、like_count:int、displayed_at:str。displayed_atはAPIで算出する。
+                </td>
+                <td>
+                  シード済み投稿を参照し、Postを生成する。DBの物理設計は本章では定義しない。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  表示用一覧
+                </td>
+                <td>
+                  Postの全8属性を同名の項目として持つJSON配列。数値はJSON整数、author・body・displayed_atは文字列、posted_atはISO 8601文字列。表示日時の規則は<a href="#display-time-rules">14章の処理設計</a>を参照。
+                </td>
+                <td>
+                  PRC-002→PRC-001。APIが生成した値をそのまま返す。閲覧によるDB更新は行わない。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  取得失敗
+                </td>
+                <td>
+                  エラーの伝達方式は未決。
+                </td>
+                <td>
+                  PRC-002→PRC-001。16章参照。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-11">
-        <h2>11. 状態遷移設計</h2>
-        <p>分類：個別系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>対象の状態</td>
-                <td>［記入：対象の状態］</td>
-              </tr>
-              <tr>
-                <td>イベント・条件</td>
-                <td>［記入：イベント・条件］</td>
-              </tr>
-              <tr>
-                <td>遷移先</td>
-                <td>［記入：遷移先］</td>
-              </tr>
-              <tr>
-                <td>実行処理</td>
-                <td>［記入：実行処理］</td>
-              </tr>
-              <tr>
-                <td>許可しない遷移時の扱い</td>
-                <td>［記入：許可しない遷移時の扱い］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          11. 状態遷移設計
+        </h2>
+        <p>
+          分類：個別系
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 760 190"
-              role="img"
-              aria-labelledby="logic-11-title logic-11-desc"
-            >
-              <title id="logic-11-title">記入例・未確定</title>
-              <desc id="logic-11-desc">
-                箱は対象データの状態、矢印は許可された状態変化です。画面の移動ではありません。
+            <svg viewBox="0 0 760 170" role="img" aria-labelledby="state-title state-desc">
+              <title id="state-title">
+                一覧表示データの状態遷移案
+              </title>
+              <desc id="state-desc">
+                取得前 → 取得中 → 一覧あり／0件／失敗。箱は一覧表示データの状態、矢印は状態の変化。画面間の移動ではない。取得前は論理上の初期状態であり、画面上の表示を必須としない。
               </desc>
               <defs>
-                <marker
-                  id="logic-11-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="state-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <rect
-                x="15.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="102.0" y="107" text-anchor="middle">仮の状態A</text>
-              <path
-                d="M 190.0 100 H 387.0"
-                stroke="#344e70"
-                marker-end="url(#logic-11-arrow)"
-              />
-              <text x="288.5" y="50" text-anchor="middle">
-                仮のイベント［条件］
+              <rect x="10.0" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="114.16666666666667" y="99" text-anchor="middle">
+                取得前
               </text>
-              <rect
-                x="395.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="482.0" y="107" text-anchor="middle">仮の状態B</text>
+              <path d="M218.33333333333337 93 H258.33333333333337" stroke="#344e70" marker-end="url(#state-arrow)"/>
+              <text x="243.33333333333337" y="40" text-anchor="middle">
+                初回表示
+              </text>
+              <rect x="263.33333333333337" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="367.50000000000006" y="99" text-anchor="middle">
+                取得中
+              </text>
+              <path d="M471.66666666666674 93 H511.66666666666674" stroke="#344e70" marker-end="url(#state-arrow)"/>
+              <text x="496.66666666666674" y="40" text-anchor="middle">
+                取得結果
+              </text>
+              <rect x="516.6666666666667" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="620.8333333333334" y="99" text-anchor="middle">
+                一覧あり／0件／失敗
+              </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：箱は対象データの状態、矢印は許可された状態変化です。画面の移動ではありません。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            箱は一覧表示データの状態、矢印は状態の変化。画面間の移動ではない。取得前は論理上の初期状態であり、画面上の表示を必須としない。
           </figcaption>
         </figure>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  現在状態
+                </th>
+                <th scope="col">
+                  イベント・条件
+                </th>
+                <th scope="col">
+                  次状態
+                </th>
+                <th scope="col">
+                  実行処理・制約
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>対象データ・初期状態・終端状態</td>
-                <td>［記入：対象データ・初期状態・終端状態］</td>
+                <td>
+                  取得前
+                </td>
+                <td>
+                  初回表示
+                </td>
+                <td>
+                  取得中
+                </td>
+                <td>
+                  PRC-001がPRC-002を起動する。
+                </td>
               </tr>
               <tr>
-                <td>遷移前・イベント・条件・遷移先・実行処理</td>
-                <td>［記入：遷移前・イベント・条件・遷移先・実行処理］</td>
+                <td>
+                  取得中
+                </td>
+                <td>
+                  取得成功・1件以上
+                </td>
+                <td>
+                  一覧あり
+                </td>
+                <td>
+                  取得済みデータを表示する。
+                </td>
               </tr>
               <tr>
-                <td>禁止する遷移・拒否時の扱い</td>
-                <td>［記入：禁止する遷移・拒否時の扱い］</td>
+                <td>
+                  取得中
+                </td>
+                <td>
+                  取得成功・0件
+                </td>
+                <td>
+                  0件
+                </td>
+                <td>
+                  投稿がない状態を表示する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  取得中
+                </td>
+                <td>
+                  取得・整形に失敗
+                </td>
+                <td>
+                  失敗
+                </td>
+                <td>
+                  取得失敗を表示。0件とは区別する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  一覧あり・0件・失敗
+                </td>
+                <td>
+                  再試行・タブ切替・離脱
+                </td>
+                <td>
+                  未決
+                </td>
+                <td>
+                  採用と遷移条件を設計時に決める。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  取得中
+                </td>
+                <td>
+                  再取得の起動
+                </td>
+                <td>
+                  未決
+                </td>
+                <td>
+                  重複したAPI呼出と古い応答の扱いは未決。全件取得のためページ単位の追加取得は行わない。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-12">
-        <h2>12. バッチ全体設計</h2>
-        <p>分類：俯瞰系</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>起動から終了までの流れ</td>
-                <td>［記入：起動から終了までの流れ］</td>
-              </tr>
-              <tr>
-                <td>スケジュール・依存関係</td>
-                <td>［記入：スケジュール・依存関係］</td>
-              </tr>
-              <tr>
-                <td>同時実行・再実行</td>
-                <td>［記入：同時実行・再実行］</td>
-              </tr>
-              <tr>
-                <td>失敗・復旧</td>
-                <td>［記入：失敗・復旧］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <h2>
+          12. バッチ全体設計
+        </h2>
+        <p>
+          分類：俯瞰系
+        </p>
+        <p>
+          投稿一覧の閲覧に必要な定期バッチは対象外。マイグレーションと動作確認データの用意は、開発者が実行する準備処理として管理する。
+        </p>
         <figure>
           <div class="diagram-wrap">
-            <svg
-              viewBox="0 0 760 190"
-              role="img"
-              aria-labelledby="logic-12-title logic-12-desc"
-            >
-              <title id="logic-12-title">記入例・未確定</title>
-              <desc id="logic-12-desc">
-                箱は起動・ジョブ・終了、矢印は実行依存を示します。
+            <svg viewBox="0 0 760 170" role="img" aria-labelledby="setup-title setup-desc">
+              <title id="setup-title">
+                開発環境の準備順序案
+              </title>
+              <desc id="setup-desc">
+                PRC-003：スキーマ準備 → PRC-004：確認データ準備 → SCR-001：表示確認。箱は開発時の作業、矢印は実行依存。定期実行・本番ジョブを意味しない。失敗した段階で準備を中止し、復旧・再実行方式はツール決定後に定義する。
               </desc>
               <defs>
-                <marker
-                  id="logic-12-arrow"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#344e70" />
+                <marker id="setup-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70"/>
                 </marker>
               </defs>
-              <rect
-                x="15.0"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="102.0" y="107" text-anchor="middle">仮の起動</text>
-              <path
-                d="M 190.0 100 H 260.33333333333337"
-                stroke="#344e70"
-                marker-end="url(#logic-12-arrow)"
-              />
-              <text x="225.16666666666669" y="50" text-anchor="middle">
-                仮のスケジュール
+              <rect x="10.0" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="114.16666666666667" y="99" text-anchor="middle">
+                PRC-003：スキーマ準備
               </text>
-              <rect
-                x="268.33333333333337"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="355.33333333333337" y="107" text-anchor="middle">
-                BAT-001：仮のバッチ
+              <path d="M218.33333333333337 93 H258.33333333333337" stroke="#344e70" marker-end="url(#setup-arrow)"/>
+              <text x="243.33333333333337" y="40" text-anchor="middle">
+                成功時のみ
               </text>
-              <path
-                d="M 443.33333333333337 100 H 513.6666666666667"
-                stroke="#344e70"
-                marker-end="url(#logic-12-arrow)"
-              />
-              <text x="478.50000000000006" y="50" text-anchor="middle">
-                仮の成功条件
+              <rect x="263.33333333333337" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="367.50000000000006" y="99" text-anchor="middle">
+                PRC-004：確認データ準備
               </text>
-              <rect
-                x="521.6666666666667"
-                y="70"
-                width="175"
-                height="65"
-                rx="5"
-                fill="#f4f7fb"
-                stroke="#344e70"
-              />
-              <text x="608.6666666666667" y="107" text-anchor="middle">
-                仮の終了
+              <path d="M471.66666666666674 93 H511.66666666666674" stroke="#344e70" marker-end="url(#setup-arrow)"/>
+              <text x="496.66666666666674" y="40" text-anchor="middle">
+                準備完了
+              </text>
+              <rect x="516.6666666666667" y="60" width="208.33333333333334" height="66" rx="6" fill="#f4f7fb" stroke="#344e70"/>
+              <text x="620.8333333333334" y="99" text-anchor="middle">
+                SCR-001：表示確認
               </text>
             </svg>
           </div>
           <figcaption>
-            記入例・未確定：箱は起動・ジョブ・終了、矢印は実行依存を示します。
-            名称・関係・条件は仮です。実際の設計に置き換えてください。
+            箱は開発時の作業、矢印は実行依存。定期実行・本番ジョブを意味しない。失敗した段階で準備を中止し、復旧・再実行方式はツール決定後に定義する。
           </figcaption>
         </figure>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>採用状況（未決／対象外／採用）</td>
-                <td>［記入：採用状況（未決／対象外／採用）］</td>
-              </tr>
-              <tr>
-                <td>スケジュール・タイムゾーン・依存関係</td>
-                <td>［記入：スケジュール・タイムゾーン・依存関係］</td>
-              </tr>
-              <tr>
-                <td>同時実行・再実行・冪等性</td>
-                <td>［記入：同時実行・再実行・冪等性］</td>
-              </tr>
-              <tr>
-                <td>失敗・復旧・通知</td>
-                <td>［記入：失敗・復旧・通知］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-13">
-        <h2>13. バッチプログラム一覧</h2>
-        <p>分類：管理系</p>
+        <h2>
+          13. バッチプログラム一覧
+        </h2>
+        <p>
+          分類：管理系
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">バッチID</th>
-                <th scope="col">関連プログラム・機能</th>
-                <th scope="col">起動契機・実行順</th>
-                <th scope="col">入出力</th>
-                <th scope="col">終了コード</th>
-                <th scope="col">再実行条件</th>
+                <th scope="col">
+                  バッチID
+                </th>
+                <th scope="col">
+                  名称・起動契機
+                </th>
+                <th scope="col">
+                  関連プログラム・処理
+                </th>
+                <th scope="col">
+                  入出力・実行条件
+                </th>
+                <th scope="col">
+                  採用状況
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：バッチID］</td>
-                <td>［記入：関連プログラム・機能］</td>
-                <td>［記入：起動契機・実行順］</td>
-                <td>［記入：入出力］</td>
-                <td>［記入：終了コード］</td>
-                <td>［記入：再実行条件］</td>
+                <td>
+                  対象外
+                </td>
+                <td>
+                  定期実行バッチ
+                </td>
+                <td>
+                  対象外
+                </td>
+                <td>
+                  閲覧時の取得で対応する。
+                </td>
+                <td>
+                  対象外
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  未採番
+                </td>
+                <td>
+                  開発者によるマイグレーション
+                </td>
+                <td>
+                  PRG-003 / PRC-003
+                </td>
+                <td>
+                  スキーマ定義→DB。終了コード・再実行・同時実行条件は未決。
+                </td>
+                <td>
+                  準備処理として対象。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  未採番
+                </td>
+                <td>
+                  開発者による動作確認データ準備
+                </td>
+                <td>
+                  PRG-004 / PRC-004
+                </td>
+                <td>
+                  確認データ→DB。スキーマ準備後に実行。再実行条件は未決。
+                </td>
+                <td>
+                  準備処理として対象。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-14">
-        <h2>14. 処理設計（プログラム仕様書）</h2>
-        <p>分類：個別系</p>
+        <h2>
+          14. 処理設計（プログラム仕様書）
+        </h2>
+        <p>
+          分類：個別系
+        </p>
+        <article id="process-001">
+          <h3>
+            PRC-001：トップページの投稿一覧表示
+          </h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    設計項目
+                  </th>
+                  <th scope="col">
+                    内容・決定状況
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    目的・関連
+                  </td>
+                  <td>
+                    FUN-001 / PRG-001 / SCR-001（/）/ ITEM-003。取得結果を画面に表示する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    起動・入力
+                  </td>
+                  <td>
+                    トップページへのアクセスを起点に、条件指定なしで一覧取得APIを呼び出す。認証の要否は未決。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    出力
+                  </td>
+                  <td>
+                    取得中・一覧あり・0件・取得失敗の表示状態と、成功時の投稿データ。表示文言は未決。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    手順
+                  </td>
+                  <td>
+                    ①取得中にする ②HTTP GETでPRC-002を呼び出す ③Postの配列を受け取る ④一覧あり・0件・失敗へ分岐する ⑤受信した順序のまま表示し、日時にはdisplayed_atを用いる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    副作用・例外
+                  </td>
+                  <td>
+                    投稿データは更新しない。失敗を空一覧として扱わない。表示中の再取得・中断・古い応答の破棄は未決。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    完了条件・確認観点
+                  </td>
+                  <td>
+                    DBの投稿が表示され、0件と失敗が区別されること。表示項目・順序・件数・表示状態を設計と照合する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <article id="process-002">
+          <h3>
+            PRC-002：投稿一覧の取得・整形
+          </h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    設計項目
+                  </th>
+                  <th scope="col">
+                    内容・決定状況
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    目的・関連
+                  </td>
+                  <td>
+                    FUN-001 / PRG-002 / CLS-001。バックエンドAPIで投稿テーブルを全件参照し、Postの配列をJSONで返す。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    入力・条件
+                  </td>
+                  <td>
+                    絞り込みなしで投稿テーブルの全データを取得する。posted_at降順。件数上限・ページネーション・追加読み込みは設けない。同じ投稿日時の行同士の順序とAPI認証の要否は未決。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    出力
+                  </td>
+                  <td>
+                    正常：Postの8属性を持つJSONオブジェクトの配列（0件は[]）。各属性名と型は<a href="#post-attributes">6章の属性一覧</a>に一致させる。異常：取得失敗。エラーコード・応答形式は未決。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    手順
+                  </td>
+                  <td>
+                    ①投稿テーブルをposted_at降順で全件SELECTする ②現在時刻を1回取得する ③各行からPostを生成し、posted_atと現在時刻からdisplayed_atを算出する ④Postの8属性を同名のJSON項目にして配列で返す。途中の失敗は異常として呼出元へ伝える。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    整合性・資源
+                  </td>
+                  <td>
+                    一覧取得は参照のみ。DBセッション・トランザクション・接続解放・タイムアウト・再試行の方式は未決。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    完了条件・確認観点
+                  </td>
+                  <td>
+                    1件・複数件・0件で全件が返り、posted_at降順であること。Postの8項目と型、0以上の各件数、長文・改行、DB停止・通信失敗・変換失敗を確認する。displayed_atは59秒/60秒、3599秒/3600秒、86399秒/86400秒、604799秒/604800秒の境界を確認する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        <h4 id="post-json-example">
+          正常応答のデータ形式例
+        </h4>
+        <p>
+          値はサンプル。現在時刻を2026-10-22T12:00:00+00:00とした例。Postの属性名をそのままJSONのキーにし、一覧用のラッパーや別の応答項目を追加しない。
+        </p>
+        <pre><code>[
+  {
+    "post_id": 1,
+    "author": "ユーザーA",
+    "body": "トップページのレイアウトを考えています。",
+    "posted_at": "2026-10-20T12:00:00+00:00",
+    "reply_count": 2,
+    "retweet_count": 1,
+    "like_count": 5,
+    "displayed_at": "2日"
+  }
+]</code></pre>
+        <h4 id="display-time-rules">
+          displayed_at：表示日時の算出
+        </h4>
+        <p>
+          API処理で現在時刻nowを1回取得し、各Postについて
+          <code>
+            経過秒数 = now - posted_at
+          </code>
+          を求める。同じ応答内ではnowを共有し、時差を含む同じ時間軸で比較する。1日は24時間、1週間は7日（604800秒）とする。
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  経過時間
+                </th>
+                <th scope="col">
+                  displayed_atの値
+                </th>
+                <th scope="col">
+                  例
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>処理ごとの目的・起動条件</td>
-                <td>［記入：処理ごとの目的・起動条件］</td>
+                <td>
+                  1分未満
+                </td>
+                <td>
+                  たった今
+                </td>
+                <td>
+                  0〜59秒 → たった今
+                </td>
               </tr>
               <tr>
-                <td>入出力</td>
-                <td>［記入：入出力］</td>
+                <td>
+                  1分以上・1時間未満
+                </td>
+                <td>
+                  整数の分数 + 分（端数切り捨て）
+                </td>
+                <td>
+                  120秒 → 2分
+                </td>
               </tr>
               <tr>
-                <td>手順</td>
-                <td>［記入：手順］</td>
+                <td>
+                  1時間以上・1日未満
+                </td>
+                <td>
+                  整数の時間数 + 時間（端数切り捨て）
+                </td>
+                <td>
+                  7200秒 → 2時間
+                </td>
               </tr>
               <tr>
-                <td>データ操作・整合性</td>
-                <td>［記入：データ操作・整合性］</td>
+                <td>
+                  1日以上・1週間未満
+                </td>
+                <td>
+                  整数の日数 + 日（端数切り捨て）
+                </td>
+                <td>
+                  172800秒 → 2日
+                </td>
               </tr>
               <tr>
-                <td>例外・再試行</td>
-                <td>［記入：例外・再試行］</td>
-              </tr>
-              <tr>
-                <td>ログ・エラー</td>
-                <td>［記入：ログ・エラー］</td>
-              </tr>
-              <tr>
-                <td>完了条件</td>
-                <td>［記入：完了条件］</td>
+                <td>
+                  1週間以上
+                </td>
+                <td>
+                  投稿日時をyyyy/mm/dd形式に整形
+                </td>
+                <td>
+                  2026年10月1日の投稿 → 2026/10/01
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
+        <p>
+          算出したdisplayed_atは応答時の値とし、DBの更新は行わない。画面を開いたままの自動再計算は今回の対象外。日付表示のタイムゾーンと、未来のposted_atを持つデータの扱いは未決。投稿データのサンプル用SampleMessage・GreetingResponseはPostの正式な仕様に流用しない。
+        </p>
+        </article>
+        <article id="process-003">
+          <h3>
+            PRC-003：DBマイグレーション
+          </h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    設計項目
+                  </th>
+                  <th scope="col">
+                    内容・決定状況
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    目的・関連
+                  </td>
+                  <td>
+                    FUN-002 / PRG-003。設計した投稿関連テーブルを作成できるようにする。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    起動・入出力
+                  </td>
+                  <td>
+                    開発者が選択した環境で明示的に実行する。入力：DB設計・変更定義。出力：反映済みのDB構造。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    手順・整合性
+                  </td>
+                  <td>
+                    ツール、履歴管理、実行前確認、トランザクション、失敗時のロールバック、再実行・同時実行制御は未決。既存のcreate_allによるサンプル初期化を正式な移行方式として確定しない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    完了条件・確認観点
+                  </td>
+                  <td>
+                    マイグレーションで設計したテーブルが作成されること。適用済み環境での再実行・途中失敗時の状態は採用ツールの設計に基づいて確認する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <article id="process-004">
+          <h3>
+            PRC-004：動作確認用投稿データの用意
+          </h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">
+                    設計項目
+                  </th>
+                  <th scope="col">
+                    内容・決定状況
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    目的・関連
+                  </td>
+                  <td>
+                    FUN-002 / PRG-004。投稿一覧の動作確認に必要なデータを用意する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    起動・入出力
+                  </td>
+                  <td>
+                    PRC-003完了後、開発者が事前にシードを投入する。入力：投稿の初期値。出力：DBの投稿データ。閲覧APIの呼出では実行しない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    手順・整合性
+                  </td>
+                  <td>
+                    post_id・author・body・posted_at・reply_count・retweet_count・like_countをシードとして用意する。displayed_atは保存しない。具体的な初期値・投入コマンド・重複防止・復旧は未決。既存データを削除して0件状態を作る操作は定義しない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    完了条件・確認観点
+                  </td>
+                  <td>
+                    用意した投稿がSCR-001で確認できること。0件環境・取得失敗環境も分けて確認する。再実行・失敗時の扱いは投入方式の決定後に検証する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <h3 id="open-decisions">
+          決定事項と残る未決事項
+        </h3>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
+                <th scope="col">
+                  設計事項ID
+                </th>
+                <th scope="col">
+                  内容
+                </th>
+                <th scope="col">
+                  反映先
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>処理ID・目的・起動条件・完了条件</td>
-                <td>［記入：処理ID・目的・起動条件・完了条件］</td>
+                <td>
+                  DEC-001
+                </td>
+                <td>
+                  未決：日付表示のタイムゾーンと未来日時の扱い。決定済み：Postの8属性・型、displayed_atの相対表示規則。
+                </td>
+                <td>
+                  入出力設計5章、本書3・6・10・14章、DB設計
+                </td>
               </tr>
               <tr>
-                <td>入力項目・型・条件</td>
-                <td>［記入：入力項目・型・条件］</td>
+                <td>
+                  DEC-002
+                </td>
+                <td>
+                  未決：APIパス・ファイル配置・エラー応答。決定済み：フロントエンドからHTTP GET、バックエンドで全件参照しPostのJSON配列を返す。
+                </td>
+                <td>
+                  本書2・7・8・14章、API設計
+                </td>
               </tr>
               <tr>
-                <td>出力項目・型・条件</td>
-                <td>［記入：出力項目・型・条件］</td>
+                <td>
+                  DEC-003
+                </td>
+                <td>
+                  未決：同じ投稿日時の行同士の順序・API認証。決定済み：絞り込みなしの全件取得・posted_at降順。
+                </td>
+                <td>
+                  本書8〜11・14章、DB設計、API設計
+                </td>
               </tr>
               <tr>
-                <td>手順・分岐・繰り返し</td>
-                <td>［記入：手順・分岐・繰り返し］</td>
+                <td>
+                  DEC-004
+                </td>
+                <td>
+                  取得中・0件・失敗の文言、再試行・中断・重複取得
+                </td>
+                <td>
+                  入出力設計4章、本書5・9・11・14〜16章
+                </td>
               </tr>
               <tr>
-                <td>データ操作・整合性・トランザクション</td>
-                <td>［記入：データ操作・整合性・トランザクション］</td>
+                <td>
+                  DEC-005
+                </td>
+                <td>
+                  決定済み：全件取得のためページネーション・追加読み込みは対象外。
+                </td>
+                <td>
+                  入出力設計、本書8〜11・14章、API・DB設計
+                </td>
               </tr>
               <tr>
-                <td>例外・再試行・ロールバック</td>
-                <td>［記入：例外・再試行・ロールバック］</td>
+                <td>
+                  DEC-006
+                </td>
+                <td>
+                  対応画面幅・サイドバー内の機能の採用
+                </td>
+                <td>
+                  入出力設計。採用する機能は別途ロジックを追加。
+                </td>
               </tr>
               <tr>
-                <td>LOG ID・ERR ID</td>
-                <td>［記入：LOG ID・ERR ID］</td>
+                <td>
+                  DEC-007
+                </td>
+                <td>
+                  マイグレーション・確認データ投入の方式と実行条件
+                </td>
+                <td>
+                  本書12〜14章、DB設計
+                </td>
               </tr>
               <tr>
-                <td>正常系・境界値・異常系の確認観点</td>
-                <td>［記入：正常系・境界値・異常系の確認観点］</td>
+                <td>
+                  DEC-008
+                </td>
+                <td>
+                  ログ・エラーコード・タイムアウト・DB資源管理
+                </td>
+                <td>
+                  本書14〜16章、API設計
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-15">
-        <h2>15. ログ一覧</h2>
-        <p>分類：管理系</p>
+        <h2>
+          15. ログ一覧
+        </h2>
+        <p>
+          分類：管理系
+        </p>
+        <p>
+          以下は出力候補。LOG IDは設計管理用であり、出力の採用・形式・レベル・保存先・保存期間は未決。
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">ログID</th>
-                <th scope="col">用途</th>
-                <th scope="col">出力する処理・条件</th>
-                <th scope="col">レベル・出力先</th>
-                <th scope="col">メッセージ・項目</th>
-                <th scope="col">保存・マスキング方針</th>
+                <th scope="col">
+                  ログID
+                </th>
+                <th scope="col">
+                  用途・出力条件
+                </th>
+                <th scope="col">
+                  関連処理
+                </th>
+                <th scope="col">
+                  レベル・出力先
+                </th>
+                <th scope="col">
+                  候補項目・マスキング
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：ログID］</td>
-                <td>［記入：用途］</td>
-                <td>［記入：出力する処理・条件］</td>
-                <td>［記入：レベル・出力先］</td>
-                <td>［記入：メッセージ・項目］</td>
-                <td>［記入：保存・マスキング方針］</td>
+                <td>
+                  LOG-001
+                </td>
+                <td>
+                  投稿取得の失敗原因を調査する。
+                </td>
+                <td>
+                  PRC-002 / ERR-001
+                </td>
+                <td>
+                  未決
+                </td>
+                <td>
+                  発生日時・処理ID・エラー種別・追跡IDを候補とする。投稿本文・認証情報・秘密情報を含む接続文字列は記録しない。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  LOG-002
+                </td>
+                <td>
+                  DB構造の準備・確認データ投入の実行結果を確認する。
+                </td>
+                <td>
+                  PRC-003・PRC-004 / ERR-002
+                </td>
+                <td>
+                  未決
+                </td>
+                <td>
+                  実行処理・結果・対象変更を候補とする。確認データの本文や接続秘密情報は記録しない。
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>秘密情報・不要な個人情報を含めない出力方針</td>
-                <td>［記入：秘密情報・不要な個人情報を含めない出力方針］</td>
-              </tr>
-              <tr>
-                <td>保存期間・マスキング・閲覧権限</td>
-                <td>［記入：保存期間・マスキング・閲覧権限］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
       <section id="chapter-16">
-        <h2>16. エラーコード一覧</h2>
-        <p>分類：管理系</p>
+        <h2>
+          16. エラーコード一覧
+        </h2>
+        <p>
+          分類：管理系
+        </p>
+        <p>
+          ERR IDは設計上の識別子。実際に返すエラーコードやHTTPステータスは未決。利用者向け文言は入出力設計と合わせて決める。
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
-                <th scope="col">エラーID・コード</th>
-                <th scope="col">意味・発生条件</th>
-                <th scope="col">関連処理・ログ</th>
-                <th scope="col">返却・表示文言</th>
-                <th scope="col">通信ステータス・再試行可否</th>
-                <th scope="col">復旧方法</th>
+                <th scope="col">
+                  エラーID
+                </th>
+                <th scope="col">
+                  意味・発生条件
+                </th>
+                <th scope="col">
+                  関連処理・ログ
+                </th>
+                <th scope="col">
+                  表示・返却内容
+                </th>
+                <th scope="col">
+                  再試行・復旧
+                </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>［記入：エラーID・コード］</td>
-                <td>［記入：意味・発生条件］</td>
-                <td>［記入：関連処理・ログ］</td>
-                <td>［記入：返却・表示文言］</td>
-                <td>［記入：通信ステータス・再試行可否］</td>
-                <td>［記入：復旧方法］</td>
+                <td>
+                  ERR-001
+                </td>
+                <td>
+                  一覧取得失敗：DB参照、API通信、Postの生成・JSON変換・表示日時算出の失敗。
+                </td>
+                <td>
+                  PRC-002→PRC-001 / LOG-001
+                </td>
+                <td>
+                  利用者：取得に失敗したことを表示。文言は未決。内部：原因を区別して調査可能にする方式を検討。コード・HTTPステータスは未決。
+                </td>
+                <td>
+                  再試行の条件・回数・操作は未決。DB復旧等の対応は原因別に定義する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  ERR-002
+                </td>
+                <td>
+                  準備処理失敗：マイグレーション・確認データ投入の失敗。
+                </td>
+                <td>
+                  PRC-003・PRC-004 / LOG-002
+                </td>
+                <td>
+                  開発者向けの失敗通知。終了コード・詳細の形式は未決。
+                </td>
+                <td>
+                  成功を前提に次の準備処理へ進めない。復旧・再実行方法はツールと投入方式の決定後に定義する。
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  対象外
+                </td>
+                <td>
+                  取得成功かつ0件
+                </td>
+                <td>
+                  PRC-002→PRC-001
+                </td>
+                <td>
+                  エラーではなく、空の状態として表示する。
+                </td>
+                <td>
+                  対象外
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">設計項目</th>
-                <th scope="col">記入内容</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>内部向けメッセージ</td>
-                <td>［記入：内部向けメッセージ］</td>
-              </tr>
-              <tr>
-                <td>利用者向けメッセージ</td>
-                <td>［記入：利用者向けメッセージ］</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="back"><a href="#toc">目次へ戻る</a></p>
+        <p class="back">
+          <a href="#toc">
+            目次へ戻る
+          </a>
+        </p>
       </section>
     </main>
     <footer>
-      テンプレート：記入例は未確定です。更新時は関連文書・図表の整合性も確認してください。
+      ロジック設計書 v1.0.0｜投稿一覧表示の設計案。未決事項は設計の進行に合わせて更新する。
     </footer>
   </body>
 </html>

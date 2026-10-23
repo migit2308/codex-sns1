@@ -437,13 +437,17 @@
       </div>
     </header>
     <main>
+      <p id="implementation-status">
+        実装状況：Issue
+        #2の投稿一覧を実装済み。PC向け3カラム、初回取得・0件・失敗・再試行を提供する。バックエンドはbackend/src/sns、画面はfrontend/src/App.jsx、移行はbackend/migrationsに配置する。本文書の設計仕様と実装状況は別に管理する。
+      </p>
       <aside class="note">
         <strong> 対象と確定状況 </strong>
         <p>
-          SCR-001の投稿一覧ITEM-003、API-001、PRC-002〜PRC-004に対応する設計案。今回の編集で実際のDB作成・Alembic導入・移行・シード投入は行わない。
+          SCR-001の投稿一覧ITEM-003、API-001、PRC-002〜PRC-004に対応する設計案。Alembic導入・初回移行・シード投入・APIからの参照を実装済み。
         </p>
         <p>
-          保存対象はPostの7属性。displayed_atはAPIで算出し、保存しない。閲覧APIは参照のみで、投稿の作成・編集・削除・各件数の増減は対象外。既存のsample.dbとsample_messagesは接続確認用として残し、正式な投稿へのデータ移行は行わない。
+          保存対象はPostの7属性。displayed_atはAPIで算出し、保存しない。閲覧APIは参照のみで、投稿の作成・編集・削除・各件数の増減は対象外。既存のsample.dbのファイルは残すが、接続確認用APIと初期化コードは削除する。既存データを正式な投稿へ移行しない。
         </p>
       </aside>
       <p>
@@ -557,7 +561,8 @@
                 <td>
                   SQLite＋Python標準sqlite3＋SQLAlchemy。調査時のローカル実行環境はSQLite
                   3.50.4、SQLAlchemy
-                  2.1.5。SQLiteはPythonの実行環境に依存するため実装時にも確認する。Alembicの導入・バージョン固定は実装時に行う。
+                  2.1.5。SQLiteはPythonの実行環境に依存するため実装時にも確認する。Alembic
+                  1.20.1を導入済み。
                 </td>
               </tr>
               <tr>
@@ -999,7 +1004,7 @@ CREATE INDEX ix_posts_posted_at_post_id
                 <tr>
                   <td>実装時の確認</td>
                   <td>
-                    空のDBへの適用、headでの再実行、既存シードの保持、途中失敗時の履歴とスキーマを検証する。Alembicの導入・バージョン固定とファイル配置は実装時に行う。
+                    空のDBへの適用、headでの再実行、既存シードの保持、途中失敗時の履歴とスキーマを検証する。backend/alembic.ini、backend/migrations、backend/src/snsに実装済み。
                   </td>
                 </tr>
               </tbody>
@@ -1239,7 +1244,13 @@ CREATE INDEX ix_posts_posted_at_post_id
                 <tr>
                   <td>失敗時の処理</td>
                   <td>
-                    参照・変換・未来日時検出の失敗は既存の<a href="ロジック設計.html#error-001">ERR-001</a>に従う。準備処理の失敗は<a href="ロジック設計.html#error-002">ERR-002</a>として作業を中止する。DBがない場合に閲覧APIが空DBを新設して正常0件と扱わないよう、実装時に存在・スキーマを確認する。
+                    参照・変換・未来日時検出の失敗は既存の<a
+                      href="ロジック設計.html#error-001"
+                      >ERR-001</a
+                    >に従う。準備処理の失敗は<a
+                      href="ロジック設計.html#error-002"
+                      >ERR-002</a
+                    >として作業を中止する。DBがない場合に閲覧APIが空DBを新設して正常0件と扱わないよう、読み取り専用接続mode=roで未作成ファイルを作らず、未移行スキーマも取得失敗として扱う。
                   </td>
                 </tr>
                 <tr>
@@ -1251,7 +1262,7 @@ CREATE INDEX ix_posts_posted_at_post_id
                 <tr>
                   <td>ログ・監視</td>
                   <td>
-                    投稿本文・接続情報はログに出さない。LOG-001・LOG-002の採否・出力先・保持期間、監視、バックアップ周期・世代は未決。
+                    投稿本文・接続情報はログに出さない。LOG-001はPRC-002と例外種別を標準エラーに出力する。シードは成功・失敗をコンソールに通知する。ログ保持期間、監視、バックアップ周期・世代は未決。
                   </td>
                 </tr>
                 <tr>
@@ -1271,7 +1282,7 @@ CREATE INDEX ix_posts_posted_at_post_id
     </main>
     <footer>
       データベース設計書
-      v1.0.0｜投稿一覧の設計案。DB作成・マイグレーション・シード・APIの実動作は実装時に確認する。
+      v1.0.0｜投稿一覧の設計案。初回移行・シード・APIの実接続を確認済み。
     </footer>
   </body>
 </html>

@@ -4,7 +4,33 @@ version = "0.1.0"
 description = "SNS開発用のFastAPIバックエンド"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "alembic==1.20.1",
     "fastapi[standard]==0.153.0",
     "sqlalchemy==2.1.5",
     "uvicorn==0.54.0",
 ]
+
+[dependency-groups]
+dev = [
+    "httpx==0.28.1",
+    "pytest==9.1.1",
+    "ruff==0.17.2",
+    "setuptools==84.2.1",
+]
+
+[build-system]
+requires = ["setuptools==84.2.1"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+src = ["src"]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B", "C4", "SIM", "BLE"]

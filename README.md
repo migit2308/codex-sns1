@@ -1,16 +1,37 @@
 # codex-sns1
 
-Codexを利用してSNS風Webアプリを開発するプロジェクトです。
-現在はViteとReactで「Hello World」を表示するフロントエンドと、FastAPIのサンプルAPIを用意しています。
+旧Twitter風SNSをCodexで開発するプロジェクトです。
+トップページから、SQLiteに事前投入した投稿を取得して表示します（Issue #2）。
+
+PC向けの3カラム構成です。投稿本文・投稿者・表示日時・各件数を表示し、投稿一覧以外の機能は「準備中」で操作できません。
+対応画面幅は1024px以上です。スマートフォン専用レイアウトはなく、それ未満では横スクロールします。
 
 ## 前提環境
 
-- Node.js 22.12以降の22系、または24系（動作確認：22.20.0）
-- npm（動作確認：10.9.3。Node.jsと一緒にインストールされます）
+- Node.js 22.12以降の22系、または24系
+- npm（Node.jsに同梱）
+- uvとPython 3.12系（uvが対応するPythonを用意できます）
 
-## フロントエンドの起動
+依存の直接バージョンとロックファイルをGitで管理しています。
 
-リポジトリのルートから実行します。
+## 最初の起動
+
+リポジトリのルートから、バックエンドを準備します。
+
+```sh
+cd backend
+uv sync --locked
+uv run --locked alembic upgrade head
+uv run --locked python -m sns.seed
+uv run --locked uvicorn sns.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+- `uv sync --locked`：依存を導入し、`src/sns` を開発用パッケージとしてインストールします。
+- `alembic upgrade head`：`backend/data/sns.db` に投稿テーブルと適用履歴を作成します。適用済みなら変更しません。
+- `python -m sns.seed`：3件の確認用投稿を投入します。同じIDはスキップし、既存値を上書きしません。
+- `uvicorn`：APIサーバーを起動します。起動するだけではDBの作成や初期データ投入を行いません。
+
+別のターミナルでフロントエンドを起動します。
 
 ```sh
 cd frontend
@@ -18,158 +39,81 @@ npm ci
 npm run dev
 ```
 
-ブラウザで http://127.0.0.1:5173 を開くと「Hello World」が表示されます。
-サーバーはこのPCからだけアクセスできる設定です。
-停止するには、起動したターミナルで `Ctrl+C` を押します。
-5173番ポートが使用中の場合は、既存のサーバーを停止してから再実行してください。
+[トップページ](http://127.0.0.1:5173/)を開くと、投稿が新しい順（同じ投稿日時なら投稿IDの大きい順）に表示されます。
+停止するには、それぞれのターミナルで `Ctrl+C` を押します。ポートが使用中なら既存サーバーを確認してください。
 
-- `npm ci`：`package-lock.json` に記録されたバージョンで依存ライブラリを導入します。初回や依存関係が変わったときに実行します。
-- `npm run dev`：開発用サーバーを起動します。ソースを保存すると画面に変更が反映されます。
-- `npm run build`：配布用のHTML・JavaScript・CSSを `frontend/dist/` に生成します。
-- `npm run preview`：ビルド済みの画面をローカルで確認します。先に `npm run build` を実行し、ターミナルに表示されたURLを開きます。本番運用用のサーバーではありません。
+## APIとデータ
 
-## 構成と編集箇所
+| 接続先                                        | 用途                       |
+| --------------------------------------------- | -------------------------- |
+| ブラウザの `GET /api/posts`                   | Viteを経由した投稿一覧取得 |
+| バックエンドの `GET /posts`                   | 認証なしの投稿一覧取得     |
+| [APIドキュメント](http://127.0.0.1:8000/docs) | FastAPIが生成するAPI仕様   |
 
-| ファイル | 役割 |
-| --- | --- |
-| `frontend/index.html` | ブラウザが最初に読み込むHTML。Reactを表示する場所を用意します。 |
-| `frontend/src/main.jsx` | Reactを起動し、画面をHTMLに組み込みます。 |
-| `frontend/src/App.jsx` | 画面の内容。「Hello World」の文字を変えるときはここを編集します。 |
-| `frontend/src/style.css` | 文字の色や余白など、見た目を指定します。 |
-| `frontend/vite.config.js` | Reactの変換や開発サーバーの設定です。 |
-| `frontend/package.json` | コマンドと直接利用するライブラリを定義します。 |
-| `frontend/package-lock.json` | 間接的な依存関係も含め、インストールするバージョンを記録します。 |
+正常時はPostの8項目を持つJSON配列を返します。0件は200と `[]`、取得失敗は500と `POST_LIST_FETCH_FAILED` です。未来の投稿日時が1件でもあれば一覧全体を失敗として扱います。
+200・500応答はキャッシュしません。投稿を閲覧しても件数や本文は変更されません。
 
-今回はJavaScriptを使用しています。`.jsx` は、JavaScriptの中にHTMLに似た画面の記述（JSX）を書けるファイルです。
+日時はUTCで保存し、表示用の文字列をAPIで計算します。1週間未満は「○分」「○時間」「○日」、1週間以上は日本時間の日付です。
+表示日時は再取得時に更新され、画面を開いたままの自動更新は行いません。
 
-## バージョン方針
+既存のVite設定で `/api/posts` をバックエンドの `/posts` に転送します。開発時のブラウザには同一オリジンの接続に見えます。
+この転送は開発サーバー用です。本番の配信・転送構成は別途必要です。
 
-Vite 8.3.4、React / React DOM 19.3.1、React用Viteプラグイン6.1.2を採用しています。
-正式リリースを使用し、beta・RC・canaryや実験的機能は採用しません。
-直接依存は固定し、ロックファイルもGit管理して環境を再現します。更新時にはビルドとブラウザ表示を確認します。
+接続確認用の `GET /`・`GET /health` と旧DB初期化コードは廃止しました。既存の `sample.db` ファイルは削除・移行しません。
 
-- [Viteのリリース・サポート方針](https://vite.dev/releases)
-- [Reactのバージョン情報](https://react.dev/versions)
+## フロントエンドの読み方
 
-## 作業範囲
+- `frontend/src/App.jsx`：ホーム画面と表示部品を定義します。`LeftSidebar`、`Timeline`、`PostCard`、`RightSidebar` がそれぞれ画面の一部分を担当します。
+- `useState` は読み込み状態と投稿データを保持します。`useEffect` は初回表示・再試行に合わせてAPIを呼びます。状態が変わるとReactが必要な部分を描き直します。
+- `frontend/src/style.css`：3カラムの配置、青い強調色、余白、投稿の区切り線を設定します。
+- JSXの `{post.body}` は本文を文字列として扱うため、投稿内のHTMLを実行しません。CSSの `white-space: pre-wrap` で改行を保持します。
 
-[Issue #1](https://github.com/migit2308/codex-sns1/issues/1)のフロントエンドとバックエンドの初期構築に対応しています。
-SQLiteのサンプルテーブルと、React画面からFastAPIを呼び出す接続確認も用意しています。
+取得中・0件・失敗を別の状態として扱い、失敗時には再試行できます。5秒でタイムアウトし、再試行中の重複操作や画面離脱後の応答反映を防ぎます。
 
-## React画面からのAPI接続確認
+## バックエンドの構成
 
-1. バックエンドの起動手順に従って、FastAPIを8000番ポートで起動します。
-2. 別のターミナルでフロントエンドを `npm run dev` で起動します。
-3. http://127.0.0.1:5173/ を開き、「APIからメッセージを取得」を押します。
-4. 「APIの応答：Hello World」と表示されれば、ReactからFastAPIへの接続成功です。
+| 配置                          | 役割                                   |
+| ----------------------------- | -------------------------------------- |
+| `backend/src/sns/main.py`     | FastAPIの起点、HTTP応答とエラー変換    |
+| `backend/src/sns/database.py` | 接続先・読み取り専用接続・モデルのBase |
+| `backend/src/sns/models.py`   | 保存用のPostRecordとDB制約             |
+| `backend/src/sns/schemas.py`  | 応答用のPost・ErrorResponse            |
+| `backend/src/sns/posts.py`    | 一覧取得・UTC復元・表示日時の算出      |
+| `backend/src/sns/seed.py`     | シード検証・投入・重複スキップ         |
+| `backend/migrations/`         | Alembicの移行処理と適用履歴            |
+| `backend/tests/`              | 一時DBを使用する自動テスト             |
 
-取得中はボタンが無効になり、5秒以内に取得できない場合やAPIがエラーを返した場合は、エラーメッセージが表示されます。
-バックエンドを停止してボタンを押すと失敗時の表示を確認できます。再起動後、同じボタンで再試行できます。
+`src` はソースの置き場所で、Pythonでimportするパッケージ名は `sns` です。
+SQLiteの日時保存値はTEXTで、SQLAlchemyがPythonのdatetimeへ変換します。保存時はUTCに統一し、取得時にUTCとして復元します。
 
-Reactは `fetch('/api/')` でViteへリクエストします。Viteのプロキシが `/api` を取り除き、FastAPIの `GET /` へ転送します。
-プロキシはリクエストを別のサーバーへ中継する仕組みで、ブラウザからは画面と同じ接続先に見えるため、今回の開発環境ではCORS設定の追加は不要です。
-接続先は `frontend/vite.config.js` の `server.proxy` で指定しています。
-この設定は開発サーバー用です。ビルドしたファイルを配信する際のAPI転送設定は別途必要になります。
-
-参考：[Viteのプロキシ設定](https://vite.dev/config/server-options.html#server-proxy)
-
-## バックエンドの起動
-
-前提ツールはuvです（動作確認：0.9.2）。未導入の場合は[uv公式のインストール手順](https://docs.astral.sh/uv/getting-started/installation/)を参照してください。
-Pythonは3.12系を使用します（動作確認：3.12.12）。
-
-リポジトリのルートから、フロントエンドとは別のターミナルで実行します。
+## コマンドと確認
 
 ```sh
-cd backend
-uv sync --locked
-uv run --locked fastapi dev main.py --host 127.0.0.1 --port 8000
+# backend/ 内
+uv run --locked pytest -q
+uv run --locked ruff check src migrations tests
+uv run --locked ruff format --check src migrations tests
+uv run --locked alembic current
+uv run --locked alembic check
+
+# frontend/ 内
+npm test
+npm run build
 ```
 
-`uv sync --locked` は `uv.lock` に記録された依存関係を `backend/.venv/` に導入します。
-対応するPythonが見つからなければ、uvが自動的に取得します。
-`.python-version` と `pyproject.toml` により、このプロジェクトではPython 3.12系を使用します。
-仮想環境の手動有効化は不要です。`uv run` がプロジェクトの環境でコマンドを実行します。
+バックエンドのテストは専用の一時DBを使います。開発中の `sns.db` や `sample.db` は変更しません。
+別のDBを手動確認する場合は、各バックエンドコマンドに環境変数 `SNS_DATABASE_PATH` で絶対パスを指定します。API・Alembic・シードは同じ設定を使います。
 
-`fastapi dev main.py` は `main.py` のFastAPIアプリを検出して開発サーバーを起動します。ソースを変更すると自動で再起動します。
-`backend/` 内では、`uv run fastapi dev` でも `main.py` が自動検出されます。
-停止するには `Ctrl+C` を押します。8000番ポートが使用中の場合は既存のサーバーを停止するか、別のポートを指定してください。
+DBファイル・ジャーナルは `backend/data/` に保存され、Git管理対象外です。準備処理はAPIを停止して単独で実行してください。
+初回移行のdowngradeは投稿テーブルを削除するため、通常の再実行や復旧には使用しません。
 
-### サンプルAPIと動作確認
+## 表示されないとき
 
-| メソッド・パス | HTTPステータス | レスポンス | 用途 |
-| --- | --- | --- | --- |
-| `GET /` | 200 | `{"message":"Hello World"}` | 挨拶のサンプル |
-| `GET /health` | 200 | `{"status":"ok"}` | APIプロセスの応答確認（DBの接続確認は含みません） |
+- 「投稿一覧を取得できませんでした。」：APIが起動しているか、マイグレーションが完了しているか確認してください。DBがない場合も、空一覧を返さず失敗します。
+- 「まだ投稿がありません」：取得は成功しています。初期データが必要ならAPI停止後にシードを投入してください。
+- バックエンドを停止すると失敗表示になり、再起動後に「再試行」で復旧できます。
 
-ブラウザで http://127.0.0.1:8000/ を開くか、別のターミナルから実行します。
+## 設計書
 
-```sh
-curl -i http://127.0.0.1:8000/
-curl -i http://127.0.0.1:8000/health
-```
-
-両方ともHTTP 200と上表のJSONが返れば起動成功です。
-存在しないパスは404、サンプルAPIへのPOSTは405になります。
-
-- APIドキュメント：http://127.0.0.1:8000/docs （Swagger UIの表示には外部CDNへの接続が必要です）
-- OpenAPI定義：http://127.0.0.1:8000/openapi.json （コードから自動生成されます）
-- Pythonの確認：`backend/` 内で `uv run --locked python --version`
-
-### バックエンドの構成
-
-| ファイル | 役割 |
-| --- | --- |
-| `backend/main.py` | APIの処理、URL、返却データの型を定義します。 |
-| `backend/.python-version` | uvで使用するPythonの系列を指定します。 |
-| `backend/pyproject.toml` | Pythonの対応範囲と直接依存を定義します。 |
-| `backend/uv.lock` | 間接依存も含めたバージョンを固定し、Gitで管理します。 |
-
-FastAPI 0.153.0、Uvicorn 0.54.0の正式版を固定しています。
-`fastapi[standard]` を指定し、`fastapi dev` に必要なCLIなどの標準依存も導入しています。
-FastAPIがAPIの処理や仕様を定義し、UvicornがHTTPリクエストを受け付けるサーバーとして動きます。
-`.venv/` とPythonのキャッシュはGit管理から除外しています。
-
-## SQLiteのサンプルテーブル
-
-SQLAlchemy 2.1.5を使用します。SQLAlchemyはPythonのクラスとDBのテーブルを対応づけるORMです。
-SQLiteへの接続にはPython標準の `sqlite3` ドライバーを使用するため、別途DBサーバーの起動は不要です。
-
-リポジトリのルートから、次を実行します。
-
-```sh
-cd backend
-uv sync --locked
-uv run --locked python -m db.init_db
-```
-
-`backend/data/sample.db` に `sample_messages` テーブルが作成され、
-`id=1, body=Hello SQLite` のサンプル行と作成日時が表示されます。
-このテーブルは環境の動作確認用で、SNSの正式な投稿テーブルではありません。
-
-| カラム | SQLAlchemyの型 | 条件・意味 |
-| --- | --- | --- |
-| `id` | Integer | 主キー。未指定の場合はSQLiteが整数IDを採番します。サンプル行は1を使用します。 |
-| `body` | Text | NOT NULL。サンプルの本文です。 |
-| `created_at` | DateTime | NOT NULL。DBが挿入時にUTCの日時を設定します（秒精度、タイムゾーン情報は格納しません）。 |
-
-初期化コマンドは再実行できます。既存テーブルを削除せず、IDが1の行が存在する場合は追加・上書きをしません。
-SQLiteはファイルに保存するため、プロセスを終了してもデータは残ります。
-DBの保存先はPythonファイルの場所から決めているため、作業ディレクトリによって変わりません。
-DBファイルとジャーナルなどを含む `backend/data/` はGit管理対象外です。
-
-| ファイル | 役割 |
-| --- | --- |
-| `backend/db/__init__.py` | DB関連コードをPythonパッケージとしてまとめます。 |
-| `backend/db/database.py` | DB保存先、接続用のEngine、モデルの共通Baseを定義します。 |
-| `backend/db/models.py` | Pythonのクラスでテーブルとカラムを定義します。 |
-| `backend/db/init_db.py` | テーブル作成・サンプル行の追加・読み取りを行います。 |
-
-DB関連コードは `backend/db/`、実データは `backend/data/` に分けています。
-`python -m db.init_db` は、`db` パッケージ内の `init_db` を実行する指定です。`backend/` 内で実行してください。
-
-テーブルは `Base.metadata.create_all()` で作成します。この処理は既存テーブルのカラム変更までは行いません。
-今後、正式なテーブルの構造を変更するときは、マイグレーションの導入を別途検討します。
-API経由のDB操作はまだ追加していません。
-
-参考：[SQLAlchemy ORMの公式クイックスタート](https://docs.sqlalchemy.org/en/20/orm/quickstart.html)
+`docs/detail_design/` に入出力・ロジック・API・データベース設計書を保存しています。
+投稿作成、編集、削除、返信、リツイート、いいね操作、検索・フォローは今回の実装対象外です。

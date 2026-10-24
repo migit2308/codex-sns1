@@ -77,9 +77,10 @@ describe("投稿一覧", () => {
     expect(
       screen.getByRole("link", { name: "ホーム", exact: true }),
     ).toHaveAttribute("aria-current", "page");
-    screen
-      .getAllByRole("button")
-      .forEach((button) => expect(button).toBeDisabled());
+    screen.getAllByRole("button").forEach((button) => {
+      if (button.textContent === "投稿する") expect(button).toBeEnabled();
+      else expect(button).toBeDisabled();
+    });
     expect(screen.getByRole("textbox")).toBeDisabled();
     expect(screen.getAllByText("準備中").length).toBeGreaterThan(1);
   });

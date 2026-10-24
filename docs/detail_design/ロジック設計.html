@@ -555,12 +555,12 @@
               <li><a href="#open-decisions">決定事項と残る未決事項</a></li>
               <li>
                 <a href="#chapter-14-detail-6"
-                  >PRC-005：投稿モーダル・送信・一覧統合（未実装）</a
+                  >PRC-005：投稿モーダル・送信・一覧統合（実装済み）</a
                 >
               </li>
               <li>
                 <a href="#chapter-14-detail-7"
-                  >PRC-006：投稿検証・保存・応答生成（未実装）</a
+                  >PRC-006：投稿検証・保存・応答生成（実装済み）</a
                 >
               </li>
               <li><a href="#chapter-14-detail-8">投稿作成の受入確認</a></li>
@@ -581,7 +581,7 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.1.1</td>
+              <td>1.2.0</td>
             </tr>
             <tr>
               <td>更新日</td>
@@ -589,7 +589,7 @@
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3未実装）</td>
+              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
             </tr>
           </tbody>
         </table>
@@ -597,13 +597,13 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードは実装済み。Issue
-        #3の投稿モーダル・投稿作成APIは設計確定・未実装。本書の投稿作成に関する図表は実装後の仕様を定義する。
+        Issue #2の投稿一覧・初回移行・シードと、Issue
+        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
       </p>
       <aside class="note">
         <strong> 対象範囲と設計の前提 </strong>
         <p>
-          ホームSCR-001（URL：/）の投稿一覧ITEM-003と、投稿モーダルSCR-002を対象とする。FUN・PRG・PRC等のIDは本書で管理する設計上のID。各図は処理の設計案であり、実装済みであることを示さない。
+          ホームSCR-001（URL：/）の投稿一覧ITEM-003と、投稿モーダルSCR-002を対象とする。FUN・PRG・PRC等のIDは本書で管理する設計上のID。各図は処理仕様を示し、実装状況と検証結果は冒頭および末尾で管理する。
         </p>
         <p>
           閲覧処理は保存済み投稿の参照のみとし、DBへのINSERT・UPDATE・DELETEを行わない。Issue
@@ -664,7 +664,7 @@
                   利用者がCOM-001またはITEM-002の「投稿する」を押す。認証なし。
                 </td>
                 <td>SCR-002 / API-002 / PRC-005・PRC-006</td>
-                <td>設計確定・未実装。</td>
+                <td>設計確定・実装済み。</td>
               </tr>
             </tbody>
           </table>
@@ -749,7 +749,9 @@
               <tr>
                 <td>PRG-005</td>
                 <td>投稿モーダル・送信・一覧統合</td>
-                <td>frontend/src/App.jsx内の画面責務として追加予定。</td>
+                <td>
+                  frontend/src/App.jsxが一覧を管理し、PostComposer.jsxがモーダル、posts.jsが検証・一覧統合を担当する。
+                </td>
                 <td>FUN-003</td>
                 <td>
                   本文→POST /api/posts→CreatedPost /
@@ -761,7 +763,7 @@
                 <td>PRG-006</td>
                 <td>投稿作成API・保存</td>
                 <td>
-                  backend/src/sns/main.pyを起点にsns/schemas.py・sns/posts.py・sns/database.pyへ追加予定。
+                  backend/src/sns/main.pyを起点にsns/schemas.py・sns/posts.py・sns/database.pyに実装済み。
                 </td>
                 <td>FUN-003</td>
                 <td>PostCreate→INSERT→CreatedPost（7項目）。TBL-001に依存。</td>
@@ -816,24 +818,24 @@
               </tr>
               <tr>
                 <td>CLS-002</td>
-                <td>PostCreate / sns/schemas.py（追加予定）</td>
+                <td>PostCreate / sns/schemas.py（実装済み）</td>
                 <td>投稿作成要求を検証する。</td>
                 <td>
                   body: strict
                   string、必須・null不可、1〜280コードポイント、指定空白のみ不可、余分な項目禁止。
                 </td>
                 <td>PRG-006 / PRC-006</td>
-                <td>設計確定・未実装。</td>
+                <td>設計確定・実装済み。</td>
               </tr>
               <tr>
                 <td>CLS-003</td>
-                <td>CreatedPost / sns/schemas.py（追加予定）</td>
+                <td>CreatedPost / sns/schemas.py（実装済み）</td>
                 <td>投稿作成の結果を保持する。表示用の算出値を含めない。</td>
                 <td>
                   post_id・author・body・posted_at・reply_count・retweet_count・like_countの7属性。全項目必須・null不可。型はCLS-001の対応属性と同じ。
                 </td>
                 <td>PRG-006 / PRC-006 → PRG-005</td>
-                <td>設計確定・未実装。</td>
+                <td>設計確定・実装済み。</td>
               </tr>
             </tbody>
           </table>
@@ -3625,7 +3627,7 @@
         </div>
         <article id="process-005">
           <h3 id="chapter-14-detail-6">
-            PRC-005：投稿モーダル・送信・一覧統合（未実装）
+            PRC-005：投稿モーダル・送信・一覧統合（実装済み）
           </h3>
           <div class="table-wrap">
             <table>
@@ -3684,7 +3686,7 @@
         </article>
         <article id="process-006">
           <h3 id="chapter-14-detail-7">
-            PRC-006：投稿検証・保存・応答生成（未実装）
+            PRC-006：投稿検証・保存・応答生成（実装済み）
           </h3>
           <div class="table-wrap">
             <table>
@@ -3974,11 +3976,20 @@
           <a href="#toc"> 目次へ戻る </a>
         </p>
       </section>
+      <aside class="note" id="implementation-verification">
+        <strong>実装と検証（2026-10-24）</strong>
+        <p>
+          バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
+        </p>
+        <p>
+          専用の検証用DBと実ブラウザで、両方の投稿入口、本文と改行の保存、先頭反映、再読み込み後の表示、Tab/Shift+Tabの循環、連続Escでの確認取消、背景操作禁止、保存失敗後の本文保持と再試行を確認した。5秒の期限・遅延応答・GETとの競合は自動テストで確認する。コードとドキュメントはfeature/post-composerで管理し、画像・下書き・認証・スマートフォン対応は追加していない。
+        </p>
+      </aside>
     </main>
     <footer>
-      ロジック設計書 v1.1.1｜2026-10-24｜Issue
+      ロジック設計書 v1.2.0｜2026-10-24｜Issue
       #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は未実装。
+      #2は実装済み、Issue #3は実装済み。
     </footer>
   </body>
 </html>

@@ -521,7 +521,7 @@
               </li>
               <li>
                 <a href="#chapter-5-detail-3"
-                  >SCR-002：投稿入力モーダル（設計確定・未実装）</a
+                  >SCR-002：投稿入力モーダル（設計確定・実装済み）</a
                 >
               </li>
             </ul>
@@ -550,7 +550,7 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.1.1</td>
+              <td>1.2.0</td>
             </tr>
             <tr>
               <td>更新日</td>
@@ -558,7 +558,7 @@
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3未実装）</td>
+              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
             </tr>
           </tbody>
         </table>
@@ -566,8 +566,8 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードは実装済み。Issue
-        #3の投稿モーダル・投稿作成APIは設計確定・未実装。本書の投稿作成に関する図表は実装後の仕様を定義する。
+        Issue #2の投稿一覧・初回移行・シードと、Issue
+        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
       </p>
       <aside class="note">
         <strong> 設計対象と確定状況 </strong>
@@ -630,7 +630,7 @@
                 <td>
                   <a href="#screen-layout-compose">レイアウト</a> /
                   <a href="#screen-input-compose">入力設計</a
-                  >。設計確定・未実装。
+                  >。設計確定・実装済み。
                 </td>
               </tr>
             </tbody>
@@ -1078,7 +1078,7 @@
         </article>
         <article id="screen-layout-compose">
           <h3 id="chapter-5-detail-3">
-            SCR-002：投稿入力モーダル（設計確定・未実装）
+            SCR-002：投稿入力モーダル（設計確定・実装済み）
           </h3>
           <figure>
             <div class="diagram-wrap">
@@ -1363,11 +1363,20 @@
           <a href="#toc"> 目次へ戻る </a>
         </p>
       </section>
+      <aside class="note" id="implementation-verification">
+        <strong>実装と検証（2026-10-24）</strong>
+        <p>
+          バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
+        </p>
+        <p>
+          専用の検証用DBと実ブラウザで、両方の投稿入口、本文と改行の保存、先頭反映、再読み込み後の表示、Tab/Shift+Tabの循環、連続Escでの確認取消、背景操作禁止、保存失敗後の本文保持と再試行を確認した。5秒の期限・遅延応答・GETとの競合は自動テストで確認する。コードとドキュメントはfeature/post-composerで管理し、画像・下書き・認証・スマートフォン対応は追加していない。
+        </p>
+      </aside>
     </main>
     <footer>
-      入出力設計書 v1.1.1｜2026-10-24｜Issue
+      入出力設計書 v1.2.0｜2026-10-24｜Issue
       #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は未実装。
+      #2は実装済み、Issue #3は実装済み。
     </footer>
   </body>
 </html>

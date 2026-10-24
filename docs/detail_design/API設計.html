@@ -424,7 +424,7 @@
               <li><a href="#chapter-3-detail-1">API-001：投稿一覧取得</a></li>
               <li>
                 <a href="#chapter-3-detail-2"
-                  >API-002：投稿作成（設計確定・未実装）</a
+                  >API-002：投稿作成（設計確定・実装済み）</a
                 >
               </li>
             </ul>
@@ -449,7 +449,7 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.1.1</td>
+              <td>1.2.0</td>
             </tr>
             <tr>
               <td>更新日</td>
@@ -457,7 +457,7 @@
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3未実装）</td>
+              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
             </tr>
           </tbody>
         </table>
@@ -465,14 +465,14 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードは実装済み。Issue
-        #3の投稿モーダル・投稿作成APIは設計確定・未実装。本書の投稿作成に関する図表は実装後の仕様を定義する。
+        Issue #2の投稿一覧・初回移行・シードと、Issue
+        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
       </p>
       <aside class="note">
         <strong> 対象と設計の前提 </strong>
         <p>
           API-001（投稿一覧取得）は実装済み。Issue
-          #3のAPI-002（投稿作成）は設計確定・未実装。投稿の編集・削除、件数を増減する操作、投稿ボタン以外のサイドバー機能は対象外。
+          #3のAPI-002（投稿作成）は設計確定・実装済み。投稿の編集・削除、件数を増減する操作、投稿ボタン以外のサイドバー機能は対象外。
         </p>
         <p>
           一覧応答はPost（CLS-001）、作成応答はCreatedPost（CLS-003）に合わせる。API設計ではHTTPで受け渡す形式を記載し、表示日時の計算手順はロジック設計、テーブルの物理構造はDB設計で管理する。
@@ -526,7 +526,7 @@
                 <td>ブラウザ：/api/posts<br />バックエンド：/posts</td>
                 <td>認証なし。投稿者は固定。</td>
                 <td>SCR-002 / FUN-003 / PRC-006 / CLS-002・CLS-003</td>
-                <td>設計確定・未実装</td>
+                <td>設計確定・実装済み</td>
               </tr>
             </tbody>
           </table>
@@ -570,7 +570,7 @@
               <tr>
                 <td>バージョン・命名</td>
                 <td>
-                  本文書は1.1.1。URLにはバージョン番号を付けない。JSONのキーはPostの属性と同じlower_snake_caseとする。
+                  本文書は1.2.0。URLにはバージョン番号を付けない。JSONのキーはPostの属性と同じlower_snake_caseとする。
                 </td>
               </tr>
               <tr>
@@ -969,7 +969,9 @@ Accept: application/json</code></pre>
           </div>
         </article>
         <article id="api-002">
-          <h3 id="chapter-3-detail-2">API-002：投稿作成（設計確定・未実装）</h3>
+          <h3 id="chapter-3-detail-2">
+            API-002：投稿作成（設計確定・実装済み）
+          </h3>
           <div class="table-wrap">
             <table>
               <thead>
@@ -981,7 +983,7 @@ Accept: application/json</code></pre>
               <tbody>
                 <tr>
                   <td>関連・状態</td>
-                  <td>SCR-002 / FUN-003 / PRC-006。設計確定・未実装。</td>
+                  <td>SCR-002 / FUN-003 / PRC-006。設計確定・実装済み。</td>
                 </tr>
                 <tr>
                   <td>経路</td>
@@ -1353,18 +1355,27 @@ Accept: application/json</code></pre>
           </table>
         </div>
         <p>
-          API-002は3章で設計確定・未実装。API-001は認証なし、GET /api/posts →
+          API-002は3章で設計確定・実装済み。API-001は認証なし、GET /api/posts →
           /posts、全件取得、posted_at降順、同日時はpost_id降順、Postの8属性、200と[]、500のcode・message、no-storeは今回の設計で決定済み。
         </p>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
       </section>
+      <aside class="note" id="implementation-verification">
+        <strong>実装と検証（2026-10-24）</strong>
+        <p>
+          バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
+        </p>
+        <p>
+          専用の検証用DBと実ブラウザで、両方の投稿入口、本文と改行の保存、先頭反映、再読み込み後の表示、Tab/Shift+Tabの循環、連続Escでの確認取消、背景操作禁止、保存失敗後の本文保持と再試行を確認した。5秒の期限・遅延応答・GETとの競合は自動テストで確認する。コードとドキュメントはfeature/post-composerで管理し、画像・下書き・認証・スマートフォン対応は追加していない。
+        </p>
+      </aside>
     </main>
     <footer>
-      API設計書 v1.1.1｜2026-10-24｜Issue
+      API設計書 v1.2.0｜2026-10-24｜Issue
       #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は未実装。
+      #2は実装済み、Issue #3は実装済み。
     </footer>
   </body>
 </html>

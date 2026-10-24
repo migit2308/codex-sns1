@@ -432,7 +432,7 @@
               <li><a href="#chapter-6-detail-3">PRC-004：シードデータ</a></li>
               <li>
                 <a href="#chapter-6-detail-4"
-                  >PRC-006：投稿作成の保存規約（設計確定・未実装）</a
+                  >PRC-006：投稿作成の保存規約（設計確定・実装済み）</a
                 >
               </li>
             </ul>
@@ -458,7 +458,7 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.1.1</td>
+              <td>1.2.0</td>
             </tr>
             <tr>
               <td>更新日</td>
@@ -466,7 +466,7 @@
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3未実装）</td>
+              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
             </tr>
           </tbody>
         </table>
@@ -474,8 +474,8 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードは実装済み。Issue
-        #3の投稿モーダル・投稿作成APIは設計確定・未実装。本書の投稿作成に関する図表は実装後の仕様を定義する。
+        Issue #2の投稿一覧・初回移行・シードと、Issue
+        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
       </p>
       <aside class="note">
         <strong> 対象と確定状況 </strong>
@@ -666,7 +666,7 @@
                 </td>
               </tr>
               <tr>
-                <td>投稿APIの接続（未実装）</td>
+                <td>投稿APIの接続（実装済み）</td>
                 <td>
                   GETは既存mode=roを維持。POSTはSQLite
                   URIのmode=rwで既存DBだけを開き、未作成ファイル・ディレクトリを自動生成しない。接続先のSNS_DATABASE_PATH解決は共通化する。未移行・書き込み不能はERR-004。準備用の接続・初期化と分離する。
@@ -1154,7 +1154,7 @@ CREATE INDEX ix_posts_posted_at_post_id
         </article>
         <article id="create-post-transaction">
           <h3 id="chapter-6-detail-4">
-            PRC-006：投稿作成の保存規約（設計確定・未実装）
+            PRC-006：投稿作成の保存規約（設計確定・実装済み）
           </h3>
           <div class="table-wrap">
             <table>
@@ -1400,11 +1400,20 @@ CREATE INDEX ix_posts_posted_at_post_id
           <a href="#toc"> 目次へ戻る </a>
         </p>
       </section>
+      <aside class="note" id="implementation-verification">
+        <strong>実装と検証（2026-10-24）</strong>
+        <p>
+          バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
+        </p>
+        <p>
+          専用の検証用DBと実ブラウザで、両方の投稿入口、本文と改行の保存、先頭反映、再読み込み後の表示、Tab/Shift+Tabの循環、連続Escでの確認取消、背景操作禁止、保存失敗後の本文保持と再試行を確認した。5秒の期限・遅延応答・GETとの競合は自動テストで確認する。コードとドキュメントはfeature/post-composerで管理し、画像・下書き・認証・スマートフォン対応は追加していない。
+        </p>
+      </aside>
     </main>
     <footer>
-      データベース設計書 v1.1.1｜2026-10-24｜Issue
+      データベース設計書 v1.2.0｜2026-10-24｜Issue
       #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は未実装。
+      #2は実装済み、Issue #3は実装済み。
     </footer>
   </body>
 </html>

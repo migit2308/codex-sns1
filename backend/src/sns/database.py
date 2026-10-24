@@ -27,10 +27,21 @@ def writable_engine(path: Path):
     return create_engine(URL.create("sqlite+pysqlite", database=str(path)))
 
 
-def readonly_engine(path: Path):
+def existing_engine(path: Path, *, readonly: bool):
     def connect():
         return sqlite3.connect(
-            path.as_uri() + "?mode=ro", uri=True, check_same_thread=False
+            path.as_uri() + ("?mode=ro" if readonly else "?mode=rw"),
+            uri=True,
+            check_same_thread=False,
         )
 
     return create_engine("sqlite+pysqlite://", creator=connect)
+
+
+def readonly_engine(path: Path):
+    return existing_engine(path, readonly=True)
+
+
+def post_engine(path: Path):
+    """投稿APIでは未作成DBを生成しない。準備用の接続とは区別する。"""
+    return existing_engine(path, readonly=False)

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from .models import PostRecord
-from .schemas import Post
+from .schemas import CreatedPost, Post, PostCreate
 
 
 def current_time() -> datetime:
@@ -50,3 +50,25 @@ def read_posts(session: Session, now: datetime) -> list[Post]:
             )
         )
     return posts
+
+
+def create_post(session: Session, payload: PostCreate, now: datetime) -> CreatedPost:
+    record = PostRecord(
+        author="自分",
+        body=payload.body,
+        posted_at=now.astimezone(UTC).replace(tzinfo=None),
+        reply_count=0,
+        retweet_count=0,
+        like_count=0,
+    )
+    session.add(record)
+    session.flush()
+    return CreatedPost(
+        post_id=record.post_id,
+        author=record.author,
+        body=record.body,
+        posted_at=record.posted_at.replace(tzinfo=UTC),
+        reply_count=record.reply_count,
+        retweet_count=record.retweet_count,
+        like_count=record.like_count,
+    )

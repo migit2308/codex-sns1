@@ -269,3 +269,204 @@ def test_database_path_requires_absolute(monkeypatch):
     monkeypatch.setenv("SNS_DATABASE_PATH", "relative.db")
     with pytest.raises(ValueError):
         database_path()
+
+
+# 投稿作成は一覧用の時計とは別に、入力検証後に時刻を取得する。
+def post_client_for(path):
+    from sns.main import post_clock
+
+    app = create_app(path)
+    app.dependency_overrides[current_time] = lambda: NOW
+    app.dependency_overrides[post_clock] = lambda: lambda: NOW
+    return TestClient(app)
+
+
+@pytest.mark.parametrize("body", ["あ", "あ" * 280, "😀" * 280, " 本文\n次の行\t "])
+def test_create_and_read_after_reconnect(database, body):
+    path, engine = database
+    seed_posts(engine, now=NOW)
+    with post_client_for(path) as client:
+        response = client.post("/posts", json={"body": body})
+        assert response.status_code == 201
+        created = response.json()
+        assert created == {
+            "post_id": 4,
+            "author": "自分",
+            "body": body,
+            "posted_at": NOW.isoformat().replace("+00:00", "Z"),
+            "reply_count": 0,
+            "retweet_count": 0,
+            "like_count": 0,
+        }
+        assert response.headers["cache-control"] == "no-store"
+        assert response.headers["content-type"] == "application/json"
+        spec = client.get("/openapi.json").json()
+        assert set(spec["paths"]["/posts"]) == {"get", "post"}
+        assert set(spec["components"]["schemas"]["CreatedPost"]["properties"]) == set(
+            created
+        )
+        assert set(spec["paths"]["/posts"]["post"]["responses"]) == {
+            "201",
+            "422",
+            "500",
+        }
+    with post_client_for(path) as client:
+        posts = client.get("/posts").json()
+        assert posts[0] == {**created, "displayed_at": "たった今"}
+    with engine.connect() as conn:
+        row = conn.execute(text("SELECT * FROM posts WHERE post_id=4")).one()
+        assert row.body == body
+        assert row.posted_at == "2026-10-23 12:00:00.000000"
+        assert conn.scalar(text("SELECT count(*) FROM posts")) == 4
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {},
+        {"body": None},
+        {"body": 123},
+        {"body": True},
+        {"body": []},
+        {"body": {}},
+        {"body": ""},
+        {"body": " \u3000\t\n\r\v\f"},
+        {"body": "a" * 281},
+        {"body": "😀" * 281},
+        {"body": "本文", "author": "別名"},
+        ["本文"],
+        None,
+    ],
+)
+def test_create_validation_does_not_write_or_leak(database, payload, caplog):
+    from unittest.mock import Mock
+
+    from sns.main import post_clock
+
+    path, engine = database
+    app = create_app(path)
+    clock = Mock(return_value=NOW)
+    app.dependency_overrides[post_clock] = lambda: clock
+    with TestClient(app) as client:
+        response = client.post("/posts", json=payload)
+    assert response.status_code == 422
+    assert response.json() == {
+        "code": "POST_VALIDATION_FAILED",
+        "message": "投稿本文は空白のみを除く1〜280文字で入力してください。",
+    }
+    assert response.headers["cache-control"] == "no-store"
+    clock.assert_not_called()
+    with engine.connect() as conn:
+        assert conn.scalar(text("SELECT count(*) FROM posts")) == 0
+    assert "別名" not in caplog.text
+
+
+def test_create_invalid_json(database):
+    path, _ = database
+    with post_client_for(path) as client:
+        response = client.post(
+            "/posts", content='{"body":', headers={"Content-Type": "application/json"}
+        )
+    assert response.status_code == 422
+    assert set(response.json()) == {"code", "message"}
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.parametrize("problem", ["missing", "missing_directory", "unmigrated"])
+def test_create_requires_existing_migrated_database(tmp_path, problem):
+    path = tmp_path / "missing.db"
+    if problem == "missing_directory":
+        path = tmp_path / "missing" / "sns.db"
+    if problem == "unmigrated":
+        path.touch()
+    with post_client_for(path) as client:
+        response = client.post("/posts", json={"body": "本文"})
+    assert response.status_code == 500
+    assert response.json() == {
+        "code": "POST_CREATE_FAILED",
+        "message": "投稿を保存できませんでした。",
+    }
+    assert response.headers["cache-control"] == "no-store"
+    assert path.exists() == (problem == "unmigrated")
+    if problem == "missing_directory":
+        assert not path.parent.exists()
+
+
+@pytest.mark.parametrize("failure", ["insert", "serialization", "commit"])
+def test_create_rolls_back_and_returns_connection(
+    database, monkeypatch, failure, caplog
+):
+    from sns.schemas import CreatedPost
+
+    path, engine = database
+    client = post_client_for(path)
+    writer = client.app.state.write_engine
+    counts = {"checkout": 0, "checkin": 0}
+    for name in counts:
+
+        def record(*args, name=name):
+            counts[name] += 1
+
+        event.listen(writer, name, record)
+    if failure == "insert":
+        with engine.begin() as conn:
+            conn.exec_driver_sql(
+                "CREATE TRIGGER reject_post BEFORE INSERT ON posts BEGIN SELECT RAISE(ABORT, 'private body'); END"
+            )
+    elif failure == "serialization":
+
+        def fail_dump(*args, **kwargs):
+            raise ValueError("private body")
+
+        monkeypatch.setattr(CreatedPost, "model_dump", fail_dump)
+    else:
+
+        def fail_commit(conn):
+            raise RuntimeError("private body")
+
+        event.listen(writer, "commit", fail_commit)
+    with client:
+        response = client.post("/posts", json={"body": "private body"})
+    assert response.status_code == 500
+    assert response.json()["code"] == "POST_CREATE_FAILED"
+    assert "private body" not in response.text + caplog.text
+    assert "PRC-006" in caplog.text
+    assert counts == {"checkout": 1, "checkin": 1}
+    with engine.connect() as conn:
+        assert conn.scalar(text("SELECT count(*) FROM posts")) == 0
+
+
+def test_create_success_returns_connection(database):
+    path, _ = database
+    client = post_client_for(path)
+    counts = {"checkout": 0, "checkin": 0}
+    for name in counts:
+
+        def record(*args, name=name):
+            counts[name] += 1
+
+        event.listen(client.app.state.write_engine, name, record)
+    with client:
+        assert client.post("/posts", json={"body": "本文"}).status_code == 201
+    assert counts == {"checkout": 1, "checkin": 1}
+
+
+def test_create_requires_json_content_type(database):
+    path, _ = database
+    with post_client_for(path) as client:
+        response = client.post("/posts", content='{"body": "text"}')
+    assert response.status_code == 422
+    assert response.json()["code"] == "POST_VALIDATION_FAILED"
+
+
+def test_create_write_denied(database, monkeypatch):
+    import sns.main
+
+    path, engine = database
+    monkeypatch.setattr(sns.main, "post_engine", readonly_engine)
+    with post_client_for(path) as client:
+        response = client.post("/posts", json={"body": "本文"})
+    assert response.status_code == 500
+    assert response.json()["code"] == "POST_CREATE_FAILED"
+    with engine.connect() as conn:
+        assert conn.scalar(text("SELECT count(*) FROM posts")) == 0

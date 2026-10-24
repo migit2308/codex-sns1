@@ -1,4 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import PostComposer from "./PostComposer";
+import { isPost, mergePosts } from "./posts";
+export { isPost } from "./posts";
 
 const errorMessage = "投稿一覧を取得できませんでした。";
 const paths = {
@@ -30,7 +33,7 @@ function Icon({ name }) {
   );
 }
 
-export function LeftSidebar() {
+export function LeftSidebar({ onCompose }) {
   const menu = [
     ["search", "話題を検索"],
     ["bell", "通知"],
@@ -59,8 +62,8 @@ export function LeftSidebar() {
           </button>
         ))}
       </nav>
-      <button className="primary compose-button" disabled>
-        投稿する<span>準備中</span>
+      <button className="primary compose-button" onClick={onCompose}>
+        投稿する
       </button>
       <p className="sidebar-note">日々のひとことを、ここに。</p>
     </aside>
@@ -168,32 +171,43 @@ export function Timeline({ status, posts, retry, retrying = false }) {
           </button>
         </div>
       )}
-      {status === "success" &&
-        posts.map((post) => <PostCard key={post.post_id} post={post} />)}
+      {posts.map((post) => (
+        <PostCard key={post.post_id} post={post} />
+      ))}
     </section>
-  );
-}
-
-export function isPost(post) {
-  if (!post || typeof post !== "object") return false;
-  const strings = ["author", "body", "posted_at", "displayed_at"];
-  const counts = ["reply_count", "retweet_count", "like_count"];
-  return (
-    Number.isInteger(post.post_id) &&
-    strings.every((key) => typeof post[key] === "string") &&
-    counts.every((key) => Number.isInteger(post[key]) && post[key] >= 0) &&
-    Number.isFinite(Date.parse(post.posted_at))
   );
 }
 
 export default function App() {
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState({ status: "loading", posts: [] });
+  const [opener, setOpener] = useState(null);
+  const [notification, setNotification] = useState("");
+  const createdPosts = useRef(new Map());
+  const openComposer = (event) => {
+    setNotification("");
+    setOpener(event.currentTarget);
+  };
+  const created = useCallback((post) => {
+    const displayed = { ...post, displayed_at: "たった今" };
+    createdPosts.current.set(post.post_id, displayed);
+    setState((previous) => ({
+      ...previous,
+      posts: mergePosts(previous.posts, [displayed]),
+    }));
+    setNotification("投稿しました");
+    setOpener(null);
+    window.scrollTo({ top: 0 });
+  }, []);
+  const retry = useCallback(() => {
+    setState((previous) => ({ ...previous, status: "loading" }));
+    setAttempt((value) => value + 1);
+  }, []);
   useEffect(() => {
     const controller = new AbortController();
     let cancelled = false;
     const timeout = setTimeout(() => controller.abort(), 5000);
-    setState({ status: "loading", posts: [] });
+    setState((previous) => ({ ...previous, status: "loading" }));
     async function load() {
       try {
         const response = await fetch("/api/posts", {
@@ -208,10 +222,14 @@ export default function App() {
           new Set(posts.map((post) => post.post_id)).size !== posts.length
         )
           throw new Error("Invalid response");
-        if (!cancelled && !controller.signal.aborted)
-          setState({ status: "success", posts });
+        if (!cancelled && !controller.signal.aborted) {
+          const merged = mergePosts([...createdPosts.current.values()], posts);
+          for (const post of posts) createdPosts.current.delete(post.post_id);
+          setState({ status: "success", posts: merged });
+        }
       } catch {
-        if (!cancelled) setState({ status: "error", posts: [] });
+        if (!cancelled)
+          setState((previous) => ({ ...previous, status: "error" }));
       } finally {
         clearTimeout(timeout);
       }
@@ -224,48 +242,56 @@ export default function App() {
     };
   }, [attempt]);
   return (
-    <div className="app-layout">
-      <LeftSidebar />
-      <main id="main-content" className="main-column">
-        <header className="home-header">
-          <h1>ホーム</h1>
-          <span>あなたのタイムライン</span>
-        </header>
-        <div className="tabs">
-          <span className="active-tab">すべての投稿</span>
-          <button disabled>
-            フォロー中<small>準備中</small>
-          </button>
-        </div>
-        <section className="composer" aria-label="投稿フォーム（準備中）">
-          <div className="avatar muted" aria-hidden="true">
-            <Icon name="user" />
+    <>
+      <div className="app-layout" inert={Boolean(opener)}>
+        <LeftSidebar onCompose={openComposer} />
+        <main id="main-content" className="main-column">
+          <header className="home-header">
+            <h1>ホーム</h1>
+            <span>あなたのタイムライン</span>
+          </header>
+          <div className="tabs">
+            <span className="active-tab">すべての投稿</span>
+            <button disabled>
+              フォロー中<small>準備中</small>
+            </button>
           </div>
-          <div>
-            <textarea
-              disabled
-              aria-label="投稿内容（準備中）"
-              placeholder="いまどうしてる？"
-              rows="2"
-            />
-            <div className="composer-bottom">
-              <span>投稿機能は準備中です</span>
-              <button className="primary" disabled>
-                投稿する
-              </button>
+          <section className="composer" aria-label="投稿を始める">
+            <div className="avatar" aria-hidden="true">
+              自
             </div>
-          </div>
-        </section>
-        <Timeline
-          {...state}
-          retry={() => {
-            setState({ status: "loading", posts: [] });
-            setAttempt((value) => value + 1);
+            <div>
+              <p className="compose-invitation">ひとことを投稿してみましょう</p>
+              <div className="composer-bottom">
+                <span>いまの気持ちを、280文字で。</span>
+                <button className="primary" onClick={openComposer}>
+                  投稿する
+                </button>
+              </div>
+            </div>
+          </section>
+          <p className="post-notification" role="status" aria-live="polite">
+            {notification}
+          </p>
+          <Timeline
+            {...state}
+            retry={retry}
+            retrying={attempt > 0 && state.status === "loading"}
+          />
+        </main>
+        <RightSidebar />
+      </div>
+      {opener && (
+        <PostComposer
+          opener={opener}
+          onClose={() => setOpener(null)}
+          onCreated={created}
+          onCheckTimeline={() => {
+            setOpener(null);
+            retry();
           }}
-          retrying={attempt > 0 && state.status === "loading"}
         />
-      </main>
-      <RightSidebar />
-    </div>
+      )}
+    </>
   );
 }

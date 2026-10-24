@@ -369,6 +369,40 @@
           columns: 2;
         }
       }
+
+      /* 章と小見出しを同じ目次内に階層表示する。 */
+      #toc > ol {
+        list-style: none;
+        padding-left: 0;
+      }
+      #toc .toc-subsections {
+        list-style: none;
+        padding: 0 0 0 12px;
+        margin: 4px 0 12px;
+      }
+      #toc .toc-subsections li {
+        margin: 2px 0;
+      }
+      #toc .toc-subsections a {
+        font-size: 12px;
+        border: 0;
+        border-left: 2px solid #ccd5df;
+        border-radius: 0;
+        background: transparent;
+        padding: 5px 8px;
+      }
+      svg.wide-diagram {
+        min-width: 1040px;
+        font-size: 14px;
+      }
+      @media print {
+        #toc .toc-subsections {
+          break-inside: avoid;
+        }
+        svg.wide-diagram {
+          min-width: 0;
+        }
+      }
     </style>
   </head>
   <body>
@@ -376,38 +410,40 @@
       <p class="badge">旧Twitter風SNS / 詳細設計</p>
       <h1>データベース設計書</h1>
       <p>
-        トップページの投稿一覧に使用する投稿テーブルと、マイグレーション・シード準備を定義する。
+        投稿一覧・投稿作成に使用する既存投稿テーブル、接続・トランザクションと、マイグレーション・シード準備を定義する。
       </p>
       <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
         <h2 id="toc-heading">目次</h2>
-        <p>章名をクリックすると該当する章へ移動します。</p>
         <ol>
+          <li><a href="#chapter-1">1. ボリューム一覧表</a></li>
+          <li><a href="#chapter-2">2. データベース設定</a></li>
+          <li><a href="#chapter-3">3. テーブル一覧</a></li>
+          <li><a href="#chapter-4">4. インデックス一覧表</a></li>
+          <li><a href="#chapter-5">5. ER図</a></li>
           <li>
-            <a href="#chapter-1"> ボリューム一覧表 </a>
+            <a href="#chapter-6">6. テーブルレイアウト図</a>
+            <ul class="toc-subsections">
+              <li><a href="#chapter-6-detail-1">TBL-001：posts</a></li>
+              <li>
+                <a href="#chapter-6-detail-2"
+                  >PRC-003：Alembicによる変更履歴管理</a
+                >
+              </li>
+              <li><a href="#chapter-6-detail-3">PRC-004：シードデータ</a></li>
+              <li>
+                <a href="#chapter-6-detail-4"
+                  >PRC-006：投稿作成の保存規約（設計確定・未実装）</a
+                >
+              </li>
+            </ul>
           </li>
+          <li><a href="#chapter-7">7. CRUD図</a></li>
+          <li><a href="#chapter-8">8. ファイル一覧</a></li>
           <li>
-            <a href="#chapter-2"> データベース設定 </a>
-          </li>
-          <li>
-            <a href="#chapter-3"> テーブル一覧 </a>
-          </li>
-          <li>
-            <a href="#chapter-4"> インデックス一覧表 </a>
-          </li>
-          <li>
-            <a href="#chapter-5"> ER図 </a>
-          </li>
-          <li>
-            <a href="#chapter-6"> テーブルレイアウト図 </a>
-          </li>
-          <li>
-            <a href="#chapter-7"> CRUD図 </a>
-          </li>
-          <li>
-            <a href="#chapter-8"> ファイル一覧 </a>
-          </li>
-          <li>
-            <a href="#chapter-9"> ファイル管理 </a>
+            <a href="#chapter-9">9. ファイル管理</a>
+            <ul class="toc-subsections">
+              <li><a href="#chapter-9-detail-1">FIL-001：sns.dbの管理</a></li>
+            </ul>
           </li>
         </ol>
       </nav>
@@ -422,15 +458,15 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.0.0</td>
+              <td>1.1.1</td>
             </tr>
             <tr>
               <td>更新日</td>
-              <td>2026-10-23</td>
+              <td>2026-10-24</td>
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計案・レビュー待ち</td>
+              <td>設計確定（Issue #2実装済み、Issue #3未実装）</td>
             </tr>
           </tbody>
         </table>
@@ -438,16 +474,17 @@
     </header>
     <main>
       <p id="implementation-status">
-        実装状況：Issue
-        #2の投稿一覧を実装済み。PC向け3カラム、初回取得・0件・失敗・再試行を提供する。バックエンドはbackend/src/sns、画面はfrontend/src/App.jsx、移行はbackend/migrationsに配置する。本文書の設計仕様と実装状況は別に管理する。
+        Issue #2の投稿一覧・初回移行・シードは実装済み。Issue
+        #3の投稿モーダル・投稿作成APIは設計確定・未実装。本書の投稿作成に関する図表は実装後の仕様を定義する。
       </p>
       <aside class="note">
         <strong> 対象と確定状況 </strong>
         <p>
-          SCR-001の投稿一覧ITEM-003、API-001、PRC-002〜PRC-004に対応する設計案。Alembic導入・初回移行・シード投入・APIからの参照を実装済み。
+          SCR-001の投稿一覧ITEM-003、API-001・API-002、PRC-002〜PRC-004・PRC-006に対応する設計。Alembic導入・初回移行・シード投入・APIからの参照を実装済み。
         </p>
         <p>
-          保存対象はPostの7属性。displayed_atはAPIで算出し、保存しない。閲覧APIは参照のみで、投稿の作成・編集・削除・各件数の増減は対象外。既存のsample.dbのファイルは残すが、接続確認用APIと初期化コードは削除する。既存データを正式な投稿へ移行しない。
+          保存対象はPostの7属性。displayed_atはAPIで算出し、保存しない。閲覧APIは参照のみ。Issue
+          #3では既存テーブルへ投稿を追加する。編集・削除・各件数の増減は対象外。スキーマ変更・追加マイグレーションは不要。既存のsample.dbのファイルは残すが、接続確認用APIと初期化コードは削除する。既存データを正式な投稿へ移行しない。
         </p>
       </aside>
       <p>
@@ -478,9 +515,12 @@
               <tr>
                 <td>TBL-001：posts</td>
                 <td>初期シード3件。容量は未測定。</td>
-                <td>閲覧のみのため0件/日。</td>
+                <td>新規投稿p件/日（pは未決）。削除なし。</td>
                 <td>未測定。本文・投稿者名をUTF-8バイトで評価する。</td>
-                <td>初期投入後d日：3 + 0×d = 3件。容量は未測定。</td>
+                <td>
+                  初期投入後d日：N(d) = 3 + p×d件。pが変動する場合は3 +
+                  期間内投稿件数。容量は未測定。
+                </td>
                 <td>保持期間は未決。今回の操作に削除はない。</td>
               </tr>
               <tr>
@@ -494,7 +534,7 @@
               <tr>
                 <td>FIL-001：sns.db</td>
                 <td>データ・スキーマ・インデックスを含む。容量未測定。</td>
-                <td>閲覧による投稿増加なし。</td>
+                <td>閲覧では増加せず、投稿作成で増加する。</td>
                 <td>対象外</td>
                 <td>
                   SQLiteページ・空き領域等を含むため件数だけでは算定しない。
@@ -516,7 +556,7 @@
               <tr>
                 <td>基準日・予測期間</td>
                 <td>
-                  2026-10-23。初期シード投入後の任意のd日を対象とし、新しい投稿作成は想定しない。
+                  設計更新日2026-10-24。初期シード3件の投入直後をd=0とし、任意のd日後を対象とする。投稿数p件/日の利用規模は未決。
                 </td>
               </tr>
               <tr>
@@ -616,13 +656,20 @@
               <tr>
                 <td>セッション・資源</td>
                 <td>
-                  PRC-002は取得要求ごとにセッションを作成し、取得・変換後に必ず閉じる。失敗時もクローズする。PRC-004は1トランザクションで投入し、例外時はロールバックする。
+                  PRC-002は取得要求ごとにセッションを作成し、取得・変換後に必ず閉じる。失敗時もクローズする。PRC-004は1トランザクションで投入し、例外時はロールバックする。PRC-006は1投稿1トランザクションで、コミット前の失敗はロールバックし、成否にかかわらずセッションを閉じる。
                 </td>
               </tr>
               <tr>
                 <td>SQLite設定・運用</td>
                 <td>
-                  初期構成は通常テーブル・既定のDELETEジャーナル方式。WAL等の追加設定は今回採用しない。準備処理はAPIを停止した状態で単独実行する。タイムアウト・本番運用は未決。
+                  初期構成は通常テーブル・既定のDELETEジャーナル方式。WAL等の追加設定は今回採用しない。準備処理はAPIを停止した状態で単独実行する。クライアントの5秒はサーバーのロールバック保証ではない。DBロック待機は既存ドライバーの設定を維持し、失敗はERR-004とする。本番運用・性能調整は未決。
+                </td>
+              </tr>
+              <tr>
+                <td>投稿APIの接続（未実装）</td>
+                <td>
+                  GETは既存mode=roを維持。POSTはSQLite
+                  URIのmode=rwで既存DBだけを開き、未作成ファイル・ディレクトリを自動生成しない。接続先のSNS_DATABASE_PATH解決は共通化する。未移行・書き込み不能はERR-004。準備用の接続・初期化と分離する。
                 </td>
               </tr>
             </tbody>
@@ -797,6 +844,12 @@ ORDER BY posted_at DESC, post_id DESC;</code></pre>
                   外部キーがないため参照連動は対象外。通常の閲覧で作成・更新・削除は行わない。
                 </td>
               </tr>
+              <tr>
+                <td>Issue #3の関係</td>
+                <td>
+                  投稿者はUserテーブルを追加せずauthor="自分"をPRC-006で明示設定。既存の7カラム・主キー・IDX-001を維持する。
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -807,7 +860,7 @@ ORDER BY posted_at DESC, post_id DESC;</code></pre>
       <section id="chapter-6">
         <h2>6. テーブルレイアウト図</h2>
         <article id="table-posts">
-          <h3>TBL-001：posts</h3>
+          <h3 id="chapter-6-detail-1">TBL-001：posts</h3>
           <p>
             型の欄は「SQLAlchemy型 / SQLの宣言型 /
             SQLiteでの保存クラス」の順。7カラムすべてがPostの同名属性に対応する。displayed_atはPostだけに存在する算出属性。
@@ -871,7 +924,7 @@ ORDER BY posted_at DESC, post_id DESC;</code></pre>
                   <td>Integer / INTEGER / integer</td>
                   <td>不可</td>
                   <td>0</td>
-                  <td>整数かつ0以上。シード値の表示のみ。</td>
+                  <td>整数かつ0以上。新規投稿は0。増減操作は対象外。</td>
                 </tr>
                 <tr>
                   <td>リツイート数</td>
@@ -879,7 +932,7 @@ ORDER BY posted_at DESC, post_id DESC;</code></pre>
                   <td>Integer / INTEGER / integer</td>
                   <td>不可</td>
                   <td>0</td>
-                  <td>整数かつ0以上。シード値の表示のみ。</td>
+                  <td>整数かつ0以上。新規投稿は0。増減操作は対象外。</td>
                 </tr>
                 <tr>
                   <td>いいね数</td>
@@ -887,7 +940,7 @@ ORDER BY posted_at DESC, post_id DESC;</code></pre>
                   <td>Integer / INTEGER / integer</td>
                   <td>不可</td>
                   <td>0</td>
-                  <td>整数かつ0以上。シード値の表示のみ。</td>
+                  <td>整数かつ0以上。新規投稿は0。増減操作は対象外。</td>
                 </tr>
               </tbody>
             </table>
@@ -959,7 +1012,7 @@ CREATE INDEX ix_posts_posted_at_post_id
     ON posts (posted_at DESC, post_id DESC);</code></pre>
         </article>
         <article id="migration">
-          <h3>PRC-003：Alembicによる変更履歴管理</h3>
+          <h3 id="chapter-6-detail-2">PRC-003：Alembicによる変更履歴管理</h3>
           <div class="table-wrap">
             <table>
               <thead>
@@ -1012,7 +1065,7 @@ CREATE INDEX ix_posts_posted_at_post_id
           </div>
         </article>
         <article id="seed-posts">
-          <h3>PRC-004：シードデータ</h3>
+          <h3 id="chapter-6-detail-3">PRC-004：シードデータ</h3>
           <p>
             以下はAPI設計書の成功例と同じ3件。日時はUTC保存形式。初期状態の正常例であり、異常系の未来日時は通常シードに含めない。
           </p>
@@ -1099,6 +1152,61 @@ CREATE INDEX ix_posts_posted_at_post_id
             </table>
           </div>
         </article>
+        <article id="create-post-transaction">
+          <h3 id="chapter-6-detail-4">
+            PRC-006：投稿作成の保存規約（設計確定・未実装）
+          </h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">設計項目</th>
+                  <th scope="col">保存・接続規約</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>スキーマ</td>
+                  <td>
+                    TBL-001 /
+                    IDX-001をそのまま使用する。DBの文字数上限なしは維持し、API-002で新規bodyだけに280コードポイント制限を適用する。既存投稿・シードには新制限を遡及しない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>日時・固定値</td>
+                  <td>
+                    入力検証後にサーバー現在時刻をUTCで1回取得しposted_atとする。UTC化してtzinfoを外した固定形式で保存し、応答時はUTCのtzinfoを復元する。authorは「自分」、各件数は0、post_idは自動採番。displayed_atは保存せず、POSTでは算出・返却もしない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>トランザクション</td>
+                  <td>
+                    <a href="ロジック設計.html#process-006">PRC-006</a
+                    >：検証→時刻取得→セッション開始→INSERT/flush→CreatedPost（CLS-003、7項目）生成・JSONシリアライズ検証→コミット→201。応答をDB再取得なしで返せるようコミット前に確定する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>失敗・解放</td>
+                  <td>
+                    INSERT・整形・JSON化・コミットの失敗は可能な範囲でロールバックしERR-004。例外発生時もセッションを閉じる。接続プールはアプリ終了時に解放する。コミット済みの通信断は取消できずERR-005として一覧確認を促す。
+                  </td>
+                </tr>
+                <tr>
+                  <td>再送信</td>
+                  <td>
+                    冪等キー用カラム・ユニーク制約は追加しない。同文でも別要求は別投稿として保存される。
+                  </td>
+                </tr>
+                <tr>
+                  <td>確認</td>
+                  <td>
+                    新規ID・保存値・UTC復元・各件数0・再接続後の永続化。未作成時にファイルを生成しないこと、未移行・書き込み失敗・途中失敗で不完全行が残らないことを確認する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -1142,11 +1250,20 @@ CREATE INDEX ix_posts_posted_at_post_id
                 <td>全件を1トランザクション。例外時はロールバック。</td>
               </tr>
               <tr>
-                <td>投稿作成・編集・削除の画面操作</td>
+                <td>投稿編集・削除の画面操作</td>
                 <td>対象外</td>
                 <td>—</td>
                 <td>—</td>
                 <td>今回の取得APIでは実行しない。</td>
+              </tr>
+              <tr>
+                <td>PRC-006：投稿作成</td>
+                <td>SCR-002 / API-002 / FUN-003 / CLS-002・CLS-003</td>
+                <td>C（1件）</td>
+                <td>—</td>
+                <td>
+                  1要求1トランザクション。コミット前の例外はロールバック。成否にかかわらず解放。
+                </td>
               </tr>
             </tbody>
           </table>
@@ -1206,7 +1323,7 @@ CREATE INDEX ix_posts_posted_at_post_id
       <section id="chapter-9">
         <h2>9. ファイル管理</h2>
         <article id="file-sns-db">
-          <h3>FIL-001：sns.dbの管理</h3>
+          <h3 id="chapter-9-detail-1">FIL-001：sns.dbの管理</h3>
           <div class="table-wrap">
             <table>
               <thead>
@@ -1226,13 +1343,13 @@ CREATE INDEX ix_posts_posted_at_post_id
                   <td>受け入れ条件</td>
                   <td>
                     Alembic適用済みのSQLite
-                    DB。シードは6章の入力検証に合格したデータだけを受け入れる。任意ファイルのアップロード・取り込みは対象外。
+                    DB。シードは6章の入力検証、新規投稿はAPI-002の検証に合格したデータだけを受け入れる。任意ファイルのアップロード・取り込みは対象外。
                   </td>
                 </tr>
                 <tr>
                   <td>生成・更新・参照</td>
                   <td>
-                    開発者がスキーマと初期データを用意する。APIプロセスは投稿参照のみを行う。OSのファイル権限で第三者の取得・更新を防ぐ。
+                    開発者がスキーマと初期データを用意する。API-001は投稿参照のみ、API-002は投稿を1件追加する。OSのファイル権限で第三者の取得・更新を防ぐ。
                   </td>
                 </tr>
                 <tr>
@@ -1262,7 +1379,7 @@ CREATE INDEX ix_posts_posted_at_post_id
                 <tr>
                   <td>ログ・監視</td>
                   <td>
-                    投稿本文・接続情報はログに出さない。LOG-001はPRC-002と例外種別を標準エラーに出力する。シードは成功・失敗をコンソールに通知する。ログ保持期間、監視、バックアップ周期・世代は未決。
+                    投稿本文・接続情報はログに出さない。LOG-001はPRC-002、LOG-003はPRC-006と例外種別を標準エラーに出力する。シードは成功・失敗をコンソールに通知する。ログ保持期間、監視、バックアップ周期・世代は未決。
                   </td>
                 </tr>
                 <tr>
@@ -1275,14 +1392,19 @@ CREATE INDEX ix_posts_posted_at_post_id
             </table>
           </div>
         </article>
+        <p>
+          Issue #3の保存失敗は<a href="ロジック設計.html#error-004">ERR-004</a
+          >。POSTも既存DBだけをmode=rwで開き、DB未作成・未移行を正常扱いしない。新規APIで自動移行・シード投入を行わない。
+        </p>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
       </section>
     </main>
     <footer>
-      データベース設計書
-      v1.0.0｜投稿一覧の設計案。初回移行・シード・APIの実接続を確認済み。
+      データベース設計書 v1.1.1｜2026-10-24｜Issue
+      #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
+      #2は実装済み、Issue #3は未実装。
     </footer>
   </body>
 </html>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>入出力設計書｜トップページ</title>
+    <title>入出力設計書｜ホーム・投稿モーダル</title>
     <style>
       * {
         box-sizing: border-box;
@@ -447,33 +447,95 @@
           padding: 8px;
         }
       }
+      svg.issue3-diagram {
+        min-width: 660px;
+      }
+      @media print {
+        svg.issue3-diagram {
+          min-width: 0;
+        }
+      }
+
+      /* 章と小見出しを同じ目次内に階層表示する。 */
+      #toc > ol {
+        list-style: none;
+        padding-left: 0;
+      }
+      #toc .toc-subsections {
+        list-style: none;
+        padding: 0 0 0 12px;
+        margin: 4px 0 12px;
+      }
+      #toc .toc-subsections li {
+        margin: 2px 0;
+      }
+      #toc .toc-subsections a {
+        font-size: 12px;
+        border: 0;
+        border-left: 2px solid #ccd5df;
+        border-radius: 0;
+        background: transparent;
+        padding: 5px 8px;
+      }
+      svg.wide-diagram {
+        min-width: 1040px;
+        font-size: 14px;
+      }
+      @media print {
+        #toc .toc-subsections {
+          break-inside: avoid;
+        }
+        svg.wide-diagram {
+          min-width: 0;
+        }
+      }
     </style>
   </head>
   <body>
     <header>
       <p class="badge">旧Twitter風SNS / 詳細設計</p>
       <h1>入出力設計書</h1>
-      <p>トップページの投稿一覧と、左右のサイドバーのレイアウトを整理する。</p>
-      <nav id="toc" aria-label="目次">
-        <h2>目次</h2>
+      <p>
+        ホームの投稿一覧・左右のサイドバーと、Issue
+        #3の投稿入力モーダルの表示・操作を定義する。
+      </p>
+      <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
+        <h2 id="toc-heading">目次</h2>
         <ol>
+          <li><a href="#chapter-1">1. 画面一覧表</a></li>
+          <li><a href="#chapter-2">2. 画面遷移図</a></li>
+          <li><a href="#chapter-3">3. 画面共通部位一覧表</a></li>
+          <li><a href="#chapter-4">4. 画面共通設計</a></li>
           <li>
-            <a href="#chapter-1"> 画面一覧表 </a>
+            <a href="#chapter-5">5. 画面レイアウト図</a>
+            <ul class="toc-subsections">
+              <li>
+                <a href="#chapter-5-detail-1"
+                  >SCR-001：トップページ（レイアウト案）</a
+                >
+              </li>
+              <li>
+                <a href="#chapter-5-detail-2"
+                  >Issue #2で生成したレイアウト参考画像（旧仕様）</a
+                >
+              </li>
+              <li>
+                <a href="#chapter-5-detail-3"
+                  >SCR-002：投稿入力モーダル（設計確定・未実装）</a
+                >
+              </li>
+            </ul>
           </li>
           <li>
-            <a href="#chapter-2"> 画面遷移図 </a>
-          </li>
-          <li>
-            <a href="#chapter-3"> 画面共通部位一覧表 </a>
-          </li>
-          <li>
-            <a href="#chapter-4"> 画面共通設計 </a>
-          </li>
-          <li>
-            <a href="#chapter-5"> 画面レイアウト図 </a>
-          </li>
-          <li>
-            <a href="#chapter-6"> 画面入力設計 </a>
+            <a href="#chapter-6">6. 画面入力設計</a>
+            <ul class="toc-subsections">
+              <li><a href="#chapter-6-detail-1">SCR-001：トップページ</a></li>
+              <li>
+                <a href="#chapter-6-detail-2"
+                  >SCR-002：投稿入力・送信・キャンセル</a
+                >
+              </li>
+            </ul>
           </li>
         </ol>
       </nav>
@@ -488,15 +550,15 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.0.0</td>
+              <td>1.1.1</td>
             </tr>
             <tr>
               <td>更新日</td>
-              <td>2026-10-23</td>
+              <td>2026-10-24</td>
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>確定済</td>
+              <td>設計確定（Issue #2実装済み、Issue #3未実装）</td>
             </tr>
           </tbody>
         </table>
@@ -504,16 +566,18 @@
     </header>
     <main>
       <p id="implementation-status">
-        実装状況：Issue
-        #2の投稿一覧を実装済み。PC向け3カラム、初回取得・0件・失敗・再試行を提供する。バックエンドはbackend/src/sns、画面はfrontend/src/App.jsx、移行はbackend/migrationsに配置する。本文書の設計仕様と実装状況は別に管理する。
+        Issue #2の投稿一覧・初回移行・シードは実装済み。Issue
+        #3の投稿モーダル・投稿作成APIは設計確定・未実装。本書の投稿作成に関する図表は実装後の仕様を定義する。
       </p>
       <aside class="note">
         <strong> 設計対象と確定状況 </strong>
         <p>
-          画面はSCR-001（トップページ）の1ページのみを対象とする。生成画像を元に、PC向けの左サイドバー・中央コンテンツ・右サイドバーの3カラム案を記載する。左右のサイドバーは共通部位として管理する。
+          SCR-001（ホーム）とSCR-002（投稿モーダル）を対象とする。PC向け3カラムのホーム上にモーダルを重ね、URLは
+          / のままとする。左右のサイドバーは共通部位として管理する。
         </p>
         <p>
-          配置・表示項目はレビュー用の案。画像内の機能がすべて今回の実装対象になるわけではない。未確定の仕様は「未決」、今回のIssueに含めない機能は「対象外」と記載する。
+          Issue
+          #3では本文のみの投稿を追加する。画像添付・下書き・公開範囲・ログイン・スマートフォン対応・編集・削除・各アクションは対象外。個人のXの画像は使用しない。既存の生成画像は過去の検討資料であり、最新仕様は本書の図表とする。
         </p>
       </aside>
       <p>
@@ -546,7 +610,7 @@
                 <td>
                   DBに保存された投稿一覧を表示する。左右のサイドバーと中央の投稿一覧で構成する。
                 </td>
-                <td>認証なし。シード済み投稿の全件を閲覧できる。</td>
+                <td>認証なし。保存済み投稿の全件を閲覧できる。</td>
                 <td>
                   <a href="#screen-layout-home"> 画面レイアウト </a>
                   /
@@ -555,6 +619,18 @@
                     href="ロジック設計.html#post-attributes"
                     >ロジック設計のPost（CLS-001）</a
                   >に従う。
+                </td>
+              </tr>
+              <tr>
+                <td>SCR-002</td>
+                <td>投稿入力モーダル</td>
+                <td>/（変更なし）</td>
+                <td>本文入力・文字数・送信・エラー・閉じるを表示する。</td>
+                <td>認証なし。投稿者名は固定の「自分」。</td>
+                <td>
+                  <a href="#screen-layout-compose">レイアウト</a> /
+                  <a href="#screen-input-compose">入力設計</a
+                  >。設計確定・未実装。
                 </td>
               </tr>
             </tbody>
@@ -566,39 +642,92 @@
       </section>
       <section id="chapter-2">
         <h2>2. 画面遷移図</h2>
-        <p>
-          現時点ではトップページのみを記載する。他画面と画面間の遷移は対象外。サイドバーのメニューからの遷移先は未決。
-        </p>
         <figure>
           <div class="diagram-wrap">
             <svg
-              viewBox="0 0 760 180"
+              class="issue3-diagram"
+              viewBox="0 0 660 325"
               role="img"
-              aria-labelledby="home-transition-title home-transition-desc"
+              aria-labelledby="compose-transition-title compose-transition-desc"
             >
-              <title id="home-transition-title">
-                トップページのみの画面遷移図
+              <title id="compose-transition-title">
+                SCR-001とSCR-002の画面遷移
               </title>
-              <desc id="home-transition-desc">
-                画面を示す箱はSCR-001トップページの1つのみ。他画面への遷移はまだ定義していないため矢印はない。
+              <desc id="compose-transition-desc">
+                箱は画面・モーダル、矢印は操作による移行。送信失敗はSCR-002に留まり、破棄確認の取消は入力へ戻る。送信中の終了は不可。
               </desc>
+              <defs>
+                <marker
+                  id="compose-transition-arrow"
+                  viewBox="0 0 10 10"
+                  refX="9"
+                  refY="5"
+                  markerWidth="7"
+                  markerHeight="7"
+                  orient="auto"
+                >
+                  <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                </marker>
+              </defs>
               <rect
-                x="230"
-                y="35"
-                width="300"
-                height="100"
+                x="30"
+                y="10"
+                width="600"
+                height="70"
                 rx="6"
                 fill="#f4f7fb"
                 stroke="#344e70"
               />
-              <text x="380" y="77" text-anchor="middle">SCR-001</text>
-              <text x="380" y="105" text-anchor="middle">
-                トップページ（ホーム）
+              <text x="330" y="37" text-anchor="middle">
+                SCR-001 ホーム（URL：/）
+              </text>
+              <text x="330" y="60" text-anchor="middle">
+                COM-001 または ITEM-002「投稿する」
+              </text>
+              <path
+                d="M330 80 V110"
+                stroke="#344e70"
+                marker-end="url(#compose-transition-arrow)"
+              />
+              <rect
+                x="30"
+                y="115"
+                width="600"
+                height="70"
+                rx="6"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="330" y="142" text-anchor="middle">
+                SCR-002 投稿モーダル（URL：/）
+              </text>
+              <text x="330" y="165" text-anchor="middle">
+                入力 → 送信、失敗時は本文を保持して留まる
+              </text>
+              <path
+                d="M330 185 V215"
+                stroke="#344e70"
+                marker-end="url(#compose-transition-arrow)"
+              />
+              <rect
+                x="30"
+                y="220"
+                width="600"
+                height="70"
+                rx="6"
+                fill="#f4f7fb"
+                stroke="#344e70"
+              />
+              <text x="330" y="247" text-anchor="middle">
+                SCR-001 ホーム（URL：/）
+              </text>
+              <text x="330" y="270" text-anchor="middle">
+                保存成功：先頭反映・通知 ／ 閉じる：必要に応じ破棄確認
               </text>
             </svg>
           </div>
           <figcaption>
-            箱は画面を表す。現在の対象は1ページのため、遷移の矢印は記載しない。読み込み・0件・取得失敗は同一画面の表示状態として扱う。
+            箱は画面・モーダル、矢印は操作による移行。送信失敗はSCR-002に留まり、破棄確認の取消は入力へ戻る。送信中の終了は不可。
           </figcaption>
         </figure>
         <div class="table-wrap">
@@ -628,6 +757,24 @@
                 <td>今回の画面遷移図では対象外。メニューの遷移先は未決。</td>
                 <td>対象外</td>
                 <td>対象外</td>
+              </tr>
+              <tr>
+                <td>SCR-001 → SCR-002</td>
+                <td>左サイドバーと中央の「投稿する」で開く。</td>
+                <td>起動元の要素を記憶。本文は空で開始。</td>
+                <td>ホームの一覧状態は保持する。</td>
+              </tr>
+              <tr>
+                <td>SCR-002 → SCR-001</td>
+                <td>
+                  成功時は閉じて先頭へ反映し、「投稿しました」と通知。閉じる・Esc時は非空の本文があれば破棄確認。
+                </td>
+                <td>
+                  成功応答のCreatedPost（7項目）に、画面側でdisplayed_at="たった今"を補う。閉じた後は起動元へフォーカスを戻す。
+                </td>
+                <td>
+                  失敗は本文保持。背景クリックでは閉じない。ページ離脱・再読み込み後の入力復元は行わない。
+                </td>
               </tr>
             </tbody>
           </table>
@@ -661,7 +808,7 @@
                 </td>
                 <td>SCR-001</td>
                 <td>
-                  ホームを選択中として表現する案。投稿作成は今回のIssueでは対象外。ホーム以外は準備中表示としdisabledで操作不可。利用者のログイン情報は取得しない。
+                  ホームを選択中とし、「投稿する」でSCR-002を開く。他のメニューは準備中・disabled。ログイン情報は取得しない。モーダル中は背景を操作不可とする。
                 </td>
               </tr>
               <tr>
@@ -736,19 +883,26 @@
                 <td>取得失敗・中断と復旧</td>
                 <td>
                   HTTP
-                  500・通信失敗・不正な応答・タイムアウトで「投稿一覧を取得できませんでした。」と「再試行」ボタンを表示する。自動再試行は行わない。再試行中はボタンを無効にする。取得済み一覧は新しい要求時にクリアする。離脱時は要求を中断し古い結果を反映しない。未来日時のエラーはAPI設計に従い一覧全体の失敗として扱う。
+                  500・通信失敗・不正な応答・タイムアウトで「投稿一覧を取得できませんでした。」と「再試行」ボタンを表示する。自動再試行は行わない。再試行中はボタンを無効にする。再取得時も表示済み投稿を保持する。投稿成功分を含む一覧の統合はロジック設計PRC-005に従う。離脱時は要求を中断し古い結果を反映しない。未来日時のエラーはAPI設計に従い一覧全体の失敗として扱う。
                 </td>
               </tr>
               <tr>
                 <td>入力・権限・キーボード操作</td>
                 <td>
-                  投稿一覧の閲覧は認証なし。サイドバーの他機能の認証・権限、キーボード操作はブランドリンク→ホームリンク→失敗時の再試行ボタンの順。準備中のdisabled要素はTab移動から除外する。focus-visibleで輪郭を表示し、再試行中はボタンを無効にする。
+                  閲覧・投稿とも認証なし。ホームのTab順はブランド→ホーム→左の投稿ボタン→中央の投稿ボタン→失敗時の再試行とする。準備中のdisabled要素は除外しfocus-visibleで輪郭を表示する。モーダルのキーボード仕様はSCR-002に従う。
                 </td>
               </tr>
               <tr>
                 <td>未決事項の反映先</td>
                 <td>
                   表示・操作を決定後に本書の4〜6章を更新する。取得方式はAPI設計・ロジック設計、保存構造はデータベース設計にも反映する。
+                </td>
+              </tr>
+              <tr>
+                <td>投稿通知・エラー</td>
+                <td>
+                  保存成功はrole=status /
+                  aria-live=politeで「投稿しました」と通知。エラーはモーダル内のrole=alertで通知する。成功時はホーム一覧先頭までスクロールする。
                 </td>
               </tr>
             </tbody>
@@ -761,7 +915,7 @@
       <section id="chapter-5">
         <h2>5. 画面レイアウト図</h2>
         <article id="screen-layout-home">
-          <h3>SCR-001：トップページ（レイアウト案）</h3>
+          <h3 id="chapter-5-detail-1">SCR-001：トップページ（レイアウト案）</h3>
           <p>
             以下の配置図の番号は、要素一覧の番号に対応する。サイドバーの詳細は3章を参照。
           </p>
@@ -804,8 +958,8 @@
                     <p>すべての投稿 ／ フォロー中（準備中）</p>
                   </div>
                   <div class="wire-block">
-                    <strong> ③ ITEM-002：投稿入力欄 </strong>
-                    <p>いまどうしてる？ ／ 投稿する</p>
+                    <strong> ③ ITEM-002：投稿モーダルの入口 </strong>
+                    <p>ひとことを投稿してみましょう ／ 投稿する</p>
                   </div>
                   <div class="wire-block">
                     <strong> ④ ITEM-003：投稿一覧 </strong>
@@ -830,7 +984,7 @@
               </div>
             </div>
             <figcaption>
-              PC向け配置案。番号①〜⑤は次の要素一覧に対応する。投稿一覧はPostの属性を表示する。その他の寸法や機能の採用は未確定。
+              PC向け配置。番号①〜⑤は次の要素一覧に対応する。ITEM-002はモーダルを開く入口とし、投稿一覧はPostの属性を表示する。寸法は4章に従う。
             </figcaption>
           </figure>
           <div class="table-wrap">
@@ -870,19 +1024,15 @@
                 <tr>
                   <td>3</td>
                   <td>ITEM-002</td>
-                  <td>
-                    案：アイコン、投稿本文の入力欄、添付用アイコン、投稿ボタン。
-                  </td>
-                  <td>準備中の無効な入力欄。利用者情報を取得・送信しない。</td>
-                  <td>
-                    画像上の参考要素。投稿作成・画像添付は今回のIssueでは対象外。6章参照。
-                  </td>
+                  <td>投稿モーダルを開く案内と「投稿する」ボタン。</td>
+                  <td>固定の案内。ホーム上では本文を直接入力しない。</td>
+                  <td>クリックでSCR-002を開く。画像添付は対象外。6章参照。</td>
                 </tr>
                 <tr>
                   <td>4</td>
                   <td>ITEM-003</td>
                   <td>
-                    シード済み投稿一覧。表示はPostのauthor・body・reply_count・retweet_count・like_count・displayed_atを使用する。post_idは識別用、posted_atは日時算出用。画像・ユーザー名・アイコンのデータ取得は今回のPostの対象外。
+                    保存済み投稿一覧。表示はPostのauthor・body・reply_count・retweet_count・like_count・displayed_atを使用する。post_idは識別用、posted_atは日時算出用。画像・ユーザー名・アイコンのデータ取得は今回のPostの対象外。
                   </td>
                   <td>
                     フロントエンドからHTTP GET /api/postsで<a
@@ -894,7 +1044,7 @@
                     >で定義する。
                   </td>
                   <td>
-                    posted_at降順、同日時はpost_id降順で全件表示する。ページネーション・追加読み込みは対象外。各件数はシード値を表示し、閲覧時にDBを更新しない。投稿作成・各アクションの操作は対象外。
+                    posted_at降順、同日時はpost_id降順で全件表示する。ページネーション・追加読み込みは対象外。各件数は保存値を表示し、閲覧時にDBを更新しない。投稿作成成功時の7項目に画面側で「たった今」を補い、一覧用Postとして統合する。各アクションの操作は対象外。
                   </td>
                 </tr>
                 <tr>
@@ -909,7 +1059,9 @@
               </tbody>
             </table>
           </div>
-          <h3>生成したレイアウト参考画像</h3>
+          <h3 id="chapter-5-detail-2">
+            Issue #2で生成したレイアウト参考画像（旧仕様）
+          </h3>
           <p>
             内蔵画像生成ツールで作成した検討用画像。画像内の名前・本文・件数はサンプルであり、実データや確定仕様ではない。HTML単体で閲覧できるよう画像を埋め込んでいる。
           </p>
@@ -924,6 +1076,116 @@
             </figcaption>
           </figure>
         </article>
+        <article id="screen-layout-compose">
+          <h3 id="chapter-5-detail-3">
+            SCR-002：投稿入力モーダル（設計確定・未実装）
+          </h3>
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                class="issue3-diagram"
+                viewBox="0 0 660 360"
+                role="img"
+                aria-labelledby="compose-layout-title compose-layout-desc"
+              >
+                <title id="compose-layout-title">
+                  SCR-002 投稿モーダルのワイヤーフレーム
+                </title>
+                <desc id="compose-layout-desc">
+                  ホームを背景に残し、閉じる、本文、文字数、エラー、送信を1つのモーダル内に配置する。番号は要素一覧に対応する。
+                </desc>
+                <rect
+                  x="5"
+                  y="5"
+                  width="650"
+                  height="350"
+                  rx="6"
+                  fill="#e0e5eb"
+                  stroke="#718aa5"
+                />
+                <text x="22" y="30">SCR-001 ホーム（操作不可の背景）</text>
+                <rect
+                  x="45"
+                  y="47"
+                  width="570"
+                  height="286"
+                  rx="12"
+                  fill="#fff"
+                  stroke="#344e70"
+                />
+                <text x="63" y="78">① 閉じる</text>
+                <text x="270" y="78">投稿を作成</text>
+                <text x="65" y="117">② 投稿者：自分</text>
+                <rect
+                  x="65"
+                  y="131"
+                  width="530"
+                  height="96"
+                  rx="4"
+                  fill="#f4f7fb"
+                  stroke="#718aa5"
+                />
+                <text x="80" y="159">本文：いまどうしてる？</text>
+                <text x="80" y="186">複数行入力（1〜280コードポイント）</text>
+                <text x="65" y="250">④ 入力エラー・通信エラーの表示欄</text>
+                <text x="65" y="299">③ 文字数 n / 280</text>
+                <rect
+                  x="443"
+                  y="274"
+                  width="152"
+                  height="38"
+                  rx="18"
+                  fill="#eef3f8"
+                  stroke="#344e70"
+                />
+                <text x="519" y="299" text-anchor="middle">⑤ 投稿する</text>
+              </svg>
+            </div>
+            <figcaption>
+              番号①〜⑤は次の要素一覧に対応する。ホームを暗い背景に残し、中央上部の白いモーダル（幅600px、左右余白24px）を表示する。画面高を超える場合はモーダル内部を縦スクロールし、背景のスクロールと操作を止める。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">図中番号・項目ID</th>
+                  <th scope="col">役割・データ元</th>
+                  <th scope="col">操作条件</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>① ITEM-004</td>
+                  <td>見出し「投稿を作成」と閉じるボタン</td>
+                  <td>送信中は閉じる不可。</td>
+                </tr>
+                <tr>
+                  <td>② ITEM-005</td>
+                  <td>固定名「自分」と空のtextarea</td>
+                  <td>
+                    開いたとき本文へフォーカス。ラベル「投稿本文」を付ける。
+                  </td>
+                </tr>
+                <tr>
+                  <td>③ ITEM-006</td>
+                  <td>Array.from(body).length / 280</td>
+                  <td>超過時は文字数とエラーを表示。入力自体は遮断しない。</td>
+                </tr>
+                <tr>
+                  <td>④ ITEM-007</td>
+                  <td>入力不正・APIエラー・結果不明の案内</td>
+                  <td>本文を表示用HTMLとして解釈しない。</td>
+                </tr>
+                <tr>
+                  <td>⑤ ITEM-008</td>
+                  <td>POST /api/posts を開始</td>
+                  <td>無効な本文・送信中はdisabled。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -931,9 +1193,9 @@
       <section id="chapter-6">
         <h2>6. 画面入力設計</h2>
         <article id="screen-input-home">
-          <h3>SCR-001：トップページ</h3>
+          <h3 id="chapter-6-detail-1">SCR-001：トップページ</h3>
           <p>
-            投稿一覧の閲覧には本文の入力を必要としない。参考画像に含まれる入力欄・選択操作は以下で対象範囲と未決事項を管理する。
+            ホーム上には直接入力欄を設けず、ITEM-002またはCOM-001からSCR-002を開く。本文入力はSCR-002の入力設計で定義する。
           </p>
           <div class="table-wrap">
             <table>
@@ -948,14 +1210,12 @@
               </thead>
               <tbody>
                 <tr>
-                  <td>ITEM-002</td>
-                  <td>案：投稿本文の複数行入力、添付、投稿ボタン。</td>
-                  <td>対象外（今回のIssueでは投稿作成を実装しない）。</td>
+                  <td>ITEM-002 / COM-001の投稿ボタン</td>
+                  <td>ボタン（モーダルを開く）</td>
+                  <td>初期状態で操作可能。</td>
+                  <td>ホーム上の直接入力・添付は設けない。</td>
                   <td>
-                    対象外。文字数の数え方・上下限、空白・改行・正規化は投稿作成の設計で定義する。
-                  </td>
-                  <td>
-                    対象外。チェック時機、送信・成功時、キャンセル・離脱時の入力保持も投稿作成の設計で定義する。
+                    SCR-002を空の本文で開く。閉じた後は起動元へフォーカスを戻す。
                   </td>
                 </tr>
                 <tr>
@@ -978,14 +1238,136 @@
             </table>
           </div>
         </article>
+        <article id="screen-input-compose">
+          <h3 id="chapter-6-detail-2">SCR-002：投稿入力・送信・キャンセル</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">入力・制約</th>
+                  <th scope="col">送信・終了・失敗時</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ITEM-005 本文</td>
+                  <td>
+                    必須。1〜280
+                    Unicodeコードポイント。JSはArray.from、Pythonはlen。改行も1コードポイント。結合絵文字は複数になる場合がある。CRLFはtextareaのLF表現で送信し、APIは受信文字列を正規化しない。
+                  </td>
+                  <td>
+                    入力ごとに検証。前後の空白・改行を削除せず送信・保存。U+0020（半角スペース）、U+3000（全角スペース）、U+0009（タブ）、U+000A（改行）、U+000D（復帰）、U+000B（垂直タブ）、U+000C（改ページ）だけの本文と空文字は不可。
+                  </td>
+                </tr>
+                <tr>
+                  <td>ITEM-008 送信</td>
+                  <td>
+                    有効時のみ操作可能。ボタンのEnter/Spaceで送信。本文のEnterは改行。
+                  </td>
+                  <td>
+                    送信中は本文・送信・閉じるを無効化。5秒でタイムアウト。自動再送信なし。成功時だけ本文を消しモーダルを閉じる。
+                  </td>
+                </tr>
+                <tr>
+                  <td>ITEM-004 閉じる・Esc</td>
+                  <td>
+                    本文の長さが0なら即座に閉じる。空白だけでも非空なら確認。
+                  </td>
+                  <td>
+                    「入力内容を破棄しますか？」と「入力を続ける」「破棄する」をモーダル内に表示。初期フォーカスは「入力を続ける」。取消・Escは本文へ戻す。破棄を選んだ場合だけ本文を消して閉じる。送信中はEscも無効。背景クリックでは閉じない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>フォーカス・背景</td>
+                  <td>role=dialog、aria-modal=true、見出しで名前を付ける。</td>
+                  <td>
+                    背景はinert。Tab/Shift+Tabを閉じる→本文→有効な投稿ボタンの間で循環。確認中は確認ボタン間で循環。送信中はダイアログへフォーカスし、解除後は本文へ。終了時は起動元へ戻す。
+                  </td>
+                </tr>
+                <tr>
+                  <td>エラーと再試行</td>
+                  <td>
+                    422：「投稿本文は空白のみを除く1〜280文字で入力してください。」、500：「投稿を保存できませんでした。」
+                  </td>
+                  <td>
+                    本文を保持して再編集・手動送信が可能。通信切断・5秒超過・不正応答では「保存済みの可能性があるため、一覧を確認してから再投稿してください」と表示。
+                  </td>
+                </tr>
+                <tr>
+                  <td>結果不明時の一覧確認</td>
+                  <td>モーダル内に「一覧を確認する」を表示する。</td>
+                  <td>
+                    通常の閉じる・破棄確認の後にホームでGETを再実行する。本文を残す場合は確認を取り消し入力を続ける。下書き保存・再読み込み後の復元は対象外。再投稿の自動重複防止はない。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">確認ケース</th>
+                  <th scope="col">期待結果</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>正常・永続化</td>
+                  <td>
+                    有効な本文で201。固定投稿者・受付時刻・件数0を保存し、画面に即時反映。再読み込み後もGETで同じ投稿を確認する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>文字数・空白</td>
+                  <td>
+                    0・1・280・281コードポイント、日本語・英数字・絵文字・改行、指定の空白だけの値を確認する。前後の空白は保持する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>入力不正</td>
+                  <td>
+                    body欠落・null・数値・配列・オブジェクト・余分な項目・不正JSONで422。DBに行を追加せず入力値を応答に含めない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>保存失敗</td>
+                  <td>
+                    DB未作成・未移行・書き込み不能・INSERT/応答生成/コミット失敗で500。コミット前はロールバックし接続を解放する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>画面操作</td>
+                  <td>
+                    両方の入口、入力フォーカス、Tab循環、Escと閉じる、破棄確認の取消、送信中の本文変更・閉じる・連打の抑止。
+                  </td>
+                </tr>
+                <tr>
+                  <td>通信・競合</td>
+                  <td>
+                    5秒の期限・通信切断・不正応答では本文を保持し結果不明を案内。自動再送信なし。遅れて届く一覧応答と投稿IDで統合し、新規投稿が消えず重複しない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>回帰</td>
+                  <td>
+                    一覧の読み込み・0件・取得失敗・手動再試行、日時表示・並び順、HTMLを実行しない本文表示を維持する。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
       </section>
     </main>
     <footer>
-      入出力設計書
-      v1.0.0｜トップページのレイアウト案。未決事項は設計の進行に合わせて更新する。
+      入出力設計書 v1.1.1｜2026-10-24｜Issue
+      #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
+      #2は実装済み、Issue #3は未実装。
     </footer>
   </body>
 </html>

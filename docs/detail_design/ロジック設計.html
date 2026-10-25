@@ -613,7 +613,7 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.3.0</td>
+              <td>1.4.0</td>
             </tr>
             <tr>
               <td>更新日</td>
@@ -623,7 +623,7 @@
               <td>ステータス</td>
               <td>
                 設計確定（Issue #2実装済み、Issue #3実装済み、Issue
-                #4設計確定・未実装）
+                #4設計確定・実装済み）
               </td>
             </tr>
           </tbody>
@@ -634,12 +634,12 @@
       <p id="implementation-status">
         Issue #2の投稿一覧・初回移行・シードとIssue
         #3の投稿モーダル・投稿作成APIは実装済み。作成POSTはCreatedPostの7項目、一覧GETはPostの8項目。Issue
-        #4の詳細GETはPostDetailの7項目で設計確定・未実装。既存機能の実装・検証履歴は末尾に残し、今回の新機能が検証済みであることを意味しない。
+        #4の詳細GETはPostDetailの7項目で設計確定・実装済み。既存機能の検証履歴と、投稿詳細の実装・検証結果は末尾に分けて記載する。
       </p>
       <aside class="note">
         <strong> 対象範囲と設計の前提 </strong>
         <p>
-          ホームSCR-001（URL：/）の投稿一覧ITEM-003と、投稿モーダルSCR-002を対象とする。FUN・PRG・PRC等のIDは本書で管理する設計上のID。各図は処理仕様を示し、実装状況と検証結果は冒頭および末尾で管理する。
+          ホームSCR-001（URL：/）の投稿一覧ITEM-003、投稿モーダルSCR-002、投稿詳細SCR-003を対象とする。FUN・PRG・PRC等のIDは本書で管理する設計上のID。各図は処理仕様を示し、実装状況と検証結果は冒頭および末尾で管理する。
         </p>
         <p>
           閲覧処理は保存済み投稿の参照のみとし、DBへのINSERT・UPDATE・DELETEを行わない。Issue
@@ -700,7 +700,7 @@
                 </td>
                 <td>
                   利用者がCOM-001またはITEM-002の「投稿する」を押す。認証なし。詳細からの起動はIssue
-                  #4で設計確定・未実装。
+                  #4で設計確定・実装済み。
                 </td>
                 <td>SCR-002 / API-002 / PRC-005・PRC-006</td>
                 <td>設計確定・実装済み。</td>
@@ -713,7 +713,7 @@
                 </td>
                 <td>投稿リンク・詳細URL直接入力・再読み込み。認証なし。</td>
                 <td>SCR-003 / API-003 / PRC-007・PRC-008</td>
-                <td>設計確定・未実装。</td>
+                <td>設計確定・実装済み。</td>
               </tr>
             </tbody>
           </table>
@@ -822,24 +822,28 @@
                 <td>PRG-007</td>
                 <td>投稿詳細の表示制御</td>
                 <td>
-                  frontend/src/App.jsxを起点とする詳細表示の論理責務。詳細コンポーネントと日時整形を分離して実装予定。
+                  frontend/src/App.jsxでURLを判定し、PostDetail.jsxが取得状態、PostContent.jsxが投稿表示、posts.jsが応答検証・日時整形を担当する。アイコンはIcon.jsxを共用する。
                 </td>
                 <td>FUN-004</td>
                 <td>
                   post_id → API-003 →
                   PostDetail・画面状態。PRG-008と投稿モーダルPRG-005に依存。
                 </td>
-                <td><a href="#process-007">PRC-007</a>。設計確定・未実装。</td>
+                <td>
+                  <a href="#process-007">PRC-007</a>。設計確定・実装済み。
+                </td>
               </tr>
               <tr>
                 <td>PRG-008</td>
                 <td>投稿詳細の取得・検証</td>
                 <td>
-                  backend/src/sns/main.pyを起点にsns/posts.py・sns/schemas.py・sns/database.pyへ配置予定。
+                  backend/src/sns/main.pyを起点にsns/posts.py・sns/schemas.py・sns/database.pyに実装済み。
                 </td>
                 <td>FUN-004</td>
                 <td>正の整数のID → SELECT → PostDetail / 404・422・500。</td>
-                <td><a href="#process-008">PRC-008</a>。設計確定・未実装。</td>
+                <td>
+                  <a href="#process-008">PRC-008</a>。設計確定・実装済み。
+                </td>
               </tr>
             </tbody>
           </table>
@@ -912,13 +916,13 @@
               </tr>
               <tr>
                 <td>CLS-004</td>
-                <td>PostDetail / sns/schemas.py（追加予定）</td>
+                <td>PostDetail / sns/schemas.py（実装済み）</td>
                 <td>単件取得の7属性を保持。displayed_atを持たない。</td>
                 <td>
                   post_id・author・body・posted_at・reply_count・retweet_count・like_count。全項目必須・null不可。型は一覧Postの対応項目と同じ。
                 </td>
                 <td>PRG-008 / PRC-008 → PRG-007 / PRC-007</td>
-                <td>設計確定・未実装。</td>
+                <td>設計確定・実装済み。</td>
               </tr>
             </tbody>
           </table>
@@ -4904,7 +4908,7 @@
           #3でPRC-005の統合規約へ拡張する。取得中・取得失敗でも表示済み投稿を保持し、取得状態の通知・再試行と投稿一覧を併記できるようにする。
         </p>
         <article id="process-007">
-          <h3>PRC-007：投稿詳細表示（設計確定・未実装）</h3>
+          <h3>PRC-007：投稿詳細表示（設計確定・実装済み）</h3>
 
           <div class="table-wrap">
             <table>
@@ -4971,7 +4975,7 @@
           </div>
         </article>
         <article id="process-008">
-          <h3>PRC-008：投稿詳細取得（設計確定・未実装）</h3>
+          <h3>PRC-008：投稿詳細取得（設計確定・実装済み）</h3>
 
           <div class="table-wrap">
             <table>
@@ -5246,10 +5250,22 @@
           専用の検証用DBと実ブラウザで、両方の投稿入口、本文と改行の保存、先頭反映、再読み込み後の表示、Tab/Shift+Tabの循環、連続Escでの確認取消、背景操作禁止、保存失敗後の本文保持と再試行を確認した。5秒の期限・遅延応答・GETとの競合は自動テストで確認する。コードとドキュメントはfeature/post-composerで管理し、画像・下書き・認証・スマートフォン対応は追加していない。
         </p>
       </aside>
+      <aside class="note" id="detail-implementation-verification">
+        <strong>投稿詳細の実装と検証（2026-10-25）</strong>
+        <p>
+          SCR-003・API-003・PRC-007・PRC-008・PostDetailを実装済み。通常のaリンクで画面遷移し、詳細URLへの直接アクセス・再読み込みに対応する。SQLiteの保存構造・マイグレーションは変更していない。
+        </p>
+        <p>
+          バックエンド81件・フロントエンド74件の自動テスト、フロントエンドビルド、変更ファイルのRuff・Prettierチェックを実施。単件取得、404・422・500とno-store、巨大なIDの404、対象外の不正データからの独立性、日時境界、JSON変換と時計の失敗、セッション解放を確認した。
+        </p>
+        <p>
+          専用の一時DBと実ブラウザで、投稿カードのクリック・Tab/Enter、詳細URL・再読み込み、本文改行・日本時間の日付境界、詳細からの投稿成功後のURL維持・通知・フォーカス復帰、破棄確認の取消と破棄、一覧復帰後の新規投稿取得、404・422・500の表示と手動再試行による復旧を確認した。通信切断・5秒の期限・遅延応答の破棄・ID変更・ページキャッシュ復元時の再取得は自動テストで確認した。本番の配信構成は引き続き未決。
+        </p>
+      </aside>
     </main>
     <footer>
-      ロジック設計書 v1.3.0｜2026-10-25｜Issue
-      #4の投稿詳細設計を追加（設計確定・未実装）。Issue #2・#3は実装済み。
+      ロジック設計書 v1.4.0｜2026-10-25｜Issue
+      #4の投稿詳細設計を追加（設計確定・実装済み）。Issue #2・#3は実装済み。
     </footer>
   </body>
 </html>

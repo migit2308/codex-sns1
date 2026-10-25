@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>データベース設計書｜投稿一覧</title>
+    <title>データベース設計書｜投稿一覧・投稿作成・投稿詳細</title>
     <style>
       * {
         box-sizing: border-box;
@@ -403,12 +403,21 @@
           min-width: 0;
         }
       }
+      svg[aria-labelledby^="detail-"] {
+        min-width: 720px;
+      }
+      @media print {
+        svg[aria-labelledby^="detail-"] {
+          min-width: 0;
+        }
+      }
     </style>
   </head>
   <body>
     <header>
       <p class="badge">旧Twitter風SNS / 詳細設計</p>
       <h1>データベース設計書</h1>
+
       <p>
         投稿一覧・投稿作成に使用する既存投稿テーブル、接続・トランザクションと、マイグレーション・シード準備を定義する。
       </p>
@@ -458,15 +467,18 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.2.0</td>
+              <td>1.4.0</td>
             </tr>
             <tr>
               <td>更新日</td>
-              <td>2026-10-24</td>
+              <td>2026-10-25</td>
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
+              <td>
+                設計確定（Issue #2実装済み、Issue #3実装済み、Issue
+                #4設計確定・実装済み）
+              </td>
             </tr>
           </tbody>
         </table>
@@ -474,13 +486,16 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードと、Issue
-        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
+        Issue #2の投稿一覧・初回移行・シードとIssue
+        #3の投稿モーダル・投稿作成APIは実装済み。作成POSTはCreatedPostの7項目、一覧GETはPostの8項目。Issue
+        #4の詳細GETはPostDetailの7項目で設計確定・実装済み。既存機能の検証履歴と、投稿詳細の実装・検証結果は末尾に分けて記載する。
       </p>
       <aside class="note">
         <strong> 対象と確定状況 </strong>
         <p>
-          SCR-001の投稿一覧ITEM-003、API-001・API-002、PRC-002〜PRC-004・PRC-006に対応する設計。Alembic導入・初回移行・シード投入・APIからの参照を実装済み。
+          SCR-001の投稿一覧ITEM-003、API-001・API-002、PRC-002〜PRC-004・PRC-006に対応する設計。Issue
+          #4ではSCR-003 / API-003 /
+          PRC-008の単件参照を追加設計（実装済み）。Alembic導入・初回移行・シード投入・APIからの参照を実装済み。
         </p>
         <p>
           保存対象はPostの7属性。displayed_atはAPIで算出し、保存しない。閲覧APIは参照のみ。Issue
@@ -656,7 +671,7 @@
               <tr>
                 <td>セッション・資源</td>
                 <td>
-                  PRC-002は取得要求ごとにセッションを作成し、取得・変換後に必ず閉じる。失敗時もクローズする。PRC-004は1トランザクションで投入し、例外時はロールバックする。PRC-006は1投稿1トランザクションで、コミット前の失敗はロールバックし、成否にかかわらずセッションを閉じる。
+                  PRC-002・PRC-008は取得要求ごとにセッションを作成し、取得・変換後に必ず閉じる。失敗時もクローズする。PRC-004は1トランザクションで投入し、例外時はロールバックする。PRC-006は1投稿1トランザクションで、コミット前の失敗はロールバックし、成否にかかわらずセッションを閉じる。
                 </td>
               </tr>
               <tr>
@@ -1265,9 +1280,26 @@ CREATE INDEX ix_posts_posted_at_post_id
                   1要求1トランザクション。コミット前の例外はロールバック。成否にかかわらず解放。
                 </td>
               </tr>
+              <tr id="detail-read">
+                <td>PRC-008：投稿詳細取得</td>
+                <td>SCR-003 / API-003 / FUN-004 / CLS-004</td>
+                <td>R（主キーで1件）</td>
+                <td>—</td>
+                <td>
+                  パラメータ付きSELECTでpost_idが一致する行だけを参照。既存の主キーを使用し、追加の索引・カラム・テーブル・マイグレーションなし。セッションは要求単位で、データ変換失敗時も解放。設計確定・実装済み。
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
+        <p>
+          Issue
+          #4の詳細取得では日時や件数を更新しない。posted_atは既存のUTC保存規約を維持し、JSTへの変換は画面で行う。主キーに一致する対象がなければ404、対象の不正データ・未来日時やDB取得失敗は500とする。HTTPの定義は<a
+            href="API設計.html#api-003"
+            >API-003</a
+          >、取得手順は<a href="ロジック設計.html#process-008">PRC-008</a
+          >を参照。
+        </p>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -1379,7 +1411,7 @@ CREATE INDEX ix_posts_posted_at_post_id
                 <tr>
                   <td>ログ・監視</td>
                   <td>
-                    投稿本文・接続情報はログに出さない。LOG-001はPRC-002、LOG-003はPRC-006と例外種別を標準エラーに出力する。シードは成功・失敗をコンソールに通知する。ログ保持期間、監視、バックアップ周期・世代は未決。
+                    投稿本文・接続情報はログに出さない。LOG-001はPRC-002、LOG-003はPRC-006、LOG-004はPRC-008と例外種別を標準エラーに出力する。シードは成功・失敗をコンソールに通知する。ログ保持期間、監視、バックアップ周期・世代は未決。
                   </td>
                 </tr>
                 <tr>
@@ -1401,7 +1433,7 @@ CREATE INDEX ix_posts_posted_at_post_id
         </p>
       </section>
       <aside class="note" id="implementation-verification">
-        <strong>実装と検証（2026-10-24）</strong>
+        <strong>Issue #2・#3の実装と検証（2026-10-24）</strong>
         <p>
           バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
         </p>
@@ -1409,11 +1441,22 @@ CREATE INDEX ix_posts_posted_at_post_id
           専用の検証用DBと実ブラウザで、両方の投稿入口、本文と改行の保存、先頭反映、再読み込み後の表示、Tab/Shift+Tabの循環、連続Escでの確認取消、背景操作禁止、保存失敗後の本文保持と再試行を確認した。5秒の期限・遅延応答・GETとの競合は自動テストで確認する。コードとドキュメントはfeature/post-composerで管理し、画像・下書き・認証・スマートフォン対応は追加していない。
         </p>
       </aside>
+      <aside class="note" id="detail-implementation-verification">
+        <strong>投稿詳細の実装と検証（2026-10-25）</strong>
+        <p>
+          SCR-003・API-003・PRC-007・PRC-008・PostDetailを実装済み。通常のaリンクで画面遷移し、詳細URLへの直接アクセス・再読み込みに対応する。SQLiteの保存構造・マイグレーションは変更していない。
+        </p>
+        <p>
+          バックエンド81件・フロントエンド74件の自動テスト、フロントエンドビルド、変更ファイルのRuff・Prettierチェックを実施。単件取得、404・422・500とno-store、巨大なIDの404、対象外の不正データからの独立性、日時境界、JSON変換と時計の失敗、セッション解放を確認した。
+        </p>
+        <p>
+          専用の一時DBと実ブラウザで、投稿カードのクリック・Tab/Enter、詳細URL・再読み込み、本文改行・日本時間の日付境界、詳細からの投稿成功後のURL維持・通知・フォーカス復帰、破棄確認の取消と破棄、一覧復帰後の新規投稿取得、404・422・500の表示と手動再試行による復旧を確認した。通信切断・5秒の期限・遅延応答の破棄・ID変更・ページキャッシュ復元時の再取得は自動テストで確認した。本番の配信構成は引き続き未決。
+        </p>
+      </aside>
     </main>
     <footer>
-      データベース設計書 v1.2.0｜2026-10-24｜Issue
-      #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は実装済み。
+      データベース設計書 v1.4.0｜2026-10-25｜Issue
+      #4の投稿詳細設計を追加（設計確定・実装済み）。Issue #2・#3は実装済み。
     </footer>
   </body>
 </html>

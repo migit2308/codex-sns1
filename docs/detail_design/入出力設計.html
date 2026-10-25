@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>入出力設計書｜ホーム・投稿モーダル</title>
+    <title>入出力設計書｜投稿一覧・投稿作成・投稿詳細</title>
     <style>
       * {
         box-sizing: border-box;
@@ -489,21 +489,39 @@
           min-width: 0;
         }
       }
+      svg[aria-labelledby^="detail-"] {
+        min-width: 720px;
+      }
+      @media print {
+        svg[aria-labelledby^="detail-"] {
+          min-width: 0;
+        }
+      }
     </style>
   </head>
   <body>
     <header>
       <p class="badge">旧Twitter風SNS / 詳細設計</p>
       <h1>入出力設計書</h1>
+
       <p>
-        ホームの投稿一覧・左右のサイドバーと、Issue
-        #3の投稿入力モーダルの表示・操作を定義する。
+        ホームの投稿一覧・投稿入力モーダルと、Issue
+        #4の投稿詳細画面の表示・操作を定義する。
       </p>
       <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
         <h2 id="toc-heading">目次</h2>
         <ol>
           <li><a href="#chapter-1">1. 画面一覧表</a></li>
-          <li><a href="#chapter-2">2. 画面遷移図</a></li>
+          <li>
+            <a href="#chapter-2">2. 画面遷移図</a>
+            <ul class="toc-subsections">
+              <li>
+                <a href="#detail-transition"
+                  >SCR-001・SCR-003：投稿詳細への遷移</a
+                >
+              </li>
+            </ul>
+          </li>
           <li><a href="#chapter-3">3. 画面共通部位一覧表</a></li>
           <li><a href="#chapter-4">4. 画面共通設計</a></li>
           <li>
@@ -524,6 +542,11 @@
                   >SCR-002：投稿入力モーダル（設計確定・実装済み）</a
                 >
               </li>
+              <li>
+                <a href="#screen-layout-detail"
+                  >SCR-003：投稿詳細のレイアウト</a
+                >
+              </li>
             </ul>
           </li>
           <li>
@@ -533,6 +556,11 @@
               <li>
                 <a href="#chapter-6-detail-2"
                   >SCR-002：投稿入力・送信・キャンセル</a
+                >
+              </li>
+              <li>
+                <a href="#screen-input-detail"
+                  >SCR-003：詳細の取得・操作・状態</a
                 >
               </li>
             </ul>
@@ -550,15 +578,18 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.2.0</td>
+              <td>1.4.0</td>
             </tr>
             <tr>
               <td>更新日</td>
-              <td>2026-10-24</td>
+              <td>2026-10-25</td>
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
+              <td>
+                設計確定（Issue #2実装済み、Issue #3実装済み、Issue
+                #4設計確定・実装済み）
+              </td>
             </tr>
           </tbody>
         </table>
@@ -566,14 +597,14 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードと、Issue
-        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
+        Issue #2の投稿一覧・初回移行・シードとIssue
+        #3の投稿モーダル・投稿作成APIは実装済み。作成POSTはCreatedPostの7項目、一覧GETはPostの8項目。Issue
+        #4の詳細GETはPostDetailの7項目で設計確定・実装済み。既存機能の検証履歴と、投稿詳細の実装・検証結果は末尾に分けて記載する。
       </p>
       <aside class="note">
         <strong> 設計対象と確定状況 </strong>
         <p>
-          SCR-001（ホーム）とSCR-002（投稿モーダル）を対象とする。PC向け3カラムのホーム上にモーダルを重ね、URLは
-          / のままとする。左右のサイドバーは共通部位として管理する。
+          SCR-001（ホーム）、SCR-002（投稿モーダル）、SCR-003（投稿詳細）を対象とする。ホーム・詳細は共通のPC向け3カラム。モーダルは起動元画面に重ね、起動元URLを維持する。SCR-003は設計確定・実装済み。
         </p>
         <p>
           Issue
@@ -624,12 +655,28 @@
               <tr>
                 <td>SCR-002</td>
                 <td>投稿入力モーダル</td>
-                <td>/（変更なし）</td>
+                <td>起動元の / または /posts/{post_id}（変更なし）</td>
                 <td>本文入力・文字数・送信・エラー・閉じるを表示する。</td>
-                <td>認証なし。投稿者名は固定の「自分」。</td>
+                <td>
+                  認証なし。投稿者名は固定の「自分」。ホーム・詳細の両方から利用する。
+                </td>
                 <td>
                   <a href="#screen-layout-compose">レイアウト</a> /
                   <a href="#screen-input-compose">入力設計</a
+                  >。設計確定・実装済み。
+                </td>
+              </tr>
+              <tr>
+                <td>SCR-003</td>
+                <td>投稿詳細</td>
+                <td>/posts/{post_id}</td>
+                <td>
+                  投稿者・本文・投稿日時・リプライ数・リツイート数・いいね数を表示。IDは非表示。
+                </td>
+                <td>認証なし。正の整数の投稿IDを指定する。</td>
+                <td>
+                  <a href="#screen-layout-detail">画面レイアウト</a> /
+                  <a href="#screen-input-detail">操作設計</a
                   >。設計確定・実装済み。
                 </td>
               </tr>
@@ -747,16 +794,23 @@
                   認証なしで「/」にアクセスし、GET
                   /api/postsで投稿一覧を取得する。
                 </td>
-                <td>他画面からの引き継ぎは対象外。</td>
+                <td>
+                  詳細から戻る場合も /
+                  に移動して一覧を再取得する。スクロール位置の復元は今回の対象外。ブラウザがページをキャッシュから復元した場合もpageshowのpersistedを検出して再取得する。
+                </td>
                 <td>
                   取得失敗時は4章のエラー表示と再試行、中断時は要求の取消と応答破棄を行う。
                 </td>
               </tr>
               <tr>
-                <td>他画面への遷移</td>
-                <td>今回の画面遷移図では対象外。メニューの遷移先は未決。</td>
-                <td>対象外</td>
-                <td>対象外</td>
+                <td>SCR-001 → SCR-003</td>
+                <td>
+                  投稿カードのリンクをクリック、またはTabで選択してEnter。
+                </td>
+                <td>リンク先のpost_idをURLパスに含める。</td>
+                <td>
+                  詳細画面で取得状態を表示する。準備中メニューの遷移は対象外。
+                </td>
               </tr>
               <tr>
                 <td>SCR-001 → SCR-002</td>
@@ -765,12 +819,12 @@
                 <td>ホームの一覧状態は保持する。</td>
               </tr>
               <tr>
-                <td>SCR-002 → SCR-001</td>
+                <td>SCR-002 → 起動元（ホーム時はSCR-001）</td>
                 <td>
-                  成功時は閉じて先頭へ反映し、「投稿しました」と通知。閉じる・Esc時は非空の本文があれば破棄確認。
+                  ホーム起動時は成功後に閉じて一覧の先頭へ反映し、「投稿しました」と通知。閉じる・Esc時は非空の本文があれば破棄確認。
                 </td>
                 <td>
-                  成功応答のCreatedPost（7項目）に、画面側でdisplayed_at="たった今"を補う。閉じた後は起動元へフォーカスを戻す。
+                  ホームでは成功応答のCreatedPost（7項目）に、画面側でdisplayed_at="たった今"を補う。詳細起動時は詳細に留まり完了通知のみ行う。閉じた後は起動元へフォーカスを戻す。
                 </td>
                 <td>
                   失敗は本文保持。背景クリックでは閉じない。ページ離脱・再読み込み後の入力復元は行わない。
@@ -779,6 +833,132 @@
             </tbody>
           </table>
         </div>
+        <article id="detail-transition">
+          <h3>SCR-001・SCR-003・SCR-002：投稿詳細の画面遷移</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 720 300"
+                role="img"
+                aria-labelledby="detail-navigation-title detail-navigation-desc"
+              >
+                <title id="detail-navigation-title">
+                  SCR-001 → SCR-003 → SCR-001
+                </title>
+                <desc id="detail-navigation-desc">
+                  箱は処理・状態、上から下への矢印は処理の進行を表す。分岐条件は下の表で補足する。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-navigation-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="40"
+                  y="20"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="43" text-anchor="middle">
+                  SCR-001 ホーム /
+                </text>
+                <text x="360" y="64" text-anchor="middle">
+                  投稿カードのクリック・Tab → Enter
+                </text>
+                <path
+                  d="M360 78 V103"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-navigation-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="105"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="128" text-anchor="middle">
+                  SCR-003 投稿詳細 /posts/{post_id}
+                </text>
+                <text x="360" y="149" text-anchor="middle">
+                  URL直接入力・再読み込みでもAPI-003を取得
+                </text>
+                <path
+                  d="M360 163 V188"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-navigation-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="190"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="213" text-anchor="middle">
+                  SCR-001 ホーム /
+                </text>
+                <text x="360" y="234" text-anchor="middle">
+                  「投稿一覧へ戻る」またはホームリンクで一覧を再取得
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              SCR-001 → SCR-003 →
+              SCR-001：箱は処理・状態、矢印は上から下への進行。条件と例外は併記した表を参照。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">操作</th>
+                  <th scope="col">遷移・条件</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>詳細の「投稿する」</td>
+                  <td>
+                    SCR-003 →
+                    SCR-002。URLは詳細のまま。閉じる・投稿成功でSCR-003へ戻り、起動元へフォーカスを戻す。成功時は「投稿しました」と通知する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>詳細からの投稿結果が不明</td>
+                  <td>
+                    モーダルの「一覧を確認する」で既存の破棄確認を経て /
+                    へ移動し、API-001を再取得する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>404・422・通信失敗</td>
+                  <td>
+                    SCR-003内で状態を案内する。「投稿一覧へ戻る」は全状態で操作できる。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -786,7 +966,8 @@
       <section id="chapter-3">
         <h2>3. 画面共通部位一覧表</h2>
         <p>
-          左右のサイドバーを共通部位として登録する。現時点の適用先はSCR-001のみ。将来の画面への適用は、その画面を設計するときに判断する。
+          左右のサイドバーはSCR-001・SCR-003に適用する。SCR-003への適用はIssue
+          #4で設計確定・実装済み。
         </p>
         <div class="table-wrap">
           <table>
@@ -806,9 +987,11 @@
                 <td>
                   案：ロゴ、ホーム、話題を検索、通知、メッセージ、ブックマーク、プロフィール、もっと見る、投稿するボタン、利用者情報。
                 </td>
-                <td>SCR-001</td>
+                <td>SCR-001・SCR-003</td>
                 <td>
-                  ホームを選択中とし、「投稿する」でSCR-002を開く。他のメニューは準備中・disabled。ログイン情報は取得しない。モーダル中は背景を操作不可とする。
+                  ホームではホームを選択中（aria-current=page）とし、詳細では現在ページの指定を外す。ホームリンクは
+                  /
+                  へ移動する。「投稿する」でSCR-002を開く。他のメニューは準備中・disabled。ログイン情報は取得しない。モーダル中は背景を操作不可とする。
                 </td>
               </tr>
               <tr>
@@ -817,7 +1000,7 @@
                 <td>
                   案：キーワード検索、いま話題のキーワード、おすすめユーザー。
                 </td>
-                <td>SCR-001</td>
+                <td>SCR-001・SCR-003</td>
                 <td>
                   検索・トレンド・おすすめ・フォローは準備中の表示のみ。入力・操作を無効化し、架空のトレンドや利用者を表示しない。PC画面では常時表示する。
                 </td>
@@ -843,7 +1026,7 @@
               <tr>
                 <td>共通レイアウト</td>
                 <td>
-                  PC向け案：COM-001（左）、画面固有コンテンツ（中央）、COM-002（右）の3カラム。中央の投稿一覧を主領域とする。
+                  ホーム・詳細共通：COM-001（左）、画面固有コンテンツ（中央）、COM-002（右）の3カラム。中央はホームで投稿一覧、詳細で投稿1件を主領域とする。
                 </td>
               </tr>
               <tr>
@@ -861,10 +1044,11 @@
               <tr>
                 <td>表示形式</td>
                 <td>
-                  投稿者author、本文body、リプライ数reply_count、リツイート数retweet_count、いいね数like_countと、表示日時displayed_atを表示する。posted_atは日時算出の元データ、post_idは投稿の識別に使う。日時表示は<a
+                  一覧では投稿者author、本文body、リプライ数reply_count、リツイート数retweet_count、いいね数like_countと、表示日時displayed_atを表示する。posted_atは日時算出の元データ、post_idは投稿の識別に使う。日時表示は<a
                     href="ロジック設計.html#display-time-rules"
                     >ロジック設計14章</a
-                  >に従う。日本国内向けとし、日付表示はAsia/Tokyo（JST、UTC+09:00）を使用する。
+                  >に従う。詳細はposted_atをYYYY/MM/DD
+                  HH:mmへ整形し、displayed_atは参照しない。post_idはURLと取得用で、画面項目として表示しない。日本国内向けとし、日付表示はAsia/Tokyo（JST、UTC+09:00）を使用する。
                 </td>
               </tr>
               <tr>
@@ -889,7 +1073,7 @@
               <tr>
                 <td>入力・権限・キーボード操作</td>
                 <td>
-                  閲覧・投稿とも認証なし。ホームのTab順はブランド→ホーム→左の投稿ボタン→中央の投稿ボタン→失敗時の再試行とする。準備中のdisabled要素は除外しfocus-visibleで輪郭を表示する。モーダルのキーボード仕様はSCR-002に従う。
+                  閲覧・投稿とも認証なし。ホームのTab順はブランド→ホーム→左の投稿ボタン→中央の投稿ボタン→失敗時の再試行→各投稿のリンクとする。詳細はブランド→ホーム→左の投稿ボタン→一覧へ戻る→取得失敗時の再試行とする。準備中のdisabled要素は除外しfocus-visibleで輪郭を表示する。モーダルのキーボード仕様はSCR-002に従う。
                 </td>
               </tr>
               <tr>
@@ -968,7 +1152,9 @@
                     <p>画像表示は対象外</p>
                     <p>リプライ数 ／ リツイート数 ／ いいね数</p>
                     <hr />
-                    <p>次の投稿 …</p>
+                    <p>
+                      投稿カードをクリック・Tab/Enter → SCR-003<br />次の投稿 …
+                    </p>
                   </div>
                 </div>
                 <div>
@@ -1032,7 +1218,7 @@
                   <td>4</td>
                   <td>ITEM-003</td>
                   <td>
-                    保存済み投稿一覧。表示はPostのauthor・body・reply_count・retweet_count・like_count・displayed_atを使用する。post_idは識別用、posted_atは日時算出用。画像・ユーザー名・アイコンのデータ取得は今回のPostの対象外。
+                    保存済み投稿一覧。表示はPostのauthor・body・reply_count・retweet_count・like_count・displayed_atを使用する。post_idは識別・詳細URL用、posted_atは日時算出用。画像・ユーザー名・アイコンのデータ取得は今回のPostの対象外。
                   </td>
                   <td>
                     フロントエンドからHTTP GET /api/postsで<a
@@ -1044,7 +1230,9 @@
                     >で定義する。
                   </td>
                   <td>
-                    posted_at降順、同日時はpost_id降順で全件表示する。ページネーション・追加読み込みは対象外。各件数は保存値を表示し、閲覧時にDBを更新しない。投稿作成成功時の7項目に画面側で「たった今」を補い、一覧用Postとして統合する。各アクションの操作は対象外。
+                    posted_at降順、同日時はpost_id降順で全件表示する。ページネーション・追加読み込みは対象外。各件数は保存値を表示し、閲覧時にDBを更新しない。投稿作成成功時の7項目に画面側で「たった今」を補い、一覧用Postとして統合する。各アクションの操作は対象外。投稿カード全体を
+                    /posts/{post_id}
+                    へのリンクとし、クリック・Tab/EnterでSCR-003へ遷移する。
                   </td>
                 </tr>
                 <tr>
@@ -1186,6 +1374,117 @@
             </table>
           </div>
         </article>
+        <article id="screen-layout-detail">
+          <h3>SCR-003：投稿詳細（設計確定・実装済み）</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <div
+                class="home-wire"
+                role="img"
+                aria-label="SCR-003の3カラム配置。左サイドバー、中央の投稿詳細、右サイドバー。"
+              >
+                <div>
+                  <strong>① COM-001 左サイドバー</strong>
+                  <div class="wire-block">
+                    ロゴ / ホーム<br />投稿する<br />その他は準備中
+                  </div>
+                </div>
+                <div>
+                  <strong>② ITEM-009 投稿一覧へ戻る</strong>
+                  <div class="wire-block">
+                    <h4>投稿詳細</h4>
+                    <p>③ ITEM-010 投稿者</p>
+                    <p>④ ITEM-011 本文<br />改行を保持した本文</p>
+                    <p>⑤ ITEM-012 投稿日時<br />2026/10/24 15:30</p>
+                    <p>⑥ ITEM-013 リプライ数 / リツイート数 / いいね数</p>
+                  </div>
+                  <div class="wire-block">
+                    ⑦ ITEM-014 読み込み中・エラー・再試行
+                  </div>
+                </div>
+                <div>
+                  <strong>⑧ COM-002 右サイドバー</strong>
+                  <div class="wire-block">
+                    検索・トレンド・おすすめ<br />準備中
+                  </div>
+                </div>
+              </div>
+            </div>
+            <figcaption>
+              SCR-003：番号①〜⑧は下の要素一覧と対応する。値は配置説明用の例。投稿IDは表示しない。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">番号・項目</th>
+                  <th scope="col">表示・取得元</th>
+                  <th scope="col">操作・条件</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>① COM-001</td>
+                  <td>既存の左サイドバー</td>
+                  <td>ホームは / へ。「投稿する」はSCR-002を開く。</td>
+                </tr>
+                <tr>
+                  <td>② ITEM-009</td>
+                  <td>投稿一覧へ戻る</td>
+                  <td>
+                    全状態で / への通常リンクを表示。ブラウザ履歴への依存なし。
+                  </td>
+                </tr>
+                <tr>
+                  <td>③ ITEM-010</td>
+                  <td>author</td>
+                  <td>投稿者名と、その先頭文字による既存のアバター。</td>
+                </tr>
+                <tr>
+                  <td>④ ITEM-011</td>
+                  <td>body</td>
+                  <td>
+                    HTMLとして実行せず文字列表示。pre-wrap・overflow-wrap:anywhereで改行と折り返しを保持。
+                  </td>
+                </tr>
+                <tr>
+                  <td>⑤ ITEM-012</td>
+                  <td>posted_at</td>
+                  <td>
+                    Asia/TokyoでYYYY/MM/DD
+                    HH:mm。timeのdatetime属性は元のISO日時。例：2026-10-24T06:30:45Z
+                    → 2026/10/24 15:30。秒は表示しない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>⑥ ITEM-013</td>
+                  <td>reply_count / retweet_count / like_count</td>
+                  <td>
+                    0も表示。件数の読み上げラベルを付ける。増減操作は対象外。
+                  </td>
+                </tr>
+                <tr>
+                  <td>⑦ ITEM-014</td>
+                  <td>API-003の取得状態</td>
+                  <td>
+                    読込状態はaria-liveで、エラーはrole=alertで通知。再試行中は操作不可。
+                  </td>
+                </tr>
+                <tr>
+                  <td>⑧ COM-002</td>
+                  <td>既存の右サイドバー</td>
+                  <td>準備中の表示。画面幅の扱いは4章と同じ。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            詳細URLの直接アクセス・再読み込みでもアプリを表示してAPI-003を呼び出す。開発時は既存ViteのSPA配信を利用する。本番の配信構成は既存の未決事項とし、将来の配信時には
+            /posts/{post_id} をアプリへ振り分ける必要がある。
+          </p>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -1298,7 +1597,8 @@
                   <td>結果不明時の一覧確認</td>
                   <td>モーダル内に「一覧を確認する」を表示する。</td>
                   <td>
-                    通常の閉じる・破棄確認の後にホームでGETを再実行する。本文を残す場合は確認を取り消し入力を続ける。下書き保存・再読み込み後の復元は対象外。再投稿の自動重複防止はない。
+                    ホーム・詳細のどちらからでも、通常の閉じる・破棄確認を経て /
+                    へ移動し、一覧GETを再実行する。本文を残す場合は確認を取り消し入力を続ける。下書き保存・再読み込み後の復元は対象外。再投稿の自動重複防止はない。
                   </td>
                 </tr>
               </tbody>
@@ -1359,12 +1659,90 @@
             </table>
           </div>
         </article>
+        <article id="screen-input-detail">
+          <h3>SCR-003：詳細の取得・操作・状態</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">対象</th>
+                  <th scope="col">入力・操作</th>
+                  <th scope="col">結果・条件</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>一覧の投稿リンク</td>
+                  <td>
+                    投稿カードごとに /posts/{post_id}
+                    への通常リンクを1つ設ける。Tabで選択しEnterで移動。
+                  </td>
+                  <td>
+                    投稿者・本文・日時・件数を含むカード領域をクリック可能にする。本文内の追加リンク・アクションボタンは今回追加しない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>初期取得・再読み込み</td>
+                  <td>
+                    URLのpost_idでGET
+                    /api/posts/{post_id}。一覧から渡された投稿データだけで表示を確定しない。
+                  </td>
+                  <td>
+                    取得開始時に前の詳細を消し「投稿を読み込んでいます…」。5秒で中断。離脱・ID変更時は要求中断、古い応答を破棄。
+                  </td>
+                </tr>
+                <tr>
+                  <td>成功</td>
+                  <td>200かつ7項目・型・日時・要求IDとの一致を検証する。</td>
+                  <td>詳細を表示する。不正な応答は取得失敗とする。</td>
+                </tr>
+                <tr>
+                  <td>存在しない投稿</td>
+                  <td>404</td>
+                  <td>
+                    「投稿が見つかりません」。再試行は表示せず、一覧へのリンクを表示。
+                  </td>
+                </tr>
+                <tr>
+                  <td>不正な投稿ID</td>
+                  <td>422（文字列・0・負数等）</td>
+                  <td>
+                    「投稿URLが正しくありません」。再試行は表示せず、一覧へのリンクを表示。
+                  </td>
+                </tr>
+                <tr>
+                  <td>取得失敗</td>
+                  <td>
+                    500・通信切断・タイムアウト・不正応答・その他の想定外応答
+                  </td>
+                  <td>
+                    「投稿詳細を取得できませんでした。」と「再試行」。自動再試行なし。再試行中はボタンを無効化し、読み込みを通知する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>詳細からの投稿</td>
+                  <td>
+                    COM-001からSCR-002を開く。入力・送信・破棄確認は既存仕様。
+                  </td>
+                  <td>
+                    成功時はモーダルを閉じ詳細URLに留まる。「投稿しました」を通知し、フォーカスを起動元へ戻す。詳細を新規投稿に置き換えず、一覧へ移動時に再取得。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h4>確認観点（自動テスト・画面操作）</h4>
+          <p>
+            クリック・Tab/Enter、直接アクセス・再読み込み・一覧への復帰、本文の改行とHTML非実行、ID非表示、件数0、JSTの日付境界、404・422・500・通信切断・5秒超過・不正応答・再試行・離脱後の応答破棄を確認する。詳細からの投稿・破棄確認・通知・フォーカス復帰と、既存の一覧・投稿作成を回帰確認する。
+          </p>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
       </section>
       <aside class="note" id="implementation-verification">
-        <strong>実装と検証（2026-10-24）</strong>
+        <strong>Issue #2・#3の実装と検証（2026-10-24）</strong>
         <p>
           バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
         </p>
@@ -1372,11 +1750,22 @@
           専用の検証用DBと実ブラウザで、両方の投稿入口、本文と改行の保存、先頭反映、再読み込み後の表示、Tab/Shift+Tabの循環、連続Escでの確認取消、背景操作禁止、保存失敗後の本文保持と再試行を確認した。5秒の期限・遅延応答・GETとの競合は自動テストで確認する。コードとドキュメントはfeature/post-composerで管理し、画像・下書き・認証・スマートフォン対応は追加していない。
         </p>
       </aside>
+      <aside class="note" id="detail-implementation-verification">
+        <strong>投稿詳細の実装と検証（2026-10-25）</strong>
+        <p>
+          SCR-003・API-003・PRC-007・PRC-008・PostDetailを実装済み。通常のaリンクで画面遷移し、詳細URLへの直接アクセス・再読み込みに対応する。SQLiteの保存構造・マイグレーションは変更していない。
+        </p>
+        <p>
+          バックエンド81件・フロントエンド74件の自動テスト、フロントエンドビルド、変更ファイルのRuff・Prettierチェックを実施。単件取得、404・422・500とno-store、巨大なIDの404、対象外の不正データからの独立性、日時境界、JSON変換と時計の失敗、セッション解放を確認した。
+        </p>
+        <p>
+          専用の一時DBと実ブラウザで、投稿カードのクリック・Tab/Enter、詳細URL・再読み込み、本文改行・日本時間の日付境界、詳細からの投稿成功後のURL維持・通知・フォーカス復帰、破棄確認の取消と破棄、一覧復帰後の新規投稿取得、404・422・500の表示と手動再試行による復旧を確認した。通信切断・5秒の期限・遅延応答の破棄・ID変更・ページキャッシュ復元時の再取得は自動テストで確認した。本番の配信構成は引き続き未決。
+        </p>
+      </aside>
     </main>
     <footer>
-      入出力設計書 v1.2.0｜2026-10-24｜Issue
-      #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は実装済み。
+      入出力設計書 v1.4.0｜2026-10-25｜Issue
+      #4の投稿詳細設計を追加（設計確定・実装済み）。Issue #2・#3は実装済み。
     </footer>
   </body>
 </html>

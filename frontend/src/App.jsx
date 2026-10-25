@@ -1,39 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import PostComposer from "./PostComposer";
+import Icon from "./Icon";
+import PostContent from "./PostContent";
+import PostDetail from "./PostDetail";
 import { isPost, mergePosts } from "./posts";
 export { isPost } from "./posts";
 
 const errorMessage = "投稿一覧を取得できませんでした。";
-const paths = {
-  home: "M3 11 12 3l9 8v10h-6v-7H9v7H3Z",
-  search: "M21 21l-5-5M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z",
-  bell: "M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4",
-  mail: "M3 5h18v14H3ZM3 5l9 8 9-8",
-  bookmark: "M6 3h12v18l-6-4-6 4Z",
-  user: "M20 21a8 8 0 0 0-16 0M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z",
-  more: "M5 12h.01M12 12h.01M19 12h.01",
-  reply: "M21 11a9 9 0 0 1-9 9H4l1-5a9 9 0 1 1 16-4Z",
-  retweet: "m4 9 4-4 4 4M8 5v12h12m0-2-4 4-4-4m4 4V7H4",
-  heart: "M12 21 3 12C-3 4 7-1 12 6c5-7 15-2 9 6Z",
-};
-
-function Icon({ name }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d={paths[name]} />
-    </svg>
-  );
-}
-
-export function LeftSidebar({ onCompose }) {
+export function LeftSidebar({ onCompose, isHome = true }) {
   const menu = [
     ["search", "話題を検索"],
     ["bell", "通知"],
@@ -48,7 +22,11 @@ export function LeftSidebar({ onCompose }) {
         sns<span>.</span>
       </a>
       <nav aria-label="メインメニュー">
-        <a className="nav-item selected" href="/" aria-current="page">
+        <a
+          className={`nav-item${isHome ? " selected" : ""}`}
+          href="/"
+          aria-current={isHome ? "page" : undefined}
+        >
           <Icon name="home" />
           ホーム
         </a>
@@ -99,34 +77,15 @@ export function RightSidebar() {
 }
 
 export function PostCard({ post }) {
-  const counts = [
-    ["reply", "リプライ数", post.reply_count],
-    ["retweet", "リツイート数", post.retweet_count],
-    ["heart", "いいね数", post.like_count],
-  ];
   return (
-    <article className="post" aria-label={`${post.author}の投稿`}>
-      <div className="avatar" aria-hidden="true">
-        {Array.from(post.author)[0]}
-      </div>
-      <div className="post-content">
-        <header className="post-meta">
-          <h2>{post.author}</h2>
-          <span aria-hidden="true">·</span>
-          <time dateTime={post.posted_at} title={post.posted_at}>
-            {post.displayed_at}
-          </time>
-        </header>
-        <p className="post-body">{post.body}</p>
-        <div className="post-counts">
-          {counts.map(([icon, label, count]) => (
-            <span key={icon} aria-label={`${label} ${count}`}>
-              <Icon name={icon} />
-              <span>{count}</span>
-            </span>
-          ))}
-        </div>
-      </div>
+    <article aria-label={`${post.author}の投稿`}>
+      <a
+        className="post post-link"
+        href={`/posts/${post.post_id}`}
+        aria-label={`${post.author}の投稿詳細`}
+      >
+        <PostContent post={post} dateLabel={post.displayed_at} />
+      </a>
     </article>
   );
 }
@@ -179,6 +138,14 @@ export function Timeline({ status, posts, retry, retrying = false }) {
 }
 
 export default function App() {
+  const detailPath = window.location.pathname.match(/^\/posts\/([^/]+)\/?$/);
+  const isDetail = Boolean(detailPath);
+  let postId = detailPath?.[1];
+  try {
+    postId = postId && decodeURIComponent(postId);
+  } catch {
+    /* 不正なエスケープもAPIの入力検証で扱う。 */
+  }
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState({ status: "loading", posts: [] });
   const [opener, setOpener] = useState(null);
@@ -188,22 +155,38 @@ export default function App() {
     setNotification("");
     setOpener(event.currentTarget);
   };
-  const created = useCallback((post) => {
-    const displayed = { ...post, displayed_at: "たった今" };
-    createdPosts.current.set(post.post_id, displayed);
-    setState((previous) => ({
-      ...previous,
-      posts: mergePosts(previous.posts, [displayed]),
-    }));
-    setNotification("投稿しました");
-    setOpener(null);
-    window.scrollTo({ top: 0 });
-  }, []);
+  const created = useCallback(
+    (post) => {
+      if (!isDetail) {
+        const displayed = { ...post, displayed_at: "たった今" };
+        createdPosts.current.set(post.post_id, displayed);
+        setState((previous) => ({
+          ...previous,
+          posts: mergePosts(previous.posts, [displayed]),
+        }));
+        window.scrollTo({ top: 0 });
+      }
+      setNotification("投稿しました");
+      setOpener(null);
+    },
+    [isDetail],
+  );
   const retry = useCallback(() => {
     setState((previous) => ({ ...previous, status: "loading" }));
     setAttempt((value) => value + 1);
   }, []);
   useEffect(() => {
+    document.title = `${isDetail ? "投稿詳細" : "ホーム"} | codex-sns1`;
+  }, [isDetail]);
+  useEffect(() => {
+    const restored = (event) => {
+      if (event.persisted && !isDetail) retry();
+    };
+    window.addEventListener("pageshow", restored);
+    return () => window.removeEventListener("pageshow", restored);
+  }, [isDetail, retry]);
+  useEffect(() => {
+    if (isDetail) return;
     const controller = new AbortController();
     let cancelled = false;
     const timeout = setTimeout(() => controller.abort(), 5000);
@@ -240,44 +223,52 @@ export default function App() {
       clearTimeout(timeout);
       controller.abort();
     };
-  }, [attempt]);
+  }, [attempt, isDetail]);
   return (
     <>
       <div className="app-layout" inert={Boolean(opener)}>
-        <LeftSidebar onCompose={openComposer} />
+        <LeftSidebar onCompose={openComposer} isHome={!isDetail} />
         <main id="main-content" className="main-column">
-          <header className="home-header">
-            <h1>ホーム</h1>
-            <span>あなたのタイムライン</span>
-          </header>
-          <div className="tabs">
-            <span className="active-tab">すべての投稿</span>
-            <button disabled>
-              フォロー中<small>準備中</small>
-            </button>
-          </div>
-          <section className="composer" aria-label="投稿を始める">
-            <div className="avatar" aria-hidden="true">
-              自
-            </div>
-            <div>
-              <p className="compose-invitation">ひとことを投稿してみましょう</p>
-              <div className="composer-bottom">
-                <span>いまの気持ちを、280文字で。</span>
-                <button className="primary" onClick={openComposer}>
-                  投稿する
-                </button>
-              </div>
-            </div>
-          </section>
           <p className="post-notification" role="status" aria-live="polite">
             {notification}
           </p>
-          <Timeline
-            {...state}
-            retry={retry}
-            retrying={attempt > 0 && state.status === "loading"}
-          />
+          {isDetail ? (
+            <PostDetail key={postId} postId={postId} />
+          ) : (
+            <>
+              <header className="home-header">
+                <h1>ホーム</h1>
+                <span>あなたのタイムライン</span>
+              </header>
+              <div className="tabs">
+                <span className="active-tab">すべての投稿</span>
+                <button disabled>
+                  フォロー中<small>準備中</small>
+                </button>
+              </div>
+              <section className="composer" aria-label="投稿を始める">
+                <div className="avatar" aria-hidden="true">
+                  自
+                </div>
+                <div>
+                  <p className="compose-invitation">
+                    ひとことを投稿してみましょう
+                  </p>
+                  <div className="composer-bottom">
+                    <span>いまの気持ちを、280文字で。</span>
+                    <button className="primary" onClick={openComposer}>
+                      投稿する
+                    </button>
+                  </div>
+                </div>
+              </section>
+              <Timeline
+                {...state}
+                retry={retry}
+                retrying={attempt > 0 && state.status === "loading"}
+              />
+            </>
+          )}
         </main>
         <RightSidebar />
       </div>
@@ -288,7 +279,8 @@ export default function App() {
           onCreated={created}
           onCheckTimeline={() => {
             setOpener(null);
-            retry();
+            if (isDetail) window.location.assign("/");
+            else retry();
           }}
         />
       )}

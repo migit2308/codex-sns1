@@ -21,6 +21,12 @@ class Post(CreatedPost):
     displayed_at: StrictStr
 
 
+class PostDetail(CreatedPost):
+    """相対日時を含まない、単件取得用の応答。"""
+
+    post_id: StrictInt = Field(ge=1)
+
+
 class ErrorResponse(BaseModel):
     code: str
     message: str

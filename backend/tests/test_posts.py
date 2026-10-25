@@ -93,7 +93,7 @@ def test_migration_and_seed_repeat(database):
         ).utcoffset() == timedelta(0)
         assert client.get("/").status_code == client.get("/health").status_code == 404
         spec = client.get("/openapi.json").json()
-        assert set(spec["paths"]) == {"/posts"}
+        assert set(spec["paths"]) == {"/posts", "/posts/{post_id}"}
         assert (
             spec["paths"]["/posts"]["get"]["responses"]["200"]["content"][
                 "application/json"
@@ -470,3 +470,173 @@ def test_create_write_denied(database, monkeypatch):
     assert response.json()["code"] == "POST_CREATE_FAILED"
     with engine.connect() as conn:
         assert conn.scalar(text("SELECT count(*) FROM posts")) == 0
+
+
+# 詳細は全件取得や相対日時の算出を経由せず、対象の1件だけを参照する。
+def detail_client_for(path):
+    from sns.main import detail_clock
+
+    client = client_for(path)
+    client.app.dependency_overrides[detail_clock] = lambda: lambda: NOW
+    return client
+
+
+def test_detail_success_contract_and_no_write(database):
+    path, engine = database
+    seed_posts(engine, now=NOW)
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "UPDATE posts SET body='本文'||char(10)||'<script>x</script>' WHERE post_id=1"
+            )
+        )
+    with detail_client_for(path) as client:
+        before = client.get("/posts").json()
+        response = client.get("/posts/1?unused=1")
+        expected = dict(next(post for post in before if post["post_id"] == 1))
+        expected.pop("displayed_at")
+        assert response.status_code == 200
+        assert response.json() == expected
+        assert response.json()["body"] == "本文\n<script>x</script>"
+        assert response.headers["cache-control"] == "no-store"
+        assert response.headers["content-type"] == "application/json"
+        assert datetime.fromisoformat(
+            response.json()["posted_at"]
+        ).utcoffset() == timedelta(0)
+        after = client.get("/posts").json()
+        assert after == before
+        spec = client.get("/openapi.json").json()
+        detail = spec["paths"]["/posts/{post_id}"]["get"]
+        assert set(detail["responses"]) == {"200", "404", "422", "500"}
+        assert detail["parameters"][0]["schema"]["minimum"] == 1
+        schema = spec["components"]["schemas"]["PostDetail"]
+        assert set(schema["properties"]) == set(expected)
+        assert set(schema["required"]) == set(expected)
+        for status in detail["responses"].values():
+            assert "Cache-Control" in status["headers"]
+        assert (
+            "detail"
+            in detail["responses"]["422"]["content"]["application/json"]["schema"][
+                "properties"
+            ]
+        )
+
+
+@pytest.mark.parametrize("post_id", ["1", "999", str(2**63), "9" * 1000])
+def test_detail_missing_and_large_id(database, post_id):
+    path, _ = database
+    with detail_client_for(path) as client:
+        response = client.get(f"/posts/{post_id}")
+    assert response.status_code == 404
+    assert response.json() == {
+        "code": "POST_NOT_FOUND",
+        "message": "投稿が見つかりません",
+    }
+    assert response.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.parametrize("post_id", ["abc", "0", "-1", "1.5"])
+def test_detail_validation_does_not_query(database, post_id):
+    from unittest.mock import Mock
+
+    from sns.main import detail_clock
+
+    path, _ = database
+    client = detail_client_for(path)
+    checked_out = Mock()
+    clock = Mock(return_value=NOW)
+    event.listen(client.app.state.engine, "checkout", checked_out)
+    client.app.dependency_overrides[detail_clock] = lambda: clock
+    with client:
+        response = client.get(f"/posts/{post_id}")
+    assert response.status_code == 422
+    assert isinstance(response.json()["detail"], list)
+    assert response.json()["detail"][0]["loc"] == ["path", "post_id"]
+    assert response.headers["cache-control"] == "no-store"
+    clock.assert_not_called()
+    checked_out.assert_not_called()
+
+
+@pytest.mark.parametrize("problem", ["missing", "unmigrated", "invalid_date", "future"])
+def test_detail_failures(database, tmp_path, problem, caplog):
+    path, engine = database
+    if problem == "missing":
+        path = tmp_path / "missing.db"
+    elif problem == "unmigrated":
+        path = tmp_path / "empty.db"
+        path.touch()
+    else:
+        seed_posts(engine, now=NOW)
+        with engine.begin() as conn:
+            conn.execute(
+                text("UPDATE posts SET posted_at=:value WHERE post_id=1"),
+                {
+                    "value": "private-invalid-date"
+                    if problem == "invalid_date"
+                    else "2026-10-23 12:00:00.000001"
+                },
+            )
+    with detail_client_for(path) as client:
+        response = client.get("/posts/1")
+    assert response.status_code == 500
+    assert response.json() == {
+        "code": "POST_DETAIL_FETCH_FAILED",
+        "message": "投稿詳細を取得できませんでした。",
+    }
+    assert response.headers["cache-control"] == "no-store"
+    assert "PRC-008" in caplog.text
+    assert "private-invalid-date" not in response.text + caplog.text
+    if problem == "missing":
+        assert not path.exists()
+
+
+def test_detail_equal_time_and_unrelated_bad_record(database):
+    path, engine = database
+    seed_posts(engine, now=NOW)
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "UPDATE posts SET posted_at='2026-10-23 12:00:00.000000' WHERE post_id=1"
+            )
+        )
+        conn.execute(text("UPDATE posts SET posted_at='not-a-date' WHERE post_id=2"))
+    with detail_client_for(path) as client:
+        response = client.get("/posts/1")
+    assert response.status_code == 200
+    assert datetime.fromisoformat(response.json()["posted_at"]) == NOW
+    assert "displayed_at" not in response.json()
+
+
+@pytest.mark.parametrize(
+    "failure", ["success", "not_found", "serialization", "validation", "clock"]
+)
+def test_detail_connection_and_error_boundary(database, monkeypatch, failure, caplog):
+    from sns.main import detail_clock
+    from sns.schemas import PostDetail
+
+    path, engine = database
+    seed_posts(engine, now=NOW)
+    client = detail_client_for(path)
+    counts = {"checkout": 0, "checkin": 0}
+    for name in counts:
+
+        def record(*args, name=name):
+            counts[name] += 1
+
+        event.listen(client.app.state.engine, name, record)
+
+    def fail(*args, **kwargs):
+        raise ValueError("private body SQL connection")
+
+    if failure == "serialization":
+        monkeypatch.setattr(PostDetail, "model_dump", fail)
+    elif failure == "validation":
+        monkeypatch.setattr(PostDetail, "__init__", fail)
+    elif failure == "clock":
+        client.app.dependency_overrides[detail_clock] = lambda: fail
+    with client:
+        response = client.get("/posts/999" if failure == "not_found" else "/posts/1")
+    assert response.status_code == {"success": 200, "not_found": 404}.get(failure, 500)
+    expected = 0 if failure == "clock" else 1
+    assert counts == {"checkout": expected, "checkin": expected}
+    assert "private body SQL connection" not in response.text + caplog.text

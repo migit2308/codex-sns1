@@ -32,6 +32,35 @@ export function isCreatedPost(post) {
   );
 }
 
+export function isPostDetail(post, postId) {
+  return (
+    isCreatedPost(post) &&
+    post.post_id === Number(postId) &&
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(
+      post.posted_at,
+    )
+  );
+}
+
+const japanDate = new Intl.DateTimeFormat("ja-JP", {
+  timeZone: "Asia/Tokyo",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+
+export function formatPostedAt(value) {
+  const parts = Object.fromEntries(
+    japanDate
+      .formatToParts(new Date(value))
+      .map(({ type, value }) => [type, value]),
+  );
+  return `${parts.year}/${parts.month}/${parts.day} ${parts.hour}:${parts.minute}`;
+}
+
 export function isValidBody(body) {
   return Array.from(body).length <= 280 && /[^ \u3000\t\n\r\v\f]/u.test(body);
 }

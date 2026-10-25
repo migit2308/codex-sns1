@@ -214,6 +214,27 @@ h1 {
   padding: 23px 20px 16px;
   border-bottom: 1px solid #e7edf2;
 }
+.post-link:hover {
+  background: #f7fafc;
+}
+.post-link:focus-visible {
+  outline-offset: -3px;
+}
+.detail-header {
+  padding: 23px 24px 18px;
+  border-bottom: 1px solid #e7edf2;
+}
+.back-link {
+  display: inline-block;
+  color: #146aaf;
+  margin-bottom: 12px;
+}
+.detail-time {
+  display: block;
+  margin: 16px 0;
+  color: #647384;
+  font-size: 13px;
+}
 .post-meta {
   display: flex;
   align-items: baseline;

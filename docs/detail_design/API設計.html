@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>API設計書｜投稿一覧取得・投稿作成</title>
+    <title>API設計書｜投稿一覧・投稿作成・投稿詳細</title>
     <style>
       * {
         box-sizing: border-box;
@@ -403,15 +403,24 @@
           min-width: 0;
         }
       }
+      svg[aria-labelledby^="detail-"] {
+        min-width: 720px;
+      }
+      @media print {
+        svg[aria-labelledby^="detail-"] {
+          min-width: 0;
+        }
+      }
     </style>
   </head>
   <body>
     <header>
       <p class="badge">旧Twitter風SNS / 詳細設計</p>
       <h1>API設計書</h1>
+
       <p>
-        投稿一覧取得APIとIssue
-        #3の投稿作成APIについて、HTTPの入出力とエラーを定義する。
+        投稿一覧・投稿作成と、Issue
+        #4の投稿詳細取得APIについて、HTTPの入出力とエラーを定義する。
       </p>
       <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
         <h2 id="toc-heading">目次</h2>
@@ -427,12 +436,16 @@
                   >API-002：投稿作成（設計確定・実装済み）</a
                 >
               </li>
+              <li>
+                <a href="#api-003">API-003：投稿詳細取得（設計確定・未実装）</a>
+              </li>
             </ul>
           </li>
           <li>
             <a href="#chapter-4">4. エラー仕様</a>
             <ul class="toc-subsections">
               <li><a href="#chapter-4-detail-1">エラーレスポンス例</a></li>
+              <li><a href="#detail-api-errors">API-003：エラー対応表</a></li>
             </ul>
           </li>
           <li><a href="#chapter-5">5. 未決事項</a></li>
@@ -449,7 +462,7 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.2.0</td>
+              <td>1.3.0</td>
             </tr>
             <tr>
               <td>更新日</td>
@@ -457,7 +470,10 @@
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
+              <td>
+                設計確定（Issue #2実装済み、Issue #3実装済み、Issue
+                #4設計確定・未実装）
+              </td>
             </tr>
           </tbody>
         </table>
@@ -465,8 +481,9 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードと、Issue
-        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
+        Issue #2の投稿一覧・初回移行・シードとIssue
+        #3の投稿モーダル・投稿作成APIは実装済み。作成POSTはCreatedPostの7項目、一覧GETはPostの8項目。Issue
+        #4の詳細GETはPostDetailの7項目で設計確定・未実装。既存機能の実装・検証履歴は末尾に残し、今回の新機能が検証済みであることを意味しない。
       </p>
       <aside class="note">
         <strong> 対象と設計の前提 </strong>
@@ -475,7 +492,7 @@
           #3のAPI-002（投稿作成）は設計確定・実装済み。投稿の編集・削除、件数を増減する操作、投稿ボタン以外のサイドバー機能は対象外。
         </p>
         <p>
-          一覧応答はPost（CLS-001）、作成応答はCreatedPost（CLS-003）に合わせる。API設計ではHTTPで受け渡す形式を記載し、表示日時の計算手順はロジック設計、テーブルの物理構造はDB設計で管理する。
+          一覧応答はPost（CLS-001）、作成応答はCreatedPost（CLS-003）、詳細応答はPostDetail（CLS-004・設計確定／未実装）に合わせる。API設計ではHTTPで受け渡す形式を記載し、表示日時の計算手順はロジック設計、テーブルの物理構造はDB設計で管理する。
         </p>
       </aside>
       <p>
@@ -528,12 +545,26 @@
                 <td>SCR-002 / FUN-003 / PRC-006 / CLS-002・CLS-003</td>
                 <td>設計確定・実装済み</td>
               </tr>
+              <tr>
+                <td>
+                  <a href="#api-003">API-003</a>
+                </td>
+                <td>投稿詳細取得。指定IDの1件を返す。</td>
+                <td>GET</td>
+                <td>
+                  ブラウザ：/api/posts/{post_id}<br />バックエンド：/posts/{post_id}
+                </td>
+                <td>認証なし</td>
+                <td>SCR-003 / FUN-004 / PRC-008 / CLS-004</td>
+                <td>設計確定・未実装</td>
+              </tr>
             </tbody>
           </table>
         </div>
         <p>
-          接続確認用GET /・GET /healthは削除済み。現在のAPIはGET
-          /postsを提供し、旧パスは404となる。
+          接続確認用GET /・GET /healthは削除済み。実装済みはGET /posts・POST
+          /posts。Issue #4でGET /posts/{post_id}を設計する（未実装）。画面URL
+          /・/posts/{post_id} とバックエンドAPIのパスを区別する。
         </p>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
@@ -554,8 +585,8 @@
                 <td>環境・ベースURL</td>
                 <td>
                   開発時のブラウザ：http://127.0.0.1:5173。フロントエンドは相対パス
-                  /api/posts
-                  を呼び出す。バックエンドへの直接アクセス：http://127.0.0.1:8000/posts。本番の配信URL・転送構成は未決。
+                  /api/posts または /api/posts/{post_id}
+                  を呼び出す。バックエンドへの直接アクセス：http://127.0.0.1:8000/posts（一覧・作成）、http://127.0.0.1:8000/posts/{post_id}（詳細）。本番の配信URL・転送構成は未決。
                 </td>
               </tr>
               <tr>
@@ -563,14 +594,15 @@
                 <td>
                   既存のfrontend/vite.config.jsの設定に従い、Viteが /api
                   を取り除いてバックエンドへ転送する。GET /api/posts → GET
-                  /posts、POST /api/posts → POST
-                  /posts。フロントエンドのトップページURL /とは区別する。
+                  /posts、POST /api/posts → POST /posts。詳細はGET
+                  /api/posts/{post_id} → GET /posts/{post_id}。画面URL
+                  /・/posts/{post_id}とは区別する。
                 </td>
               </tr>
               <tr>
                 <td>バージョン・命名</td>
                 <td>
-                  本文書は1.2.0。URLにはバージョン番号を付けない。JSONのキーはPostの属性と同じlower_snake_caseとする。
+                  本文書は1.3.0。URLにはバージョン番号を付けない。JSONのキーはPostの属性と同じlower_snake_caseとする。
                 </td>
               </tr>
               <tr>
@@ -585,7 +617,7 @@
                 <td>ヘッダー・キャッシュ</td>
                 <td>
                   Accept:
-                  application/json。API-001の200・500、API-002の201・422・500にCache-Control:
+                  application/json。API-001の200・500、API-002の201・422・500、API-003の200・404・422・500にCache-Control:
                   no-storeを付与する。
                 </td>
               </tr>
@@ -599,13 +631,13 @@
                 <td>日時・数値・ID</td>
                 <td>
                   post_idと各件数はJSONの数値（整数）。件数は0以上。posted_atは時差情報付きISO
-                  8601文字列。displayed_atはGET応答のみの計算済み表示文字列。日本国内向けとし、日付表示はAsia/Tokyo（JST、UTC+09:00）を使用する。
+                  8601文字列。displayed_atはAPI-001（一覧）のGET応答のみの計算済み表示文字列。日本国内向けとし、日付表示はAsia/Tokyo（JST、UTC+09:00）を使用する。
                 </td>
               </tr>
               <tr>
                 <td>必須・null・空文字</td>
                 <td>
-                  GETの各投稿は8項目、POSTの作成結果はdisplayed_atを除く7項目が必須・null不可。author・bodyはDBで空文字と指定した空白だけの値を禁止する。DBと一覧応答には文字数上限を追加しない。新規作成リクエストにはAPI-002の280コードポイント制限を適用する。空白の定義とシード時の検証は<a
+                  一覧GETの各投稿は8項目、POSTの作成結果と詳細GETはdisplayed_atを除く7項目が必須・null不可。author・bodyはDBで空文字と指定した空白だけの値を禁止する。DBと一覧・詳細応答には文字数上限を追加しない。新規作成リクエストにはAPI-002の280コードポイント制限を適用する。空白の定義とシード時の検証は<a
                     href="データベース設計.html#table-posts"
                     >DB設計TBL-001</a
                   >に従い、APIは保存された文字列を返す。
@@ -614,13 +646,13 @@
               <tr>
                 <td>取得範囲・並び順</td>
                 <td>
-                  投稿テーブルの全件をposted_at降順、同日時はpost_id降順で取得する。フィルター・limit・offset・カーソル・ページネーション・追加読み込みは定義しない。同じ投稿日時の場合はpost_idの降順とする。
+                  API-001は投稿テーブルの全件をposted_at降順、同日時はpost_id降順で取得する。フィルター・limit・offset・カーソル・ページネーション・追加読み込みは定義しない。API-003はpost_idの一致する1件のみを取得する。
                 </td>
               </tr>
               <tr>
                 <td>入力検証</td>
                 <td>
-                  API-001には入力項目なし。未定義クエリは従来どおり無視する。API-002は必須の文字列bodyのみを受け付け、入力不正はERR-003とする。余分なJSON項目・型変換は許可しない。
+                  API-001には入力項目なし。未定義クエリは従来どおり無視する。API-002は必須の文字列bodyのみを受け付け、入力不正はERR-003とする。API-003はpost_idの整数・1以上を検証し、422は標準detail配列とする。余分なJSON項目・型変換は許可しない。
                 </td>
               </tr>
               <tr>
@@ -632,7 +664,8 @@
               <tr>
                 <td>ブラウザからの呼び出し</td>
                 <td>
-                  開発環境では同一オリジンの /api/posts
+                  開発環境では同一オリジンの /api/posts または
+                  /api/posts/{post_id}
                   をVite経由で呼ぶ。ブラウザから別オリジンのバックエンドへ直接接続する方式や追加CORS設定は今回採用しない。本番の構成は未決。
                 </td>
               </tr>
@@ -1018,7 +1051,7 @@ Accept: application/json</code></pre>
                 <tr>
                   <td>201 Created</td>
                   <td>
-                    CreatedPost（CLS-003）の7項目を持つ単一オブジェクト。ラッパーなし。全項目必須・null不可。post_idはDB採番、authorは「自分」、bodyは受信値、posted_atは検証直後に1回取得した受付時刻（UTC）、各件数は0。displayed_atは返さず算出もしない。投稿直後は画面側で「たった今」を補い、GETの再取得後はAPI-001の表示日時を使用する。
+                    CreatedPost（CLS-003）の7項目を持つ単一オブジェクト。ラッパーなし。全項目必須・null不可。post_idはDB採番、authorは「自分」、bodyは受信値、posted_atは検証直後に1回取得した受付時刻（UTC）、各件数は0。displayed_atは返さず算出もしない。ホームの一覧反映時は画面側で「たった今」を補い、一覧GETの再取得後はAPI-001の表示日時を使用する。詳細からの投稿成功後も既存の詳細表示を維持する。
                   </td>
                 </tr>
                 <tr>
@@ -1184,6 +1217,186 @@ Accept: application/json</code></pre>
             </table>
           </div>
         </article>
+        <article id="api-003">
+          <h3>API-003：投稿詳細取得（設計確定・未実装）</h3>
+
+          <p>
+            SCR-003 / FUN-004 / PRC-008 /
+            CLS-004。単一リソースを参照するGETであり、DBへの書き込みは行わない。<a
+              href="入出力設計.html#screen-input-detail"
+              >画面操作</a
+            >
+            / <a href="ロジック設計.html#process-008">取得処理</a> /
+            <a href="データベース設計.html#detail-read">DB参照</a>。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">リクエスト項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>メソッド・パス</td>
+                  <td>
+                    GET /posts/{post_id}。ブラウザからはGET
+                    /api/posts/{post_id}。
+                  </td>
+                </tr>
+                <tr>
+                  <td>パス：post_id</td>
+                  <td>
+                    必須・null不可の整数、1以上。非整数・文字列・0・負数は422。存在しない有効な整数は404。
+                  </td>
+                </tr>
+                <tr>
+                  <td>クエリ・ボディ</td>
+                  <td>
+                    定義しない。既存仕様に合わせ、未定義クエリは無視する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>ヘッダー・認証</td>
+                  <td>
+                    Accept: application/json。ボディなし。認証・認可条件なし。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre><code>GET /api/posts/1 HTTP/1.1
+Host: 127.0.0.1:5173
+Accept: application/json</code></pre>
+          <h4>成功応答</h4>
+          <p>
+            200 OK。Content-Type: application/json、Cache-Control:
+            no-store。PostDetail（CLS-004）の7項目を持つ単一オブジェクト。すべて必須・null不可。余分な項目・ラッパー・displayed_atは返さない。
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">JSON型</th>
+                  <th scope="col">意味・制約</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>post_id</td>
+                  <td>integer</td>
+                  <td>要求した投稿ID。正の整数。</td>
+                </tr>
+                <tr>
+                  <td>author</td>
+                  <td>string</td>
+                  <td>保存された投稿者名。</td>
+                </tr>
+                <tr>
+                  <td>body</td>
+                  <td>string</td>
+                  <td>保存された本文。改行・前後の空白を保持。</td>
+                </tr>
+                <tr>
+                  <td>posted_at</td>
+                  <td>string（date-time）</td>
+                  <td>UTCを表す時差情報付きISO 8601文字列。</td>
+                </tr>
+                <tr>
+                  <td>reply_count</td>
+                  <td>integer</td>
+                  <td>0以上のリプライ数。</td>
+                </tr>
+                <tr>
+                  <td>retweet_count</td>
+                  <td>integer</td>
+                  <td>0以上のリツイート数。</td>
+                </tr>
+                <tr>
+                  <td>like_count</td>
+                  <td>integer</td>
+                  <td>0以上のいいね数。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <pre><code>{
+  "post_id": 1,
+  "author": "ユーザーA",
+  "body": "投稿の詳細です。\n改行を保持します。",
+  "posted_at": "2026-10-24T06:30:45Z",
+  "reply_count": 2,
+  "retweet_count": 1,
+  "like_count": 5
+}</code></pre>
+          <p>
+            上記はAPIの形式を示すサンプル。実DBの値・現在時刻を保証しない。posted_atが処理時刻と等しければ正常、対象行が未来日時なら500。表示用の日時整形は画面で行う。
+          </p>
+          <h4>エラー応答</h4>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">HTTP</th>
+                  <th scope="col">本文・条件</th>
+                  <th scope="col">画面・再試行</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>404</td>
+                  <td>
+                    <code
+                      >{"code":"POST_NOT_FOUND","message":"投稿が見つかりません"}</code
+                    >。有効なIDで対象なし。
+                  </td>
+                  <td>一覧へのリンク。再試行なし。</td>
+                </tr>
+                <tr>
+                  <td>422</td>
+                  <td>
+                    FastAPI標準のdetail配列。入力検証で失敗し、DB参照しない。
+                  </td>
+                  <td>「投稿URLが正しくありません」。再試行なし。</td>
+                </tr>
+                <tr>
+                  <td>500</td>
+                  <td>
+                    <code
+                      >{"code":"POST_DETAIL_FETCH_FAILED","message":"投稿詳細を取得できませんでした。"}</code
+                    >。DB接続・参照・型検証・未来日時・JSON変換の失敗。
+                  </td>
+                  <td>原因解消後に手動で再試行。内部情報は返さない。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            200・404・422・500すべてにCache-Control:
+            no-storeを付与する。422はPOSTの独自エラー変換の対象に含めず、本文は標準形式のままヘッダーを付与する。
+          </p>
+          <p>
+            422の形式例（GET
+            /api/posts/0）。標準応答はdetail内に検証位置loc・種類type・説明msg等を持ち、入力により要素が変わる。画面は英語の検証文言に依存しない。
+          </p>
+          <pre><code>{
+  "detail": [
+    {
+      "type": "greater_than_equal",
+      "loc": ["path", "post_id"],
+      "msg": "Input should be greater than or equal to 1",
+      "input": "0",
+      "ctx": {"ge": 1}
+    }
+  ]
+}</code></pre>
+          <h4>実装時の確認観点（未実施）</h4>
+          <p>
+            既存投稿1件の7項目・型・UTCオフセット・改行保持・非更新、対象なし404、文字列・小数・0・負数の422とDB未参照、DB未作成・未移行・不正日時・未来日時・変換失敗の500、各応答のno-storeとJSON、正常・失敗時のセッション解放、OpenAPIの単一オブジェクトと各HTTP応答を確認する。
+          </p>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -1191,7 +1404,7 @@ Accept: application/json</code></pre>
       <section id="chapter-4">
         <h2>4. エラー仕様</h2>
         <p>
-          API-001の取得失敗とAPI-002の入力不正・保存失敗を定義する。応答はcode・messageの2項目で、項目別配列・入力値・内部例外は含めない。POSTの検証例外もこの形式に変換する。追跡IDは今回採用しない。
+          API-001の取得失敗、API-002の入力不正・保存失敗、API-003の対象なし・取得失敗はcode・message形式。内部例外・SQL・接続情報は含めない。API-003の422だけはFastAPI標準のdetail配列とし、POSTの422変換とは区別する。追跡IDは今回採用しない。
         </p>
         <div class="table-wrap">
           <table>
@@ -1209,7 +1422,7 @@ Accept: application/json</code></pre>
                 <td>string</td>
                 <td>必須・null不可</td>
                 <td>
-                  エラー一覧で定義する固定コード（POST_LIST_FETCH_FAILED、POST_VALIDATION_FAILED、POST_CREATE_FAILED）。
+                  エラー一覧で定義する固定コード（POST_LIST_FETCH_FAILED、POST_VALIDATION_FAILED、POST_CREATE_FAILED、POST_NOT_FOUND、POST_DETAIL_FETCH_FAILED）。
                 </td>
               </tr>
               <tr>
@@ -1306,6 +1519,48 @@ Accept: application/json</code></pre>
             </tbody>
           </table>
         </div>
+        <article id="detail-api-errors">
+          <h3>API-003：エラー対応表</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">エラーID</th>
+                  <th scope="col">HTTP・コード</th>
+                  <th scope="col">条件・復旧</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="ロジック設計.html#error-006">ERR-006</a></td>
+                  <td>404 / POST_NOT_FOUND</td>
+                  <td>指定IDなし。「投稿が見つかりません」。一覧へ戻る。</td>
+                </tr>
+                <tr>
+                  <td><a href="ロジック設計.html#error-007">ERR-007</a></td>
+                  <td>422 / 独自コードなし</td>
+                  <td>不正なID。FastAPI標準detail。画面はURL不正を案内。</td>
+                </tr>
+                <tr>
+                  <td><a href="ロジック設計.html#error-008">ERR-008</a></td>
+                  <td>500 / POST_DETAIL_FETCH_FAILED</td>
+                  <td>
+                    PRC-008 /
+                    LOG-004。DB参照・変換・対象の未来日時。「投稿詳細を取得できませんでした。」。手動再試行。
+                  </td>
+                </tr>
+                <tr>
+                  <td><a href="ロジック設計.html#error-009">ERR-009</a></td>
+                  <td>HTTPなし / 独自コードなし（画面側）</td>
+                  <td>
+                    通信断・5秒超過・不正応答等。500応答とは区別し、画面で取得失敗と再試行を表示。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -1363,7 +1618,7 @@ Accept: application/json</code></pre>
         </p>
       </section>
       <aside class="note" id="implementation-verification">
-        <strong>実装と検証（2026-10-24）</strong>
+        <strong>Issue #2・#3の実装と検証（2026-10-24）</strong>
         <p>
           バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
         </p>
@@ -1373,9 +1628,8 @@ Accept: application/json</code></pre>
       </aside>
     </main>
     <footer>
-      API設計書 v1.2.0｜2026-10-24｜Issue
-      #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は実装済み。
+      API設計書 v1.3.0｜2026-10-24｜Issue
+      #4の投稿詳細設計を追加（設計確定・未実装）。Issue #2・#3は実装済み。
     </footer>
   </body>
 </html>

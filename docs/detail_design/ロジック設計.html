@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ロジック設計書｜投稿一覧・投稿作成</title>
+    <title>ロジック設計書｜投稿一覧・投稿作成・投稿詳細</title>
     <style>
       * {
         box-sizing: border-box;
@@ -412,15 +412,23 @@
           min-width: 0;
         }
       }
+      svg[aria-labelledby^="detail-"] {
+        min-width: 720px;
+      }
+      @media print {
+        svg[aria-labelledby^="detail-"] {
+          min-width: 0;
+        }
+      }
     </style>
   </head>
   <body>
     <header>
       <p class="badge">旧Twitter風SNS / 詳細設計</p>
       <h1>ロジック設計書</h1>
+
       <p>
-        投稿一覧の取得・表示と、Issue
-        #3の投稿入力・送信・保存・一覧反映の処理を定義する。
+        投稿一覧・投稿作成と、Issue #4の投稿詳細表示・単件取得の処理を定義する。
       </p>
       <nav id="toc" aria-labelledby="toc-heading" tabindex="-1">
         <h2 id="toc-heading">目次</h2>
@@ -435,6 +443,7 @@
                 <a href="#chapter-4-detail-1">UC-001：投稿一覧を閲覧する</a>
               </li>
               <li><a href="#chapter-4-detail-2">UC-002：本文を投稿する</a></li>
+              <li><a href="#detail-usecase">UC-003：投稿詳細を閲覧する</a></li>
             </ul>
           </li>
           <li>
@@ -445,6 +454,9 @@
               </li>
               <li>
                 <a href="#chapter-5-detail-2">ACT-002：投稿の作業と分岐</a>
+              </li>
+              <li>
+                <a href="#detail-activity">ACT-003：投稿詳細の取得と復旧</a>
               </li>
             </ul>
           </li>
@@ -458,6 +470,9 @@
                   >CLS-002・CLS-003：投稿作成の入出力と一覧用Postの関係</a
                 >
               </li>
+              <li>
+                <a href="#detail-class">CLS-004：PostDetailの属性と関係</a>
+              </li>
             </ul>
           </li>
           <li>
@@ -466,6 +481,11 @@
               <li>
                 <a href="#chapter-7-detail-1"
                   >PRG-001・PRG-002：一覧表示の依存関係</a
+                >
+              </li>
+              <li>
+                <a href="#detail-packages"
+                  >PRG-007・PRG-008：投稿詳細の依存関係</a
                 >
               </li>
             </ul>
@@ -483,6 +503,11 @@
                   >PRC-005・PRC-006：投稿作成のシーケンス</a
                 >
               </li>
+              <li>
+                <a href="#detail-sequence"
+                  >PRC-007・PRC-008：詳細取得シーケンス</a
+                >
+              </li>
             </ul>
           </li>
           <li>
@@ -494,6 +519,7 @@
                 >
               </li>
               <li><a href="#chapter-9-detail-2">PRC-006：保存処理フロー</a></li>
+              <li><a href="#detail-flow">PRC-008：詳細取得フロー</a></li>
             </ul>
           </li>
           <li>
@@ -504,6 +530,9 @@
               </li>
               <li>
                 <a href="#chapter-10-detail-2">DF-002：投稿作成データの流れ</a>
+              </li>
+              <li>
+                <a href="#detail-dataflow">DF-003：投稿詳細データの流れ</a>
               </li>
             </ul>
           </li>
@@ -520,6 +549,7 @@
                   >PRC-005：投稿モーダルの状態遷移</a
                 >
               </li>
+              <li><a href="#detail-states">PRC-007：投稿詳細の状態遷移</a></li>
             </ul>
           </li>
           <li>
@@ -564,6 +594,8 @@
                 >
               </li>
               <li><a href="#chapter-14-detail-8">投稿作成の受入確認</a></li>
+              <li><a href="#process-007">PRC-007：投稿詳細表示</a></li>
+              <li><a href="#process-008">PRC-008：投稿詳細取得</a></li>
             </ul>
           </li>
           <li><a href="#chapter-15">15. ログ一覧</a></li>
@@ -581,15 +613,18 @@
           <tbody>
             <tr>
               <td>文書バージョン</td>
-              <td>1.2.0</td>
+              <td>1.3.0</td>
             </tr>
             <tr>
               <td>更新日</td>
-              <td>2026-10-24</td>
+              <td>2026-10-25</td>
             </tr>
             <tr>
               <td>ステータス</td>
-              <td>設計確定（Issue #2実装済み、Issue #3実装済み）</td>
+              <td>
+                設計確定（Issue #2実装済み、Issue #3実装済み、Issue
+                #4設計確定・未実装）
+              </td>
             </tr>
           </tbody>
         </table>
@@ -597,8 +632,9 @@
     </header>
     <main>
       <p id="implementation-status">
-        Issue #2の投稿一覧・初回移行・シードと、Issue
-        #3の投稿モーダル・投稿作成APIを実装済み。POSTはCreatedPostの7項目、GETはdisplayed_atを含むPostの8項目を返す。実装と検証の範囲は末尾の確認結果に記載する。
+        Issue #2の投稿一覧・初回移行・シードとIssue
+        #3の投稿モーダル・投稿作成APIは実装済み。作成POSTはCreatedPostの7項目、一覧GETはPostの8項目。Issue
+        #4の詳細GETはPostDetailの7項目で設計確定・未実装。既存機能の実装・検証履歴は末尾に残し、今回の新機能が検証済みであることを意味しない。
       </p>
       <aside class="note">
         <strong> 対象範囲と設計の前提 </strong>
@@ -659,12 +695,25 @@
               <tr>
                 <td>FUN-003</td>
                 <td>画面・API系：投稿作成</td>
-                <td>本文をDBへ保存しホームへ即時反映する。</td>
                 <td>
-                  利用者がCOM-001またはITEM-002の「投稿する」を押す。認証なし。
+                  本文をDBへ保存する。ホームでは一覧へ即時反映し、詳細からは詳細に留まり完了を通知する。
+                </td>
+                <td>
+                  利用者がCOM-001またはITEM-002の「投稿する」を押す。認証なし。詳細からの起動はIssue
+                  #4で設計確定・未実装。
                 </td>
                 <td>SCR-002 / API-002 / PRC-005・PRC-006</td>
                 <td>設計確定・実装済み。</td>
+              </tr>
+              <tr>
+                <td>FUN-004</td>
+                <td>画面・API系：投稿詳細表示</td>
+                <td>
+                  投稿IDで1件取得し、posted_atの日本時間・年月日と時分、投稿者・本文・各件数を表示。
+                </td>
+                <td>投稿リンク・詳細URL直接入力・再読み込み。認証なし。</td>
+                <td>SCR-003 / API-003 / PRC-007・PRC-008</td>
+                <td>設計確定・未実装。</td>
               </tr>
             </tbody>
           </table>
@@ -769,6 +818,29 @@
                 <td>PostCreate→INSERT→CreatedPost（7項目）。TBL-001に依存。</td>
                 <td><a href="#process-006">PRC-006</a></td>
               </tr>
+              <tr>
+                <td>PRG-007</td>
+                <td>投稿詳細の表示制御</td>
+                <td>
+                  frontend/src/App.jsxを起点とする詳細表示の論理責務。詳細コンポーネントと日時整形を分離して実装予定。
+                </td>
+                <td>FUN-004</td>
+                <td>
+                  post_id → API-003 →
+                  PostDetail・画面状態。PRG-008と投稿モーダルPRG-005に依存。
+                </td>
+                <td><a href="#process-007">PRC-007</a>。設計確定・未実装。</td>
+              </tr>
+              <tr>
+                <td>PRG-008</td>
+                <td>投稿詳細の取得・検証</td>
+                <td>
+                  backend/src/sns/main.pyを起点にsns/posts.py・sns/schemas.py・sns/database.pyへ配置予定。
+                </td>
+                <td>FUN-004</td>
+                <td>正の整数のID → SELECT → PostDetail / 404・422・500。</td>
+                <td><a href="#process-008">PRC-008</a>。設計確定・未実装。</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -803,7 +875,8 @@
                 <td>CLS-001</td>
                 <td>Post / backend/src/sns/schemas.py。</td>
                 <td>
-                  一覧表示用の投稿1件を保持し、8属性をGET APIの応答項目とする。
+                  一覧表示用の投稿1件を保持し、8属性を一覧GET
+                  APIの応答項目とする。
                 </td>
                 <td>
                   <a href="#post-attributes"> 属性一覧 </a>
@@ -836,6 +909,16 @@
                 </td>
                 <td>PRG-006 / PRC-006 → PRG-005</td>
                 <td>設計確定・実装済み。</td>
+              </tr>
+              <tr>
+                <td>CLS-004</td>
+                <td>PostDetail / sns/schemas.py（追加予定）</td>
+                <td>単件取得の7属性を保持。displayed_atを持たない。</td>
+                <td>
+                  post_id・author・body・posted_at・reply_count・retweet_count・like_count。全項目必須・null不可。型は一覧Postの対応項目と同じ。
+                </td>
+                <td>PRG-008 / PRC-008 → PRG-007 / PRC-007</td>
+                <td>設計確定・未実装。</td>
               </tr>
             </tbody>
           </table>
@@ -1045,6 +1128,111 @@
                   <td>事後条件</td>
                   <td>
                     成功投稿は再読み込み後もGETで取得できる。キャンセル・入力不正では新規投稿なし。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <article id="detail-usecase">
+          <h3>UC-003：投稿詳細を閲覧する</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                class="issue3-diagram"
+                viewBox="0 0 760 170"
+                role="img"
+                aria-labelledby="detail-uc-title detail-uc-desc"
+              >
+                <title id="detail-uc-title">
+                  UC-003 / FUN-004 / SCR-003：投稿詳細の閲覧
+                </title>
+                <desc id="detail-uc-desc">
+                  左の箱はシステム外の利用者、右の箱はSNS内の投稿詳細を閲覧する目的。利用者は1つの領域にまとめる。左から右への矢印は利用関係であり、処理順序ではない。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-uc-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="10"
+                  y="60"
+                  width="335"
+                  height="66"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="177.5" y="98" text-anchor="middle">利用者</text>
+                <path
+                  d="M345 93 H385"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-uc-arrow)"
+                />
+                <text x="365" y="40" text-anchor="middle">利用</text>
+                <rect
+                  x="390"
+                  y="60"
+                  width="335"
+                  height="66"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="557.5" y="98" text-anchor="middle">
+                  SNS：UC-003 投稿詳細を閲覧する
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              UC-003 / FUN-004 /
+              SCR-003：左の箱はシステム外の利用者、右の箱はSNS内の目的。矢印は左から右への利用関係であり、処理順序ではない。投稿を開く操作と確認後の操作は、同じ利用者が行う。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">項目</th>
+                  <th scope="col">内容</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>基本シナリオ</td>
+                  <td>
+                    利用者が投稿リンクを開く、または詳細URLへアクセスする。SNSがAPI-003で対象IDの1件を取得し、SCR-003に投稿者・本文・投稿日時・件数を表示する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>利用者の操作</td>
+                  <td>
+                    同じ利用者が詳細を確認し、一覧へ戻る、取得失敗時に再試行する、投稿モーダルを開く操作を行う。
+                  </td>
+                </tr>
+                <tr>
+                  <td>事前条件</td>
+                  <td>認証不要。対象の投稿IDをURLから取得する。</td>
+                </tr>
+                <tr>
+                  <td>成功後</td>
+                  <td>投稿IDを除く6項目が表示される。APIはDBを変更しない。</td>
+                </tr>
+                <tr>
+                  <td>代替・例外</td>
+                  <td>
+                    404は対象なし、422はURL不正。500・通信失敗は手動再試行。URL直接アクセスと再読み込みも同じ取得フロー。
                   </td>
                 </tr>
               </tbody>
@@ -1360,6 +1548,158 @@
             </figcaption>
           </figure>
         </article>
+        <article id="detail-activity">
+          <h3>ACT-003：投稿詳細の取得と復旧</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 720 470"
+                role="img"
+                aria-labelledby="detail-act-title detail-act-desc"
+              >
+                <title id="detail-act-title">
+                  ACT-003 / PRC-007・PRC-008：利用者・画面・APIの作業
+                </title>
+                <desc id="detail-act-desc">
+                  箱は処理・状態、上から下への矢印は処理の進行を表す。分岐条件は下の表で補足する。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-act-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="40"
+                  y="20"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="43" text-anchor="middle">
+                  利用者：投稿のリンク・URLを開く
+                </text>
+                <path
+                  d="M360 78 V103"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-act-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="105"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="128" text-anchor="middle">
+                  画面：読み込みを通知、5秒の期限でAPI-003を要求
+                </text>
+                <path
+                  d="M360 163 V188"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-act-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="190"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="213" text-anchor="middle">
+                  API：ID検証 → 単件SELECT → データ検証 → 応答
+                </text>
+                <path
+                  d="M360 248 V273"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-act-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="275"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="298" text-anchor="middle">
+                  画面：200は詳細、404は対象なし、422はURL不正
+                </text>
+                <text x="360" y="319" text-anchor="middle">
+                  500・通信失敗等は取得失敗と手動再試行
+                </text>
+                <path
+                  d="M360 333 V358"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-act-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="360"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="383" text-anchor="middle">
+                  利用者：一覧へ戻る／取得失敗時に再試行
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              ACT-003 /
+              PRC-007・PRC-008：利用者・画面・APIの作業：箱は処理・状態、矢印は上から下への進行。条件と例外は併記した表を参照。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">分岐条件</th>
+                  <th scope="col">次の作業</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>200かつ正しい7項目</td>
+                  <td>日本時間の年月日・時分と本文・件数を表示。</td>
+                </tr>
+                <tr>
+                  <td>404 / 422</td>
+                  <td>対象なし / URL不正を案内し、一覧へ戻る。</td>
+                </tr>
+                <tr>
+                  <td>500 / 通信失敗等</td>
+                  <td>取得失敗 → 手動再試行で再び要求。</td>
+                </tr>
+                <tr>
+                  <td>離脱・ID変更</td>
+                  <td>要求中断。遅延応答は破棄。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -1400,7 +1740,7 @@
             </svg>
           </div>
           <figcaption>
-            CLS-001： 箱はクラス、+は公開属性を表す。8属性をGET
+            CLS-001： 箱はクラス、+は公開属性を表す。8属性を一覧GET
             APIで同名の項目として返す。displayed_atは算出値であり、永続化する属性ではない。継承は定義せず、投稿作成の入出力との関係はCLS-002の図に示す。
           </figcaption>
         </figure>
@@ -1614,6 +1954,152 @@
             </figcaption>
           </figure>
         </article>
+        <article id="detail-class">
+          <h3>CLS-004：PostDetailの属性と関係</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 720 300"
+                role="img"
+                aria-labelledby="detail-types-title detail-types-desc"
+              >
+                <title id="detail-types-title">
+                  CLS-004：詳細応答と表示の型
+                </title>
+                <desc id="detail-types-desc">
+                  箱は保存データ・応答型・表示処理、矢印はデータ変換の依存。クラス継承・外部キーを表すものではない。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-types-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="40"
+                  y="20"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="43" text-anchor="middle">
+                  PostRecord / TBL-001：7カラム
+                </text>
+                <text x="360" y="64" text-anchor="middle">
+                  読み取り専用の単件参照
+                </text>
+                <path
+                  d="M360 78 V103"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-types-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="105"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="128" text-anchor="middle">
+                  CLS-004 PostDetail（全7属性・必須・null不可）
+                </text>
+                <text x="360" y="149" text-anchor="middle">
+                  post_id / author / body / posted_at / 各3件数
+                </text>
+                <path
+                  d="M360 163 V188"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-types-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="190"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="213" text-anchor="middle">
+                  PRC-007：本文・投稿者・件数を表示
+                </text>
+                <text x="360" y="234" text-anchor="middle">
+                  posted_atのみJSTへ整形、post_idはURL・照合に使用
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              CLS-004：詳細応答と表示の型：箱は保存データ・応答型・表示処理、矢印はデータ変換の依存。クラス継承・外部キーを表すものではない。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">属性</th>
+                  <th scope="col">内部型 / JSON型</th>
+                  <th scope="col">制約</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>post_id</td>
+                  <td>strict int / integer</td>
+                  <td>要求した投稿ID。正の整数。</td>
+                </tr>
+                <tr>
+                  <td>author</td>
+                  <td>strict str / string</td>
+                  <td>保存された投稿者名。</td>
+                </tr>
+                <tr>
+                  <td>body</td>
+                  <td>strict str / string</td>
+                  <td>保存された本文。改行・前後の空白を保持。</td>
+                </tr>
+                <tr>
+                  <td>posted_at</td>
+                  <td>datetime / string（date-time）</td>
+                  <td>UTCを表す時差情報付きISO 8601文字列。</td>
+                </tr>
+                <tr>
+                  <td>reply_count</td>
+                  <td>strict int / integer</td>
+                  <td>0以上のリプライ数。</td>
+                </tr>
+                <tr>
+                  <td>retweet_count</td>
+                  <td>strict int / integer</td>
+                  <td>0以上のリツイート数。</td>
+                </tr>
+                <tr>
+                  <td>like_count</td>
+                  <td>strict int / integer</td>
+                  <td>0以上のいいね数。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            CLS-003
+            CreatedPostとは7項目の構造を共有するが、作成結果と取得結果の用途を区別し、詳細応答にPostDetailを追加する。CLS-001
+            Postは一覧用としてdisplayed_atを持つ。詳細から一覧用の相対日時を生成・参照しない。既存の作成APIの型は変更しない。
+          </p>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -1737,6 +2223,105 @@
           PRG-006（API起点・検証・保存）→ sns/database.py /
           PostRecord。PostCreateは入力、CreatedPostは作成APIの出力。画面はdisplayed_atを補って既存Postへ変換する。既存の一覧取得責務と共通の日時整形を利用し、閲覧の読み取り専用接続を変更しない。
         </p>
+        <article id="detail-packages">
+          <h3>PRG-007・PRG-008：投稿詳細の依存関係</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 720 300"
+                role="img"
+                aria-labelledby="detail-dependency-title detail-dependency-desc"
+              >
+                <title id="detail-dependency-title">
+                  PRG-007 → API-003 → PRG-008 → TBL-001
+                </title>
+                <desc id="detail-dependency-desc">
+                  箱は責務・パッケージ、矢印は呼び出し依存。APIから画面への戻り値はPostDetailまたはエラー。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-dependency-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="40"
+                  y="20"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="43" text-anchor="middle">
+                  frontend：PRG-007 詳細表示・日時整形
+                </text>
+                <text x="360" y="64" text-anchor="middle">
+                  既存の共通サイドバー・PRG-005モーダルを利用
+                </text>
+                <path
+                  d="M360 78 V103"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-dependency-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="105"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="128" text-anchor="middle">
+                  HTTP GET /api/posts/{post_id}
+                </text>
+                <text x="360" y="149" text-anchor="middle">
+                  Viteが /api を除去し /posts/{post_id} へ転送
+                </text>
+                <path
+                  d="M360 163 V188"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-dependency-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="190"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="213" text-anchor="middle">
+                  backend：PRG-008（main → posts / schemas）
+                </text>
+                <text x="360" y="234" text-anchor="middle">
+                  database → SQLite posts（TBL-001）
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              PRG-007 → API-003 → PRG-008 →
+              TBL-001：箱は責務・パッケージ、矢印は呼び出し依存。APIから画面への戻り値はPostDetailまたはエラー。
+            </figcaption>
+          </figure>
+          <p>
+            ルーティングは / と /posts/{post_id}
+            を区別する。詳細URLでもアプリを配信する。画面のパスと /api
+            付きAPI呼び出しを混同しない。投稿成功時の詳細保持はPRC-005・PRC-007で定義し、一覧へ戻る際のAPI-001再取得を行う。
+          </p>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -2113,6 +2698,148 @@
             </figcaption>
           </figure>
         </article>
+        <article id="detail-sequence">
+          <h3>PRC-007・PRC-008：投稿詳細のシーケンス</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 900 440"
+                role="img"
+                aria-labelledby="detail-seq-title detail-seq-desc"
+              >
+                <title id="detail-seq-title">
+                  PRC-007・PRC-008：詳細取得シーケンス
+                </title>
+                <desc id="detail-seq-desc">
+                  時間は上から下へ。縦破線はライフライン、実線矢印は要求、破線矢印は応答。ID検証後に単件参照し、応答を画面へ返す。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-seq-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="10"
+                  y="10"
+                  width="160"
+                  height="40"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="90" y="35" text-anchor="middle">利用者</text>
+                <path d="M90 50 V420" stroke="#718aa5" stroke-dasharray="5 5" />
+                <rect
+                  x="230"
+                  y="10"
+                  width="160"
+                  height="40"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="310" y="35" text-anchor="middle">PRC-007 画面</text>
+                <path
+                  d="M310 50 V420"
+                  stroke="#718aa5"
+                  stroke-dasharray="5 5"
+                />
+                <rect
+                  x="480"
+                  y="10"
+                  width="160"
+                  height="40"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="560" y="35" text-anchor="middle">PRC-008 API</text>
+                <path
+                  d="M560 50 V420"
+                  stroke="#718aa5"
+                  stroke-dasharray="5 5"
+                />
+                <rect
+                  x="720"
+                  y="10"
+                  width="160"
+                  height="40"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="800" y="35" text-anchor="middle">TBL-001 DB</text>
+                <path
+                  d="M800 50 V420"
+                  stroke="#718aa5"
+                  stroke-dasharray="5 5"
+                />
+                <path
+                  d="M90 100 H310"
+                  stroke="#344e70"
+                  marker-end="url(#detail-seq-arrow)"
+                />
+                <text x="200.0" y="88" text-anchor="middle">
+                  詳細リンク・URLを開く
+                </text>
+                <path
+                  d="M310 160 H560"
+                  stroke="#344e70"
+                  marker-end="url(#detail-seq-arrow)"
+                />
+                <text x="435.0" y="148" text-anchor="middle">
+                  GET /api/posts/{post_id}
+                </text>
+                <path
+                  d="M560 220 H800"
+                  stroke="#344e70"
+                  marker-end="url(#detail-seq-arrow)"
+                />
+                <text x="680.0" y="208" text-anchor="middle">
+                  ID検証後：主キーでSELECT
+                </text>
+                <path
+                  d="M800 280 H560"
+                  stroke="#344e70"
+                  stroke-dasharray="6 4"
+                  marker-end="url(#detail-seq-arrow)"
+                />
+                <text x="680.0" y="268" text-anchor="middle">
+                  対象1件 / 対象なし
+                </text>
+                <path
+                  d="M560 340 H310"
+                  stroke="#344e70"
+                  stroke-dasharray="6 4"
+                  marker-end="url(#detail-seq-arrow)"
+                />
+                <text x="435.0" y="328" text-anchor="middle">
+                  200 / 404 / 422 / 500
+                </text>
+                <path
+                  d="M310 400 H90"
+                  stroke="#344e70"
+                  stroke-dasharray="6 4"
+                  marker-end="url(#detail-seq-arrow)"
+                />
+                <text x="200.0" y="388" text-anchor="middle">
+                  表示・エラーと一覧へのリンク
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              PRC-007・PRC-008：縦破線はライフライン、実線矢印は要求、横破線矢印は応答。時間は上から下へ。
+            </figcaption>
+          </figure>
+          <p>
+            422ではDB参照を行わない。SELECT結果がなければ404。対象のposted_atをUTCとして復元し現在時刻と比較する。未来日時・参照・型検証・JSON変換失敗は500。対象外の投稿に不正値があっても単件取得には読み込まない。APIは応答変換まで含めて例外を処理し、セッションを必ず解放する。
+          </p>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -2416,6 +3143,140 @@
               箱は処理または応答、矢印は正常・異常の分岐。どの経路でもセッションを解放する。コミット後の通信断は保存取消を保証しない。
             </figcaption>
           </figure>
+        </article>
+        <article id="detail-flow">
+          <h3>PRC-008：投稿詳細の処理フロー</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 720 470"
+                role="img"
+                aria-labelledby="detail-process-title detail-process-desc"
+              >
+                <title id="detail-process-title">
+                  PRC-008：単件参照・検証・応答
+                </title>
+                <desc id="detail-process-desc">
+                  箱は処理・状態、上から下への矢印は処理の進行を表す。分岐条件は下の表で補足する。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-process-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="40"
+                  y="20"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="43" text-anchor="middle">
+                  開始：post_idの型と1以上を検証
+                </text>
+                <text x="360" y="64" text-anchor="middle">
+                  不正 → 422（DB参照なし）
+                </text>
+                <path
+                  d="M360 78 V103"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-process-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="105"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="128" text-anchor="middle">
+                  読み取り専用セッションで主キーをSELECT
+                </text>
+                <text x="360" y="149" text-anchor="middle">対象なし → 404</text>
+                <path
+                  d="M360 163 V188"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-process-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="190"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="213" text-anchor="middle">
+                  UTC復元・型検証・現在時刻との比較
+                </text>
+                <text x="360" y="234" text-anchor="middle">
+                  不正データ・未来日時 → 500
+                </text>
+                <path
+                  d="M360 248 V273"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-process-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="275"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="298" text-anchor="middle">
+                  PostDetailの7項目をJSONへ変換
+                </text>
+                <text x="360" y="319" text-anchor="middle">変換失敗 → 500</text>
+                <path
+                  d="M360 333 V358"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-process-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="360"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="383" text-anchor="middle">
+                  成功は200、各応答にno-store
+                </text>
+                <text x="360" y="404" text-anchor="middle">
+                  正常・例外ともセッションを解放して終了
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              PRC-008：単件参照・検証・応答：箱は処理・状態、矢印は上から下への進行。条件と例外は併記した表を参照。
+            </figcaption>
+          </figure>
+          <p>
+            各箱の「→」は異常終了の分岐。接続・SELECT失敗は500。ID検証前に接続しない。DBへのINSERT・UPDATE・DELETEを行わない。
+          </p>
         </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
@@ -2752,6 +3613,106 @@
               DF-002：上段は左から右へ本文・登録データが流れ、下段は作成応答から一覧表示へ戻る。箱は発生元・処理・保存先、矢印は受け渡すデータ。実行順やトランザクションは9章・14章に従う。POST応答は7項目で、画面が表示日時を補う。
             </figcaption>
           </figure>
+        </article>
+        <article id="detail-dataflow">
+          <h3>DF-003：投稿詳細データの流れ</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 720 300"
+                role="img"
+                aria-labelledby="detail-dfd-title detail-dfd-desc"
+              >
+                <title id="detail-dfd-title">
+                  DF-003 / SCR-003 / API-003 / TBL-001
+                </title>
+                <desc id="detail-dfd-desc">
+                  箱は外部実体・処理・データストア、矢印はラベルに記したデータの受け渡し。処理順序は9章を参照。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-dfd-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="40"
+                  y="20"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="43" text-anchor="middle">
+                  外部実体：ブラウザのURL（post_id）
+                </text>
+                <text x="360" y="64" text-anchor="middle">
+                  PRC-007からAPI-003へIDを渡す
+                </text>
+                <path
+                  d="M360 78 V103"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-dfd-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="105"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="128" text-anchor="middle">
+                  処理：PRC-008 単件取得 ← データストア TBL-001
+                </text>
+                <text x="360" y="149" text-anchor="middle">
+                  post_idで参照した1行・UTC日時
+                </text>
+                <path
+                  d="M360 163 V188"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-dfd-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="190"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="213" text-anchor="middle">
+                  処理：PRC-007 表示整形 ← PostDetailの7項目
+                </text>
+                <text x="360" y="234" text-anchor="middle">
+                  表示先：SCR-003の6項目（IDは画面非表示）
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              DF-003 / SCR-003 / API-003 /
+              TBL-001：箱は外部実体・処理・データストア、矢印はラベルに記したデータの受け渡し。処理順序は9章を参照。
+            </figcaption>
+          </figure>
+          <p>
+            本文はHTML化せずテキストとして扱う。posted_atを日本時間の表示文字列へ変換するが、DB値を変更せず、displayed_atも生成しない。エラーデータは<a
+              href="API設計.html#detail-api-errors"
+              >API設計の詳細エラー対応表</a
+            >を参照。
+          </p>
         </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
@@ -3126,6 +4087,145 @@
                   <td>送信中 → 閉じる・編集・再送信</td>
                   <td>禁止</td>
                   <td>背景クリックは常に閉じる操作にしない。</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <article id="detail-states">
+          <h3>PRC-007：投稿詳細の状態遷移</h3>
+
+          <figure>
+            <div class="diagram-wrap">
+              <svg
+                viewBox="0 0 720 300"
+                role="img"
+                aria-labelledby="detail-state-title detail-state-desc"
+              >
+                <title id="detail-state-title">
+                  PRC-007：詳細画面の取得状態
+                </title>
+                <desc id="detail-state-desc">
+                  箱は処理・状態、上から下への矢印は処理の進行を表す。分岐条件は下の表で補足する。
+                </desc>
+                <defs>
+                  <marker
+                    id="detail-state-arrow"
+                    viewBox="0 0 10 10"
+                    refX="9"
+                    refY="5"
+                    markerWidth="7"
+                    markerHeight="7"
+                    orient="auto"
+                  >
+                    <path d="M0 0 L10 5 L0 10 Z" fill="#344e70" />
+                  </marker>
+                </defs>
+                <rect
+                  x="40"
+                  y="20"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="43" text-anchor="middle">
+                  初期表示・ID変更 → loading
+                </text>
+                <text x="360" y="64" text-anchor="middle">
+                  前の投稿を消す、5秒の期限で取得
+                </text>
+                <path
+                  d="M360 78 V103"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-state-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="105"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="128" text-anchor="middle">
+                  loading → success / not-found / invalid-url / error
+                </text>
+                <text x="360" y="149" text-anchor="middle">
+                  200検証成功 / 404 / 422 / その他の失敗
+                </text>
+                <path
+                  d="M360 163 V188"
+                  fill="none"
+                  stroke="#344e70"
+                  marker-end="url(#detail-state-arrow)"
+                />
+                <rect
+                  x="40"
+                  y="190"
+                  width="640"
+                  height="58"
+                  rx="6"
+                  fill="#f4f7fb"
+                  stroke="#344e70"
+                />
+                <text x="360" y="213" text-anchor="middle">
+                  error → loading（手動再試行）
+                </text>
+                <text x="360" y="234" text-anchor="middle">
+                  全状態 → 離脱（中断・遅延応答破棄）
+                </text>
+              </svg>
+            </div>
+            <figcaption>
+              PRC-007：詳細画面の取得状態：箱は処理・状態、矢印は上から下への進行。条件と例外は併記した表を参照。
+            </figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">状態・イベント</th>
+                  <th scope="col">遷移先・画面動作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>loading → 正常200</td>
+                  <td>success。7項目と要求ID一致を検証し表示。</td>
+                </tr>
+                <tr>
+                  <td>loading → 404</td>
+                  <td>not-found。対象なし・一覧へのリンク。</td>
+                </tr>
+                <tr>
+                  <td>loading → 422</td>
+                  <td>invalid-url。URL不正・一覧へのリンク。</td>
+                </tr>
+                <tr>
+                  <td>loading → 500等・通信断・期限超過・不正応答</td>
+                  <td>error。取得失敗・手動再試行。</td>
+                </tr>
+                <tr>
+                  <td>error → 再試行</td>
+                  <td>
+                    loading。要求を新規作成し5秒期限を再設定。再試行ボタンは取得中無効。
+                  </td>
+                </tr>
+                <tr>
+                  <td>任意状態 → 一覧へ戻る</td>
+                  <td>
+                    / に移動して一覧を再取得。詳細要求は中断し結果を破棄。
+                  </td>
+                </tr>
+                <tr>
+                  <td>任意状態 → 投稿モーダル</td>
+                  <td>
+                    詳細の取得状態を背景に保持しSCR-002を開く。成功・閉じるで詳細に留まり起動元にフォーカス復帰。
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -3662,7 +4762,7 @@
                 <tr>
                   <td>成功・一覧の統合</td>
                   <td>
-                    有効な201のCreatedPost（7項目）にdisplayed_at="たった今"を画面側で補い、一覧用Postへ変換して投稿IDをキーとする成功投稿集合へ保存。現在の一覧へ追加・同一IDは置換し、posted_at降順・同日時post_id降順に整列する。モーダルを閉じ、一覧の先頭へスクロールし「投稿しました」と通知する。
+                    ホーム起動時は、有効な201のCreatedPost（7項目）にdisplayed_at="たった今"を画面側で補い、一覧用Postへ変換して投稿IDをキーとする成功投稿集合へ保存。現在の一覧へ追加・同一IDは置換し、posted_at降順・同日時post_id降順に整列する。モーダルを閉じ、一覧の先頭へスクロールし「投稿しました」と通知する。詳細起動時はモーダルを閉じて同じ詳細URLに留まり、先頭スクロール・詳細の置換をせず「投稿しました」と通知する。起動元へフォーカスを戻し、一覧へ移動時にAPI-001を再取得する。
                   </td>
                 </tr>
                 <tr>
@@ -3681,7 +4781,7 @@
             </table>
           </div>
           <p>
-            作成応答は7項目専用の検証を行う。GET用の8項目検証をそのまま適用しない。GETで同じ投稿を取得した後は、GETのdisplayed_atを優先して更新する。
+            作成応答は7項目専用の検証を行う。一覧GET用の8項目検証をそのまま適用しない。一覧GETで同じ投稿を取得した後は、一覧GETのdisplayed_atを優先して更新する。
           </p>
         </article>
         <article id="process-006">
@@ -3803,6 +4903,122 @@
           PRC-001の一覧反映はIssue
           #3でPRC-005の統合規約へ拡張する。取得中・取得失敗でも表示済み投稿を保持し、取得状態の通知・再試行と投稿一覧を併記できるようにする。
         </p>
+        <article id="process-007">
+          <h3>PRC-007：投稿詳細表示（設計確定・未実装）</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">設計項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>関連・起動</td>
+                  <td>
+                    FUN-004 / PRG-007 / SCR-003 / API-003 /
+                    CLS-004。リンク・直接アクセス・再読み込み・ブラウザ履歴によるID変更で対象を取得。
+                  </td>
+                </tr>
+                <tr>
+                  <td>取得・検証</td>
+                  <td>
+                    GET /api/posts/{post_id}をcache:
+                    no-storeで要求。200の単一オブジェクトの7項目・文字列・正の整数ID・0以上の整数件数・時差情報付き日時・要求ID一致を検証。displayed_atは受け取らず、一覧の8項目検証と区別する。
+                  </td>
+                </tr>
+                <tr>
+                  <td>日時・本文</td>
+                  <td>
+                    posted_atをAsia/TokyoでYYYY/MM/DD
+                    HH:mmへ整形。例：2026-10-24T18:30:45Z → 2026/10/25
+                    03:30。秒は表示せず、丸め上げない。本文はpre-wrapで改行を保持しテキスト描画。
+                  </td>
+                </tr>
+                <tr>
+                  <td>期限・競合</td>
+                  <td>
+                    5秒でAbortController相当による中断。ID変更・離脱・再試行前に旧要求を破棄し、最新要求のみ反映。自動再試行なし。前の投稿を別IDの画面に残さない。
+                  </td>
+                </tr>
+                <tr>
+                  <td>状態・復旧</td>
+                  <td>
+                    <a href="#detail-states">状態遷移</a>と<a
+                      href="入出力設計.html#screen-input-detail"
+                      >画面の文言・操作</a
+                    >に従う。全状態で / へのリンク。404・422には再試行なし。
+                  </td>
+                </tr>
+                <tr>
+                  <td>投稿との連携</td>
+                  <td>
+                    PRC-005を起動元付きで利用。詳細からの成功は詳細に留まり通知・フォーカス復帰。結果不明の「一覧を確認する」は既存の破棄確認後、ホームへ移動してGET。
+                  </td>
+                </tr>
+                <tr>
+                  <td>配信</td>
+                  <td>
+                    開発ではViteのSPA配信で詳細URLもアプリを返す。将来の本番配信でも
+                    /posts/{post_id}
+                    のアプリへの振り分けが必要。本番構成の具体化は既存の未決事項。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <article id="process-008">
+          <h3>PRC-008：投稿詳細取得（設計確定・未実装）</h3>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">設計項目</th>
+                  <th scope="col">仕様</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>関連・入出力</td>
+                  <td>
+                    FUN-004 / PRG-008 / API-003 / TBL-001。正の整数post_id →
+                    PostDetail（7項目）。<a href="API設計.html#api-003"
+                      >HTTP契約</a
+                    >に従う。
+                  </td>
+                </tr>
+                <tr>
+                  <td>手順</td>
+                  <td>
+                    ①パスの整数・1以上を検証 ②要求単位の読み取り専用セッションで
+                    WHERE post_id = :post_id のパラメータ付き単件SELECT
+                    ③対象なしなら404 ④SQLiteの保存日時をUTCとして復元
+                    ⑤処理時の現在時刻をUTCで1回取得し対象のposted_atを比較
+                    ⑥PostDetailの型・JSON化を検証 ⑦200で返す。
+                  </td>
+                </tr>
+                <tr>
+                  <td>エラー・資源</td>
+                  <td>
+                    422は標準detail配列でDB未参照。404はPOST_NOT_FOUND。対象が未来、DB・データ検証・JSON化等の失敗はLOG-004
+                    /
+                    POST_DETAIL_FETCH_FAILED。200・404・422・500にno-store。DBセッションは成功・変換失敗時とも必ず解放。
+                  </td>
+                </tr>
+                <tr>
+                  <td>取得範囲・副作用</td>
+                  <td>
+                    主キーが一致する対象の1件のみを参照する。一覧の全件取得・相対日時計算を流用しない。他の投稿の不正日時によって対象取得を失敗させない。DB・履歴・シード変更はなし。
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
         <p class="back">
           <a href="#toc"> 目次へ戻る </a>
         </p>
@@ -3854,6 +5070,15 @@
                 <td>
                   処理ID
                   PRC-006と例外クラス名だけを記録。本文・SQL・接続情報・例外本文を記録しない。入力不正では本文をログに出さない。保存期間・監視は未決。
+                </td>
+              </tr>
+              <tr>
+                <td>LOG-004</td>
+                <td>詳細取得の障害調査</td>
+                <td>PRC-008 / ERR-008</td>
+                <td>ERROR / stderr。PRC-008と例外の型だけを記録。</td>
+                <td>
+                  本文・入力ID・SQL・接続情報・例外本文を記録しない。404・422は障害ログにしない。保持・本番監視は既存同様に未決。
                 </td>
               </tr>
             </tbody>
@@ -3921,6 +5146,42 @@
                 <td>エラーではなく、空の状態として表示する。</td>
                 <td>対象外</td>
               </tr>
+              <tr id="error-006">
+                <td>ERR-006</td>
+                <td>有効なIDに該当する投稿なし。</td>
+                <td>PRC-008 → PRC-007</td>
+                <td>404 / POST_NOT_FOUND。「投稿が見つかりません」。</td>
+                <td>一覧へ戻る。再試行なし。</td>
+              </tr>
+              <tr id="error-007">
+                <td>ERR-007</td>
+                <td>投稿IDの型不正・0以下。</td>
+                <td>API-003の入力検証 → PRC-007</td>
+                <td>
+                  422 /
+                  FastAPI標準detail。独自コードなし。画面は「投稿URLが正しくありません」。
+                </td>
+                <td>DB未参照。再試行なし。URL修正または一覧へ戻る。</td>
+              </tr>
+              <tr id="error-008">
+                <td>ERR-008</td>
+                <td>対象の未来日時・DB参照・型検証・JSON化の失敗。</td>
+                <td>PRC-008 → PRC-007 / LOG-004</td>
+                <td>
+                  500 /
+                  POST_DETAIL_FETCH_FAILED。「投稿詳細を取得できませんでした。」。内部情報なし。
+                </td>
+                <td>セッション解放。原因解消後に手動再試行。</td>
+              </tr>
+              <tr id="error-009">
+                <td>ERR-009</td>
+                <td>通信断・5秒超過・不正応答・想定外応答。</td>
+                <td>PRC-007（画面側）</td>
+                <td>
+                  独自APIコードなし。実際のHTTP応答の有無を区別し、画面には「投稿詳細を取得できませんでした。」。
+                </td>
+                <td>手動再試行。自動再試行なし。離脱後の応答は破棄。</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -3977,7 +5238,7 @@
         </p>
       </section>
       <aside class="note" id="implementation-verification">
-        <strong>実装と検証（2026-10-24）</strong>
+        <strong>Issue #2・#3の実装と検証（2026-10-24）</strong>
         <p>
           バックエンド62件・フロントエンド42件の自動テスト、フロントエンドビルド、Ruff・Prettierのチェックで確認する。APIでは一時DBによる保存・再接続後の取得、入力不正、保存失敗、ロールバックと接続解放を検証する。
         </p>
@@ -3987,9 +5248,8 @@
       </aside>
     </main>
     <footer>
-      ロジック設計書 v1.2.0｜2026-10-24｜Issue
-      #3の投稿作成設計を追加。目次・図の形式と作成APIの応答を見直し。Issue
-      #2は実装済み、Issue #3は実装済み。
+      ロジック設計書 v1.3.0｜2026-10-25｜Issue
+      #4の投稿詳細設計を追加（設計確定・未実装）。Issue #2・#3は実装済み。
     </footer>
   </body>
 </html>

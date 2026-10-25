@@ -6,14 +6,15 @@ from pathlib import Path
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Request, Response
+from fastapi import Path as PathParameter
 from fastapi.exception_handlers import request_validation_exception_handler
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from .database import database_path, post_engine, readonly_engine
-from .posts import create_post, current_time, read_posts
-from .schemas import CreatedPost, ErrorResponse, Post, PostCreate
+from .posts import create_post, current_time, read_post, read_posts
+from .schemas import CreatedPost, ErrorResponse, Post, PostCreate, PostDetail
 
 logger = logging.getLogger(__name__)
 ERROR = ErrorResponse(
@@ -28,10 +29,18 @@ VALIDATION_ERROR = ErrorResponse(
 CREATE_ERROR = ErrorResponse(
     code="POST_CREATE_FAILED", message="投稿を保存できませんでした。"
 )
+NOT_FOUND = ErrorResponse(code="POST_NOT_FOUND", message="投稿が見つかりません")
+DETAIL_ERROR = ErrorResponse(
+    code="POST_DETAIL_FETCH_FAILED", message="投稿詳細を取得できませんでした。"
+)
 
 
 def post_clock() -> Callable[[], datetime]:
     # 呼出自体は入力検証が成功したハンドラー内で行う。
+    return current_time
+
+
+def detail_clock() -> Callable[[], datetime]:
     return current_time
 
 
@@ -54,7 +63,7 @@ def create_app(path: Path | None = None) -> FastAPI:
         engine.dispose()
         writer.dispose()
 
-    app = FastAPI(title="codex-sns1 API", version="1.1.0", lifespan=lifespan)
+    app = FastAPI(title="codex-sns1 API", version="1.2.0", lifespan=lifespan)
     app.state.engine = engine
     app.state.write_engine = writer
 
@@ -62,7 +71,70 @@ def create_app(path: Path | None = None) -> FastAPI:
     async def validation_error(request: Request, error: RequestValidationError):
         if request.method == "POST" and request.url.path == "/posts":
             return error_response(VALIDATION_ERROR, 422)
-        return await request_validation_exception_handler(request, error)
+        response = await request_validation_exception_handler(request, error)
+        if (
+            request.method == "GET"
+            and getattr(request.scope.get("route"), "path", None) == "/posts/{post_id}"
+        ):
+            response.headers["Cache-Control"] = "no-store"
+        return response
+
+    @app.get(
+        "/posts/{post_id}",
+        response_model=PostDetail,
+        summary="投稿詳細を取得する",
+        operation_id="get_post",
+        responses={
+            status: {
+                **({"model": ErrorResponse} if status in (404, 500) else {}),
+                **(
+                    {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "required": ["detail"],
+                                    "properties": {
+                                        "detail": {
+                                            "type": "array",
+                                            "items": {"type": "object"},
+                                        }
+                                    },
+                                }
+                            }
+                        }
+                    }
+                    if status == 422
+                    else {}
+                ),
+                "headers": {
+                    "Cache-Control": {
+                        "schema": {"type": "string"},
+                        "example": "no-store",
+                    }
+                },
+            }
+            for status in (200, 404, 422, 500)
+        },
+    )
+    def get_post(
+        post_id: Annotated[int, PathParameter(ge=1)],
+        clock: Annotated[Callable[[], datetime], Depends(detail_clock)],
+    ):
+        try:
+            now = clock()
+            with Session(engine) as session:
+                post = read_post(session, post_id, now)
+                if post is None:
+                    return error_response(NOT_FOUND, 404)
+                # 応答の変換失敗も同じ境界で扱い、セッションを確実に閉じる。
+                return JSONResponse(
+                    content=post.model_dump(mode="json"),
+                    headers={"Cache-Control": "no-store"},
+                )
+        except Exception as error:  # noqa: BLE001 - 単件取得の失敗を固定応答にする。
+            logger.error("PRC-008 failed type=%s", type(error).__name__)
+            return error_response(DETAIL_ERROR, 500)
 
     @app.post(
         "/posts",
